@@ -150,14 +150,80 @@ Comprehensive environment with multi-level BOMs, historical transactions, and ac
 # 9. API, Data Flow & Sample JSON
 
 ## 1. REST API Endpoints
-- `/materials` (GET)
-- `/work-orders` (GET/POST)
-- `/bom/{id}` (GET/POST)
-- `/mrp/run` (POST)
-- `/reports/kpis` (GET)
-- `/reports/inventory-csv` (GET)
-- `/qc/trace/{lot}/report` (GET)
-- `/equipment/capacity` (GET)
+All endpoints are prefixed with `/wp-json/mep/v1`.
 
-## 2. Data Flow: Production Workflow
-`[Forecast] -> [MRP Engine] -> [Purchase/Work Orders] -> [Inventory Issuance] -> [Production] -> [QC] -> [Stock]`
+| Endpoint | Method | Description |
+|---|---|---|
+| `/materials` | GET | List all raw materials with stock levels. |
+| `/work-orders` | GET/POST | Manage production work orders. |
+| `/bom/{id}` | GET/POST | Get or Save the Bill of Materials for a Product. |
+| `/mrp/run` | POST | Trigger the MRP explosion engine. |
+| `/reports/kpis` | GET | Fetch dashboard KPI data (OEE, Yield, Output). |
+| `/reports/inventory-csv` | GET | Download full inventory audit as CSV. |
+| `/qc/trace/{lot}` | GET | Fetch genealogy graph for a specific Lot/Batch. |
+| `/equipment/capacity` | GET | Get real-time machine load vs capacity. |
+
+## 2. Data Flow Diagrams
+
+### A. The Manufacturing "Heartbeat" (Loop)
+1. **Demand Signal**: A `Forecast` or Sales Order creates a demand for a `Product`.
+2. **Explosion (MRP)**: The MRP Engine looks at the `BOM`. It recursively checks if we have enough `Materials`.
+3. **Fulfillment Suggestion**:
+   - If Materials are missing: Suggests a `Purchase Order`.
+   - If capacity is available: Suggests a `Work Order`.
+4. **Execution**:
+   - `Purchase Order` is received -> `Inventory Transaction` (Credit).
+   - `Work Order` is started -> `Inventory Transaction` (Debit raw materials).
+5. **Completion**:
+   - `Work Order` is finished -> `QC Check` is triggered.
+   - If `Pass` -> `Product` is added to Finished Goods inventory.
+
+### B. Inventory Locking Flow
+`[Transaction Start] -> [SELECT FOR UPDATE (Stock Row)] -> [Debit/Credit] -> [Insert Audit Log] -> [Commit/Rollback]`
+
+## 3. Sample JSON Objects
+
+### Bill of Materials (BOM)
+```json
+{
+  "product_id": 101,
+  "product_name": "Leather Handbag",
+  "total_cost": 45.50,
+  "bom": [
+    {
+      "id": 501,
+      "name": "Cowhide Leather",
+      "type": "material",
+      "qty": 1.5,
+      "uom": "sqft",
+      "scrap": 0.1,
+      "cost": 12.00,
+      "substitute_id": 502,
+      "substitute_name": "PU Leather (Synthetic)"
+    },
+    {
+      "id": 202,
+      "name": "Strap Assembly",
+      "type": "product",
+      "qty": 1,
+      "sub_bom": [
+        { "id": 505, "name": "Buckle", "type": "material", "qty": 2 }
+      ]
+    }
+  ]
+}
+```
+
+### MRP Suggestion
+```json
+{
+  "material_id": 501,
+  "material_name": "Cowhide Leather",
+  "required_qty": 100,
+  "on_hand": 20,
+  "shortage": 80,
+  "suggested_action": "PURCHASE",
+  "supplier_id": 88,
+  "lead_time": "5 days"
+}
+```

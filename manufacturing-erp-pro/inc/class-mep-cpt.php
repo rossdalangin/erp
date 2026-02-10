@@ -34,7 +34,7 @@ class MEP_CPT {
 			'mep_supplier'    => __( 'Suppliers', 'manufacturing-erp-pro' ),
 			'mep_po'          => __( 'Purchase Orders', 'manufacturing-erp-pro' ),
 			'mep_qc_check'    => __( 'QC Checks', 'manufacturing-erp-pro' ),
-			'mep_ncr'         => __( 'NCRs', 'manufacturing-erp-pro' ),
+			'mep_ncr'         => __( 'NCRs / CAPA', 'manufacturing-erp-pro' ),
 			'mep_equipment'   => __( 'Equipment', 'manufacturing-erp-pro' ),
 			'mep_route'       => __( 'Routes', 'manufacturing-erp-pro' ),
 			'mep_forecast'    => __( 'Forecasts', 'manufacturing-erp-pro' ),
@@ -55,5 +55,15 @@ class MEP_CPT {
 				'supports'     => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
 			) );
 		}
+
+		// Register CAPA status for NCR
+		register_post_status( 'capa-pending', array(
+			'label'                     => _x( 'CAPA Pending', 'post' ),
+			'public'                    => true,
+			'exclude_from_search'       => false,
+			'show_in_admin_all_list'    => true,
+			'show_in_admin_status_list' => true,
+			'label_count'               => _n_noop( 'CAPA Pending <span class="count">(%s)</span>', 'CAPA Pending <span class="count">(%s)</span>' ),
+		) );
 	}
 }

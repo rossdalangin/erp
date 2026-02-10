@@ -41,8 +41,59 @@ class MEP_Reports {
 			'scrap_rate'        => $scrap_rate,
 			'inventory_value'   => '$' . number_format( $inventory_value, 2 ),
 			'on_time_delivery'  => '94%', // Placeholder for complex logic
-			'active_orders'     => $active_count
+			'active_orders'     => $active_count,
+			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 )
 		);
+	}
+
+	/**
+	 * Calculate Inventory Valuation using FIFO.
+	 */
+	public static function get_fifo_valuation() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
+		$total_value = 0;
+
+		foreach ( $materials as $mat ) {
+			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			if ( $on_hand <= 0 ) continue;
+
+			// Get recent receipts in reverse order to find the cost of remaining items
+			$receipts = $wpdb->get_results( $wpdb->prepare(
+				"SELECT quantity, reference_id FROM $table_name
+				 WHERE material_id = %d AND transaction_type = 'RECEIVE'
+				 ORDER BY created_at DESC",
+				$mat->ID
+			) );
+
+			$remaining = $on_hand;
+			foreach ( $receipts as $receipt ) {
+				$qty = (float) $receipt->quantity;
+				$take = min( $qty, $remaining );
+
+				// Get cost at time of receipt (from PO or current avg if PO missing)
+				$unit_cost = 0;
+				if ( $receipt->reference_id ) {
+					// Logic to get cost from PO line
+					$unit_cost = (float) get_post_meta( $receipt->reference_id, '_mep_unit_cost', true );
+				}
+				if ( ! $unit_cost ) {
+					$unit_cost = (float) get_post_meta( $mat->ID, '_mep_cost_avg', true );
+				}
+
+				$total_value += ( $take * $unit_cost );
+				$remaining -= $take;
+				if ( $remaining <= 0 ) break;
+			}
+
+			// If we still have remaining (e.g. from initial balance), use avg cost
+			if ( $remaining > 0 ) {
+				$total_value += ( $remaining * (float) get_post_meta( $mat->ID, '_mep_cost_avg', true ) );
+			}
+		}
+
+		return $total_value;
 	}
 
 	/**

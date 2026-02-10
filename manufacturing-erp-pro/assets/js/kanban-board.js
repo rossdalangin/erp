@@ -55,10 +55,17 @@ const KanbanBoard = () => {
     };
 
     const updateOrderStatus = (id, nextStatus) => {
+        let extraData = {};
+        if (nextStatus === 'completed') {
+            const scrap = prompt("Enter scrap quantity (if any):", "0");
+            const labor = prompt("Enter total labor minutes spent:", "60");
+            extraData = { scrap_qty: scrap, labor_mins: labor };
+        }
+
         wp.apiFetch({
             path: `/mep/v1/work-orders/${id}/status`,
             method: 'POST',
-            data: { status: nextStatus }
+            data: { status: nextStatus, ...extraData }
         }).then(() => {
             setWorkOrders(workOrders.map(o => o.id == id ? { ...o, status: nextStatus } : o));
         });
