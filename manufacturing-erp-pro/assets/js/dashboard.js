@@ -61,10 +61,28 @@ const Dashboard = () => {
                 )) : wp.element.createElement('p', null, 'No equipment data available.')
             ),
             wp.element.createElement('div', { style: { padding: '20px', background: '#fff', border: '1px solid #ccc' } },
-                wp.element.createElement('h3', null, 'Active Production Insights'),
-                wp.element.createElement('p', null, `Currently tracking ${kpis.active_orders} live work orders on the production floor.`),
-                wp.element.createElement('p', null, `Reported Production Output: ${kpis.production_output} units.`),
-                wp.element.createElement('p', null, `Current Scrap Rate: ${kpis.scrap_rate}.`)
+                wp.element.createElement('h3', null, 'Cost Variance (Est vs Actual)'),
+                kpis.cost_variance && kpis.cost_variance.length > 0 ?
+                    wp.element.createElement('table', { style: { width: '100%', fontSize: '12px', borderCollapse: 'collapse' } },
+                        wp.element.createElement('thead', null,
+                            wp.element.createElement('tr', null,
+                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'WO'),
+                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Est'),
+                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Act'),
+                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Var')
+                            )
+                        ),
+                        wp.element.createElement('tbody', null,
+                            kpis.cost_variance.map((v, i) => wp.element.createElement('tr', { key: i },
+                                wp.element.createElement('td', null, `#${v.wo_id}`),
+                                wp.element.createElement('td', null, `$${v.estimated}`),
+                                wp.element.createElement('td', null, `$${v.actual}`),
+                                wp.element.createElement('td', { style: { color: v.variance > 0 ? '#d63638' : '#46b450', fontWeight: 'bold' } },
+                                    (v.variance > 0 ? '+' : '') + `$${v.variance}`
+                                )
+                            ))
+                        )
+                    ) : wp.element.createElement('p', null, 'No production history yet for cost variance analysis.')
             )
         )
     );

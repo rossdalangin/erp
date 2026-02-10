@@ -65,6 +65,45 @@ class MEP_Inventory {
 	}
 
 	/**
+	 * Transfer stock between bins atomically.
+	 */
+	public static function transfer( $data ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+
+		$wpdb->query( 'START TRANSACTION' );
+
+		// 1. Debit Source Bin
+		$debit = $wpdb->insert( $table_name, array(
+			'material_id'      => $data['material_id'],
+			'warehouse_id'     => $data['source_warehouse_id'],
+			'bin_id'           => $data['source_bin_id'],
+			'quantity'         => - (float) $data['quantity'],
+			'transaction_type' => 'TRANSFER',
+			'reference_id'     => isset( $data['reference_id'] ) ? $data['reference_id'] : null,
+		) );
+
+		// 2. Credit Target Bin
+		$credit = $wpdb->insert( $table_name, array(
+			'material_id'      => $data['material_id'],
+			'warehouse_id'     => $data['target_warehouse_id'],
+			'bin_id'           => $data['target_bin_id'],
+			'quantity'         => (float) $data['quantity'],
+			'transaction_type' => 'TRANSFER',
+			'reference_id'     => isset( $data['reference_id'] ) ? $data['reference_id'] : null,
+		) );
+
+		if ( $debit && $credit ) {
+			MEP_DB::log_audit( 'inventory', 0, 'BIN_TRANSFER', '', $data );
+			$wpdb->query( 'COMMIT' );
+			return true;
+		} else {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+	}
+
+	/**
 	 * Get bin details including inventory levels.
 	 */
 	public static function get_bins_with_inventory( $warehouse_id ) {
@@ -87,10 +126,21 @@ class MEP_Inventory {
 				$bin->ID
 			) );
 
+			$capacity = (float) get_post_meta( $bin->ID, '_mep_capacity', true );
+			if ( ! $capacity ) $capacity = 1000; // Default capacity for visualization
+
+			$total_qty = 0;
+			foreach ( $on_hand as $item ) {
+				$total_qty += (float) $item->qty;
+			}
+
 			$data[] = array(
-				'id'    => $bin->ID,
-				'name'  => $bin->post_title,
-				'items' => $on_hand
+				'id'         => $bin->ID,
+				'name'       => $bin->post_title,
+				'capacity'   => $capacity,
+				'total_qty'  => $total_qty,
+				'occupancy'  => $capacity > 0 ? round( ( $total_qty / $capacity ) * 100 ) : 0,
+				'items'      => $on_hand
 			);
 		}
 

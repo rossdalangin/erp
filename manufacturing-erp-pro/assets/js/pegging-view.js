@@ -19,31 +19,15 @@ const PeggingView = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Mocking pegging data for visualization
-        // In a full implementation, this would be a complex recursive query from forecasts through BOMs
-        const mockData = [
-            {
-                label: 'Forecast: Signature Handbag (Oct 2023) - 100 units',
-                children: [
-                    {
-                        label: 'BOM: Bag Body Assembly',
-                        children: [
-                            { label: 'Material: Cowhide Leather - 150m2 needed', children: [] },
-                            { label: 'Material: Heavy Duty Thread - 5 spools needed', children: [] }
-                        ]
-                    },
-                    {
-                        label: 'BOM: Strap Assembly',
-                        children: [
-                            { label: 'Material: PU Leather - 50m2 needed', children: [] },
-                            { label: 'Material: Buckle #44 - 100 units needed', children: [] }
-                        ]
-                    }
-                ]
-            }
-        ];
-        setPeggingData(mockData);
-        setLoading(false);
+        wp.apiFetch({ path: '/mep/v1/mrp/pegging' })
+            .then(data => {
+                setPeggingData(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     if (loading) return wp.element.createElement('p', null, 'Calculating pegging relationships...');

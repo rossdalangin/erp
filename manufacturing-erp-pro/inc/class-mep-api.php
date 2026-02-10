@@ -59,6 +59,18 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/mrp/pegging', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_pegging_data' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/inventory/transfer', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'transfer_inventory' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/warehouses', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_warehouses' ),
@@ -153,12 +165,32 @@ class MEP_API {
 	public function update_work_order_status( $request ) {
 		$id = $request['id'];
 		$status = $request['status'];
+		$params = $request->get_params();
 
 		$old_status = get_post_field( 'post_status', $id );
 		wp_update_post( array(
 			'ID'          => $id,
 			'post_status' => $status
 		) );
+
+		if ( isset( $params['scrap_qty'] ) ) {
+			update_post_meta( $id, '_mep_actual_scrap', (float) $params['scrap_qty'] );
+		}
+		if ( isset( $params['labor_mins'] ) ) {
+			update_post_meta( $id, '_mep_actual_labor_mins', (float) $params['labor_mins'] );
+		}
+
+		// Also log to production logs table if completed
+		if ( $status === 'completed' ) {
+			global $wpdb;
+			$wpdb->insert( $wpdb->prefix . 'mep_production_logs', array(
+				'work_order_id' => $id,
+				'output_qty'    => (float) get_post_meta( $id, '_mep_work_order_qty', true ),
+				'scrap_qty'     => (float) ( $params['scrap_qty'] ?? 0 ),
+				'labor_mins'    => (float) ( $params['labor_mins'] ?? 0 ),
+				'created_at'    => current_time( 'mysql' )
+			) );
+		}
 
 		MEP_DB::log_audit( 'work_order', $id, 'STATUS_CHANGE', $old_status, $status );
 
@@ -180,6 +212,26 @@ class MEP_API {
 	public function run_mrp( $request ) {
 		$suggestions = MEP_MRP::run();
 		return new WP_REST_Response( $suggestions, 200 );
+	}
+
+	public function get_pegging_data( $request ) {
+		$data = MEP_MRP::get_pegging_data();
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function transfer_inventory( $request ) {
+		$params = $request->get_params();
+
+		// Map source/target if not provided explicitly (fallback for visual UI)
+		if ( ! isset( $params['source_warehouse_id'] ) ) {
+			$params['source_warehouse_id'] = get_post_field( 'post_parent', $params['source_bin_id'] );
+		}
+		if ( ! isset( $params['target_warehouse_id'] ) ) {
+			$params['target_warehouse_id'] = get_post_field( 'post_parent', $params['target_bin_id'] );
+		}
+
+		$success = MEP_Inventory::transfer( $params );
+		return new WP_REST_Response( array( 'success' => $success ), $success ? 200 : 400 );
 	}
 
 	public function get_warehouses( $request ) {

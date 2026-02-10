@@ -42,8 +42,46 @@ class MEP_Reports {
 			'inventory_value'   => '$' . number_format( $inventory_value, 2 ),
 			'on_time_delivery'  => '94%', // Placeholder for complex logic
 			'active_orders'     => $active_count,
-			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 )
+			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 ),
+			'cost_variance'     => static::get_cost_variance()
 		);
+	}
+
+	/**
+	 * Calculate Cost Variance (Estimated vs Actual).
+	 */
+	public static function get_cost_variance() {
+		global $wpdb;
+		$logs_table = $wpdb->prefix . 'mep_production_logs';
+		$logs = $wpdb->get_results( "SELECT * FROM $logs_table ORDER BY created_at DESC LIMIT 10" );
+
+		$variances = array();
+		foreach ( $logs as $log ) {
+			$wo_id = $log->work_order_id;
+			$product_id = get_post_field( 'post_parent', $wo_id );
+
+			$estimated_unit_cost = MEP_BOM::calculate_roll_up_cost( $product_id );
+			$qty = (float) $log->output_qty;
+
+			$total_estimated = $estimated_unit_cost * $qty;
+
+			// Actual: materials (from BOM but with actual scrap) + actual labor
+			// Simplified actual calculation for demo
+			$actual_scrap = (float) $log->scrap_qty;
+			$actual_labor = (float) $log->labor_mins * 0.5; // $0.50/min rate
+
+			$actual_cost = $total_estimated + ( $actual_scrap * 10 ) + $actual_labor; // Assume $10 avg material cost for scrap
+
+			$variances[] = array(
+				'wo_id'     => $wo_id,
+				'product'   => get_the_title( $product_id ),
+				'estimated' => round( $total_estimated, 2 ),
+				'actual'    => round( $actual_cost, 2 ),
+				'variance'  => round( $actual_cost - $total_estimated, 2 )
+			);
+		}
+
+		return $variances;
 	}
 
 	/**

@@ -84,6 +84,52 @@ class MEP_MRP {
 	}
 
 	/**
+	 * Get real Pegging data linking demand to materials.
+	 */
+	public static function get_pegging_data() {
+		$forecasts = get_posts( array(
+			'post_type'   => 'mep_forecast',
+			'post_status' => 'publish',
+			'numberposts' => -1,
+		) );
+
+		$pegging = array();
+		foreach ( $forecasts as $forecast ) {
+			$product_id = (int) $forecast->post_parent;
+			$qty = (float) get_post_meta( $forecast->ID, '_mep_forecast_qty', true );
+
+			$pegging[] = array(
+				'label'    => sprintf( __( 'Forecast: %s - %d units', 'manufacturing-erp-pro' ), get_the_title( $forecast->ID ), $qty ),
+				'children' => static::get_pegging_children( $product_id, $qty )
+			);
+		}
+
+		return $pegging;
+	}
+
+	/**
+	 * Recursive helper for pegging data.
+	 */
+	private static function get_pegging_children( $product_id, $qty ) {
+		$components = MEP_BOM::get_bom_tree( $product_id );
+		$children = array();
+
+		foreach ( $components as $comp ) {
+			$comp_qty = (float) $comp['qty'] * $qty;
+			$label = sprintf( '%s: %s - %d units needed', ucfirst( $comp['type'] ), $comp['name'], $comp_qty );
+
+			$node = array( 'label' => $label );
+			if ( $comp['type'] === 'product' ) {
+				$node['children'] = static::get_pegging_children( $comp['id'], $comp_qty );
+			}
+
+			$children[] = $node;
+		}
+
+		return $children;
+	}
+
+	/**
 	 * Background Task Scaffolding using WP Cron.
 	 */
 	public static function schedule_mrp_run() {

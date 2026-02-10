@@ -5,13 +5,21 @@
 const { useState, useEffect } = wp.element;
 
 const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop }) => {
+    const bgColor = bin.occupancy > 90 ? '#fff0f0' : (bin.occupancy > 70 ? '#fffcf0' : '#fcfcfc');
+    const borderColor = bin.occupancy > 90 ? '#d63638' : (bin.occupancy > 70 ? '#dba617' : '#ccc');
+
     return wp.element.createElement('div', {
         className: 'mep-bin-card',
         onDragOver: onDragOver,
         onDrop: (e) => onDrop(e, bin.id),
-        style: { border: '1px solid #ccc', padding: '10px', minWidth: '150px', background: '#fcfcfc' }
+        style: { border: `2px solid ${borderColor}`, padding: '15px', minWidth: '180px', background: bgColor, borderRadius: '4px' }
     },
-        wp.element.createElement('h4', null, bin.name),
+        wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' } },
+            wp.element.createElement('h4', { style: { margin: 0 } }, bin.name),
+            wp.element.createElement('span', {
+                style: { fontSize: '10px', padding: '2px 5px', borderRadius: '3px', background: borderColor, color: bin.occupancy > 70 ? '#fff' : '#333' }
+            }, `${bin.occupancy}% Full`)
+        ),
         wp.element.createElement('div', { className: 'mep-bin-contents' },
             bin.items.length > 0 ?
                 bin.items.map((item, i) => wp.element.createElement('div', {
