@@ -66,7 +66,7 @@ const Traceability = () => {
                 wp.element.createElement('button', {
                     className: 'button button-secondary',
                     onClick: () => {
-                        const reportUrl = `${window.location.origin}/wp-content/plugins/manufacturing-erp-pro/templates/genealogy-report.php?lot=${trace.lot}&print=1`;
+                        const reportUrl = wpApiSettings.root + `mep/v1/qc/trace/${trace.lot}/report?_wpnonce=` + wpApiSettings.nonce + '&print=1';
                         window.open(reportUrl, '_blank');
                     }
                 }, 'Generate Trace Report (PDF)')

@@ -44,4 +44,30 @@ class MEP_Reports {
 			'active_orders'     => $active_count
 		);
 	}
+
+	/**
+	 * Generate Inventory CSV data and send to output.
+	 */
+	public static function export_inventory_csv() {
+		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
+
+		$fp = fopen( 'php://output', 'w' );
+		fputcsv( $fp, array( 'SKU', 'Name', 'UOM', 'Stock Level', 'Avg Cost', 'Total Value' ) );
+
+		foreach ( $materials as $mat ) {
+			$stock = MEP_Inventory::get_stock_level( $mat->ID );
+			$cost  = (float) get_post_meta( $mat->ID, '_mep_cost_avg', true );
+
+			fputcsv( $fp, array(
+				get_post_meta( $mat->ID, '_mep_sku', true ),
+				$mat->post_title,
+				get_post_meta( $mat->ID, '_mep_uom', true ),
+				$stock,
+				$cost,
+				$stock * $cost
+			) );
+		}
+
+		fclose( $fp );
+	}
 }

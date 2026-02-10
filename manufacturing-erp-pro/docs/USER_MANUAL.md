@@ -21,26 +21,26 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 ## Part 2: Module-by-Module User Instructions
 
 ### 1. Inventory & Warehouse Management
-- **Setup**: Go to `ERP Pro > Warehouses` to define your storage areas.
-- **Micro-Tracking**: Create Bins within Warehouses to pinpoint stock locations.
-- **Stock Movement**: Use the `Inventory` tab to view real-time levels. Transfers are handled via the visual grid view—simply drag stock from one bin to another.
-- **Receiving**: When a PO arrives, mark it as "Received" to automatically update stock levels and record the Lot Number for traceability.
+- **Setup**: Go to `ERP Pro > Materials` to define your items and their storage rules.
+- **Visual Grid**: Access `ERP Pro > Visual Warehouse` to see a 2D bird's-eye view of your factory floor and bin occupancy.
+- **Stock Movement**: Transfers are handled visually—simply drag stock cards from one bin to another.
+- **Exporting**: Use the "Export Inventory CSV" button in the Visual Warehouse view to generate real-time stock reports for accounting.
 
 ### 2. The Visual BOM Builder
-- **Building a Product**: Navigate to `BOMs > Add New`. Select your finished product.
-- **The Canvas**: Use the interactive React canvas. Drag raw materials from the sidebar into the center.
-- **Sub-Assemblies**: You can nest BOMs. For example, a "Strap Assembly" can be a component of a "Leather Bag".
-- **Costing**: Watch the "Roll-up Cost" update live as you adjust quantities or change material types.
+- **Building a Product**: Navigate to `ERP Pro > BOM Builder`.
+- **Interactive Canvas**: Drag raw materials from the left library into the central assembly tree.
+- **Sub-Assemblies**: Nest BOMs seamlessly. (e.g., "Strap Assembly" inside "Leather Bag").
+- **Costing**: Watch the "Roll-up Cost" update live as you adjust quantities or change materials.
 
-### 3. MRP (Demand Planning)
-- **Forecasting**: Enter your sales targets in `Forecasts`.
-- **Running MRP**: Click "Run MRP" in the Dashboard. The engine will calculate total material needs and compare them against current stock.
-- **Suggestions**: Review the "Planned Purchases" list. Click "Generate POs" to automate your procurement.
+### 3. Production Planning (Kanban)
+- **The Board**: Go to `ERP Pro > Production Board`.
+- **Status Flow**: Drag-and-drop Work Order cards from "Backlog" to "In Progress" and finally to "Completed".
+- **Real-time Updates**: Moving a card automatically logs the status change in the Audit Trail for management review.
 
-### 4. Production Planning (Kanban)
-- **The Board**: Go to `ERP Pro > Production`.
-- **Workflow**: Move Work Orders from "Backlog" to "In Progress" when materials are released. Advance to "QC" once production is finished.
-- **Assignment**: Use the card details to assign specific operators or machines to a production run.
+### 4. MRP (Demand Planning)
+- **Forecasting**: Enter sales targets in `ERP Pro > Forecasts`.
+- **Running MRP**: Access the `Dashboard` and trigger an MRP run. The system will "explode" your BOMs and compare demand vs. current stock.
+- **Automation**: One-click generation of Purchase Orders from MRP suggestions to replenish your warehouse.
 
 ### 5. Equipment & Capacity Planning
 - **Machine Catalog**: Manage your factory assets in `Equipment`. Set the "Daily Capacity" in minutes for each machine.

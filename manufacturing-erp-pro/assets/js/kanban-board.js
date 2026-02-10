@@ -20,6 +20,7 @@ const WorkOrderCard = ({ wo, onDragStart }) => {
 const KanbanBoard = () => {
     const [workOrders, setWorkOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const columns = [
         { id: 'publish', label: 'Backlog' },
@@ -32,6 +33,11 @@ const KanbanBoard = () => {
             .then(data => {
                 setWorkOrders(data);
                 setLoading(false);
+            })
+            .catch(err => {
+                setError('Failed to load Work Orders.');
+                setLoading(false);
+                console.error(err);
             });
     }, []);
 
@@ -59,6 +65,7 @@ const KanbanBoard = () => {
     };
 
     if (loading) return wp.element.createElement('p', null, 'Loading Kanban Board...');
+    if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 

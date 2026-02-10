@@ -26,18 +26,21 @@ const BOMBuilder = ({ productId }) => {
     const [bom, setBom] = useState({ bom: [], total_cost: 0 });
     const [materials, setMaterials] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        wp.apiFetch({ path: `/mep/v1/bom/${productId}` })
-            .then((data) => {
-                setBom(data);
-                setLoading(false);
-            })
-            .catch((err) => console.error(err));
-
-        wp.apiFetch({ path: '/mep/v1/materials' })
-            .then((data) => setMaterials(data))
-            .catch((err) => console.error(err));
+        Promise.all([
+            wp.apiFetch({ path: `/mep/v1/bom/${productId}` }),
+            wp.apiFetch({ path: '/mep/v1/materials' })
+        ]).then(([bomData, matData]) => {
+            setBom(bomData);
+            setMaterials(matData);
+            setLoading(false);
+        }).catch((err) => {
+            setError('Failed to load BOM or Material data. Please check your permissions.');
+            setLoading(false);
+            console.error(err);
+        });
     }, [productId]);
 
     const onDragStart = (e, material) => {
@@ -80,6 +83,7 @@ const BOMBuilder = ({ productId }) => {
     };
 
     if (loading) return wp.element.createElement('p', null, 'Loading Interactive BOM Builder...');
+    if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 

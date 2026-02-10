@@ -83,9 +83,21 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/qc/trace/(?P<lot>[a-zA-Z0-9\-_]+)/report', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_lot_trace_report' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/equipment/capacity', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_equipment_capacity' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/reports/inventory-csv', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_inventory_csv' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 	}
@@ -184,14 +196,34 @@ class MEP_API {
 		return new WP_REST_Response( $data, 200 );
 	}
 
+	public function get_lot_trace_report( $request ) {
+		$lot = $request['lot'];
+		$data = MEP_Quality::trace_lot( $lot );
+
+		header( 'Content-Type: text/html' );
+		include MEP_PLUGIN_DIR . 'templates/genealogy-report.php';
+		exit;
+	}
+
 	public function get_equipment_capacity( $request ) {
 		$data = MEP_Equipment::get_capacity_data();
 		return new WP_REST_Response( $data, 200 );
 	}
 
+	public function get_inventory_csv( $request ) {
+		header( 'Content-Type: text/csv' );
+		header( 'Content-Disposition: attachment; filename="inventory-export.csv"' );
+		MEP_Reports::export_inventory_csv();
+		exit;
+	}
+
 	public function update_bom( $request ) {
 		$product_id = $request['id'];
 		$components = $request->get_param( 'components' );
+
+		if ( ! is_array( $components ) ) {
+			return new WP_Error( 'invalid_data', 'BOM components must be an array.', array( 'status' => 400 ) );
+		}
 
 		// Find or create BOM post
 		$bom_posts = get_posts( array(

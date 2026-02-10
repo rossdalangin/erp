@@ -25,6 +25,7 @@ const WarehouseLayout = () => {
     const [selectedWh, setSelectedWh] = useState(null);
     const [bins, setBins] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         wp.apiFetch({ path: '/mep/v1/warehouses' })
@@ -32,6 +33,11 @@ const WarehouseLayout = () => {
                 setWarehouses(data);
                 if (data.length > 0) setSelectedWh(data[0].id);
                 setLoading(false);
+            })
+            .catch(err => {
+                setError('Failed to load Warehouses.');
+                setLoading(false);
+                console.error(err);
             });
     }, []);
 
@@ -43,16 +49,23 @@ const WarehouseLayout = () => {
     }, [selectedWh]);
 
     if (loading) return wp.element.createElement('p', null, 'Loading Warehouse View...');
+    if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
     return wp.element.createElement('div', { className: 'mep-warehouse-layout' },
-        wp.element.createElement('div', { className: 'mep-wh-selector', style: { marginBottom: '20px' } },
-            wp.element.createElement('label', null, 'Select Warehouse: '),
-            wp.element.createElement('select', {
-                value: selectedWh,
-                onChange: (e) => setSelectedWh(e.target.value)
-            },
-                warehouses.map(wh => wp.element.createElement('option', { key: wh.id, value: wh.id }, wh.name))
-            )
+        wp.element.createElement('div', { className: 'mep-wh-toolbar', style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            wp.element.createElement('div', { className: 'mep-wh-selector' },
+                wp.element.createElement('label', null, 'Select Warehouse: '),
+                wp.element.createElement('select', {
+                    value: selectedWh,
+                    onChange: (e) => setSelectedWh(e.target.value)
+                },
+                    warehouses.map(wh => wp.element.createElement('option', { key: wh.id, value: wh.id }, wh.name))
+                )
+            ),
+            wp.element.createElement('button', {
+                className: 'button button-secondary',
+                onClick: () => window.location.href = wpApiSettings.root + 'mep/v1/reports/inventory-csv?_wpnonce=' + wpApiSettings.nonce
+            }, 'Export Inventory CSV')
         ),
         wp.element.createElement('div', {
             className: 'mep-bins-grid',

@@ -25,7 +25,7 @@
         <p><strong>Generated on:</strong> <?php echo date('Y-m-d H:i:s'); ?></p>
     </div>
 
-    <h2>Lot Details: <?php echo esc_html( $_GET['lot'] ); ?></h2>
+    <h2>Lot Details: <?php echo esc_html( $data['lot'] ); ?></h2>
 
     <h3>Transaction History</h3>
     <table>
@@ -34,14 +34,24 @@
                 <th>Date</th>
                 <th>Action</th>
                 <th>Quantity</th>
-                <th>Location</th>
+                <th>Warehouse ID</th>
             </tr>
         </thead>
         <tbody>
-            <!-- This template is designed to be populated by JS or simple PHP include -->
-            <tr>
-                <td colspan="4">Please use the Traceability module to view live data. This template serves as the layout for PDF exports.</td>
-            </tr>
+            <?php if ( ! empty( $data['history'] ) ) : ?>
+                <?php foreach ( $data['history'] as $h ) : ?>
+                    <tr>
+                        <td><?php echo esc_html( $h->created_at ); ?></td>
+                        <td><?php echo esc_html( $h->transaction_type ); ?></td>
+                        <td><?php echo esc_html( $h->quantity ); ?></td>
+                        <td><?php echo esc_html( $h->warehouse_id ); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="4">No history found for this lot.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 

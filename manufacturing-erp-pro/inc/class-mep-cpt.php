@@ -49,9 +49,9 @@ class MEP_CPT {
 				'public'       => true,
 				'has_archive'  => true,
 				'show_in_rest' => true,
+				'show_in_menu' => 'mep-dashboard',
 				'menu_icon'    => 'dashicons-hammer',
 				'supports'     => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
-				'menu_position' => 25,
 			) );
 		}
 	}

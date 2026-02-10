@@ -25,6 +25,7 @@ class MEP_Admin {
 	}
 
 	public function add_menus() {
+		// Main Menu
 		add_menu_page(
 			__( 'ERP Dashboard', 'manufacturing-erp-pro' ),
 			__( 'ERP Pro', 'manufacturing-erp-pro' ),
@@ -35,59 +36,42 @@ class MEP_Admin {
 			24
 		);
 
+		// Re-register Dashboard as first submenu to control label
 		add_submenu_page(
 			'mep-dashboard',
-			__( 'Inventory', 'manufacturing-erp-pro' ),
-			__( 'Inventory', 'manufacturing-erp-pro' ),
+			__( 'Dashboard', 'manufacturing-erp-pro' ),
+			__( 'Dashboard', 'manufacturing-erp-pro' ),
 			'manage_options',
-			'mep-inventory',
-			array( $this, 'inventory_page' )
+			'mep-dashboard',
+			array( $this, 'dashboard_page' )
 		);
 
-		add_submenu_page(
-			'mep-dashboard',
-			__( 'Production', 'manufacturing-erp-pro' ),
-			__( 'Production', 'manufacturing-erp-pro' ),
-			'manage_options',
-			'mep-production',
-			array( $this, 'production_page' )
-		);
+		// --- INVENTORY MODULE ---
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', __( 'Materials', 'manufacturing-erp-pro' ), __( 'Materials', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_material' );
+		add_submenu_page( 'mep-dashboard', __( 'Visual Warehouse', 'manufacturing-erp-pro' ), __( 'Visual Warehouse', 'manufacturing-erp-pro' ), 'manage_options', 'mep-inventory', array( $this, 'inventory_page' ) );
 
-		add_submenu_page(
-			'mep-dashboard',
-			__( 'BOM Builder', 'manufacturing-erp-pro' ),
-			__( 'BOM Builder', 'manufacturing-erp-pro' ),
-			'manage_options',
-			'mep-bom-builder',
-			array( $this, 'bom_builder_page' )
-		);
+		// --- PRODUCTION MODULE ---
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', __( 'Products & BOMs', 'manufacturing-erp-pro' ), __( 'Products', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_product' );
+		add_submenu_page( 'mep-dashboard', __( 'BOM Builder', 'manufacturing-erp-pro' ), __( 'BOM Builder', 'manufacturing-erp-pro' ), 'manage_options', 'mep-bom-builder', array( $this, 'bom_builder_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Production Board', 'manufacturing-erp-pro' ), __( 'Production Board', 'manufacturing-erp-pro' ), 'manage_options', 'mep-production', array( $this, 'production_page' ) );
 
-		add_submenu_page(
-			'mep-dashboard',
-			__( 'System Utilities', 'manufacturing-erp-pro' ),
-			__( 'System Utilities', 'manufacturing-erp-pro' ),
-			'manage_options',
-			'mep-utilities',
-			array( $this, 'utilities_page' )
-		);
+		// --- QUALITY MODULE ---
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', __( 'Quality Checks', 'manufacturing-erp-pro' ), __( 'Quality Checks', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_qc_check' );
+		add_submenu_page( 'mep-dashboard', __( 'Traceability', 'manufacturing-erp-pro' ), __( 'Traceability', 'manufacturing-erp-pro' ), 'manage_options', 'mep-traceability', array( $this, 'traceability_page' ) );
 
-		add_submenu_page(
-			'mep-dashboard',
-			__( 'Setup Wizard', 'manufacturing-erp-pro' ),
-			__( 'Setup Wizard', 'manufacturing-erp-pro' ),
-			'manage_options',
-			'mep-wizard',
-			array( $this, 'wizard_page' )
-		);
+		// --- PROCUREMENT & MRP ---
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', __( 'Suppliers', 'manufacturing-erp-pro' ), __( 'Suppliers', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_supplier' );
+		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_po' );
+		add_submenu_page( 'mep-dashboard', __( 'Forecasts', 'manufacturing-erp-pro' ), __( 'Forecasts', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_forecast' );
 
-		add_submenu_page(
-			'mep-dashboard',
-			__( 'Traceability', 'manufacturing-erp-pro' ),
-			__( 'Traceability', 'manufacturing-erp-pro' ),
-			'manage_options',
-			'mep-traceability',
-			array( $this, 'traceability_page' )
-		);
+		// --- SETTINGS ---
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', __( 'System Utilities', 'manufacturing-erp-pro' ), __( 'System Utilities', 'manufacturing-erp-pro' ), 'manage_options', 'mep-utilities', array( $this, 'utilities_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Setup Wizard', 'manufacturing-erp-pro' ), __( 'Setup Wizard', 'manufacturing-erp-pro' ), 'manage_options', 'mep-wizard', array( $this, 'wizard_page' ) );
 	}
 
 	public function wizard_page() {
