@@ -174,3 +174,32 @@ Don't let spreadsheet chaos kill your growth.
 - **Day 5**: The ROI of ERP (Hard numbers on savings).
 - **Day 6**: FAQ & Objection Handling.
 - **Day 7**: Last Call (Launch discount expires).
+
+---
+
+## Part 6: Troubleshooting & FAQ
+
+### FAQ
+
+**Q: Can I use this for process manufacturing (liquids/chemicals)?**
+A: Manufacturing ERP Pro is optimized for discrete manufacturing but supports "Light Process" via flexible UOMs (Liters, KG) and recursive BOMs for recipes.
+
+**Q: Does it integrate with WooCommerce?**
+A: Currently, demand is managed via the `Forecasts` CPT. A WooCommerce integration module is on the roadmap for Q4.
+
+**Q: Is my data safe if I reset the plugin?**
+A: The "Soft Reset" keeps your Master Data (Products, Materials) and only wipes transactions. The "Hard Reset" wipes everything. Always perform a backup before any reset.
+
+### Troubleshooting
+
+**Problem: The Visual BOM Builder is not loading.**
+- Ensure you have the `wp-element` and `wp-api-fetch` scripts enabled (standard in modern WP).
+- Check for JavaScript errors in the console (F12).
+
+**Problem: MRP suggestions are showing 0 requirements.**
+- Verify that your `Forecasts` are published.
+- Ensure the Finished Product has an "Active" BOM assigned to it.
+- Check that your current inventory is actually lower than the demand + safety stock.
+
+**Problem: "Invalid confirmation phrase" when resetting.**
+- The phrase is case-sensitive and must be exactly: `RESET PRODUCTION ENVIRONMENT`.

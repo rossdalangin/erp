@@ -1,22 +1,19 @@
 /**
- * MEP Production Kanban Board
+ * MEP Production Kanban Board - with HTML5 Drag and Drop
  */
 
 const { useState, useEffect } = wp.element;
 
-const WorkOrderCard = ({ wo, onMove }) => {
+const WorkOrderCard = ({ wo, onDragStart }) => {
     return wp.element.createElement('div', {
         className: 'mep-wo-card',
-        style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px' }
+        draggable: true,
+        onDragStart: (e) => onDragStart(e, wo.id),
+        style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px', cursor: 'grab' }
     },
         wp.element.createElement('h4', null, wo.title),
         wp.element.createElement('p', { style: { fontSize: '12px' } }, `ID: #${wo.id}`),
-        wp.element.createElement('div', { className: 'mep-wo-actions' },
-            wo.status !== 'completed' && wp.element.createElement('button', {
-                className: 'button button-small',
-                onClick: () => onMove(wo.id, 'next')
-            }, 'Advance →')
-        )
+        wp.element.createElement('span', { className: 'mep-badge', style: { fontSize: '10px', background: '#eee', padding: '2px 5px' } }, wo.status)
     );
 };
 
@@ -38,18 +35,26 @@ const KanbanBoard = () => {
             });
     }, []);
 
-    const moveOrder = (id, direction) => {
-        const wo = workOrders.find(o => o.id === id);
-        let nextStatus = wo.status;
-        if (wo.status === 'publish') nextStatus = 'in-progress';
-        else if (wo.status === 'in-progress') nextStatus = 'completed';
+    const onDragStart = (e, id) => {
+        e.dataTransfer.setData('woId', id);
+    };
 
+    const onDragOver = (e) => {
+        e.preventDefault(); // Allow drop
+    };
+
+    const onDrop = (e, nextStatus) => {
+        const id = e.dataTransfer.getData('woId');
+        updateOrderStatus(id, nextStatus);
+    };
+
+    const updateOrderStatus = (id, nextStatus) => {
         wp.apiFetch({
             path: `/mep/v1/work-orders/${id}/status`,
             method: 'POST',
             data: { status: nextStatus }
         }).then(() => {
-            setWorkOrders(workOrders.map(o => o.id === id ? { ...o, status: nextStatus } : o));
+            setWorkOrders(workOrders.map(o => o.id == id ? { ...o, status: nextStatus } : o));
         });
     };
 
@@ -62,11 +67,13 @@ const KanbanBoard = () => {
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
             className: 'mep-kanban-column',
-            style: { flex: 1, background: '#f0f0f1', padding: '15px', minHeight: '400px' }
+            onDragOver: onDragOver,
+            onDrop: (e) => onDrop(e, col.id),
+            style: { flex: 1, background: '#f0f0f1', padding: '15px', minHeight: '500px', border: '2px dashed transparent' }
         },
             wp.element.createElement('h3', null, col.label),
             workOrders.filter(wo => wo.status === col.id).map(wo =>
-                wp.element.createElement(WorkOrderCard, { key: wo.id, wo: wo, onMove: moveOrder })
+                wp.element.createElement(WorkOrderCard, { key: wo.id, wo: wo, onDragStart: onDragStart })
             )
         ))
     );

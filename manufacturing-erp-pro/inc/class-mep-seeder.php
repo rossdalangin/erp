@@ -18,8 +18,8 @@ class MEP_Seeder {
 		$wh_prod = self::create_post( 'mep_warehouse', 'Production Floor' );
 
 		// 2. Create Bins
-		self::create_post( 'mep_bin', 'Leather Storage (A1)', $wh_main );
-		self::create_post( 'mep_bin', 'Cutting Area (P1)', $wh_prod );
+		$bin_main = self::create_post( 'mep_bin', 'Leather Storage (A1)', $wh_main );
+		$bin_prod = self::create_post( 'mep_bin', 'Cutting Area (P1)', $wh_prod );
 
 		// 3. Create Suppliers
 		self::create_post( 'mep_supplier', 'Leather Supplier A' );
@@ -58,7 +58,7 @@ class MEP_Seeder {
 			MEP_Inventory::record_transaction( array(
 				'material_id'  => $leather,
 				'warehouse_id' => ($i % 2 == 0) ? $wh_main : $wh_prod,
-				'bin_id'       => ($i % 2 == 0) ? 1 : 2, // Mocked bin IDs
+				'bin_id'       => ($i % 2 == 0) ? $bin_main : $bin_prod,
 				'quantity'     => rand(10, 50),
 				'type'         => 'RECEIVE',
 				'lot_number'   => 'LOT-ABC-' . rand(100, 999)

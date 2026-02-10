@@ -1,5 +1,5 @@
 /**
- * MEP BOM Builder - Interactive React Component with DnD Simulation
+ * MEP BOM Builder - Interactive React Component with Real DnD
  */
 
 const { useState, useEffect } = wp.element;
@@ -28,7 +28,6 @@ const BOMBuilder = ({ productId }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Load BOM
         wp.apiFetch({ path: `/mep/v1/bom/${productId}` })
             .then((data) => {
                 setBom(data);
@@ -36,11 +35,23 @@ const BOMBuilder = ({ productId }) => {
             })
             .catch((err) => console.error(err));
 
-        // Load available materials for the library
         wp.apiFetch({ path: '/mep/v1/materials' })
             .then((data) => setMaterials(data))
             .catch((err) => console.error(err));
     }, [productId]);
+
+    const onDragStart = (e, material) => {
+        e.dataTransfer.setData('material', JSON.stringify(material));
+    };
+
+    const onDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    const onDrop = (e) => {
+        const material = JSON.parse(e.dataTransfer.getData('material'));
+        addMaterial(material);
+    };
 
     const addMaterial = (material) => {
         const newComponent = {
@@ -50,13 +61,11 @@ const BOMBuilder = ({ productId }) => {
             qty: 1,
             scrap: 0
         };
-        const updatedBom = [...bom.bom, newComponent];
-        setBom({ ...bom, bom: updatedBom });
+        setBom(prev => ({ ...prev, bom: [...prev.bom, newComponent] }));
     };
 
     const removeComponent = (id) => {
-        const updatedBom = bom.bom.filter(item => item.id !== id);
-        setBom({ ...bom, bom: updatedBom });
+        setBom(prev => ({ ...prev, bom: prev.bom.filter(item => item.id !== id) }));
     };
 
     const saveBom = () => {
@@ -66,9 +75,7 @@ const BOMBuilder = ({ productId }) => {
             data: { components: bom.bom }
         }).then(() => {
             alert('BOM Saved Successfully!');
-            // Refresh cost
-            wp.apiFetch({ path: `/mep/v1/bom/${productId}` })
-                .then((data) => setBom(data));
+            wp.apiFetch({ path: `/mep/v1/bom/${productId}` }).then(setBom);
         });
     };
 
@@ -78,11 +85,13 @@ const BOMBuilder = ({ productId }) => {
         // Left Sidebar: Material Library
         wp.element.createElement('div', { className: 'mep-material-library', style: { width: '250px', border: '1px solid #ccc', padding: '10px' } },
             wp.element.createElement('h3', null, 'Material Library'),
+            wp.element.createElement('p', { style: { fontSize: '11px', color: '#666' } }, 'Drag materials to the canvas'),
             materials.map(mat => wp.element.createElement('div', {
                 key: mat.id,
                 className: 'mep-library-item',
-                style: { padding: '8px', border: '1px solid #eee', marginBottom: '5px', cursor: 'pointer', background: '#fff' },
-                onClick: () => addMaterial(mat)
+                draggable: true,
+                onDragStart: (e) => onDragStart(e, mat),
+                style: { padding: '8px', border: '1px solid #eee', marginBottom: '5px', cursor: 'grab', background: '#fff' }
             }, mat.name))
         ),
         // Central Canvas
@@ -96,30 +105,25 @@ const BOMBuilder = ({ productId }) => {
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
+                onDragOver: onDragOver,
+                onDrop: onDrop,
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }
             },
                 bom.bom.length > 0 ?
                     bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, depth: 0, onRemove: removeComponent })) :
-                    wp.element.createElement('p', { className: 'empty-msg' }, 'Click on materials from the library to add them to the BOM...')
+                    wp.element.createElement('p', { className: 'empty-msg' }, 'Drag materials here to start building...')
             ),
             wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px' } },
-                wp.element.createElement('button', {
-                    className: 'button button-primary',
-                    onClick: saveBom
-                }, 'Save BOM Structure')
+                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, 'Save BOM Structure')
             )
         )
     );
 };
 
-// Initialize if container exists
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('mep-bom-builder-root');
     if (container) {
         const productId = container.dataset.productId;
-        wp.element.render(
-            wp.element.createElement(BOMBuilder, { productId: productId }),
-            container
-        );
+        wp.element.render(wp.element.createElement(BOMBuilder, { productId: productId }), container);
     }
 });

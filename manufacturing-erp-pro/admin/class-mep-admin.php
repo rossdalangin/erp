@@ -55,12 +55,35 @@ class MEP_Admin {
 
 		add_submenu_page(
 			'mep-dashboard',
+			__( 'BOM Builder', 'manufacturing-erp-pro' ),
+			__( 'BOM Builder', 'manufacturing-erp-pro' ),
+			'manage_options',
+			'mep-bom-builder',
+			array( $this, 'bom_builder_page' )
+		);
+
+		add_submenu_page(
+			'mep-dashboard',
 			__( 'System Utilities', 'manufacturing-erp-pro' ),
 			__( 'System Utilities', 'manufacturing-erp-pro' ),
 			'manage_options',
 			'mep-utilities',
 			array( $this, 'utilities_page' )
 		);
+
+		add_submenu_page(
+			'mep-dashboard',
+			__( 'Setup Wizard', 'manufacturing-erp-pro' ),
+			__( 'Setup Wizard', 'manufacturing-erp-pro' ),
+			'manage_options',
+			'mep-wizard',
+			array( $this, 'wizard_page' )
+		);
+	}
+
+	public function wizard_page() {
+		echo '<div class="wrap"><h1>' . __( 'ERP Pro Setup Wizard', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-wizard-root"></div></div>';
 	}
 
 	public function inventory_page() {
@@ -71,6 +94,16 @@ class MEP_Admin {
 	public function production_page() {
 		echo '<div class="wrap"><h1>' . __( 'Production Planning & Kanban', 'manufacturing-erp-pro' ) . '</h1>';
 		echo '<div id="mep-kanban-root"></div></div>';
+	}
+
+	public function bom_builder_page() {
+		$product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
+		echo '<div class="wrap"><h1>' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . '</h1>';
+		if ( ! $product_id ) {
+			echo '<p>' . __( 'Please select a product from the Products list to edit its BOM.', 'manufacturing-erp-pro' ) . '</p>';
+			return;
+		}
+		echo '<div id="mep-bom-builder-root" data-product-id="' . esc_attr( $product_id ) . '"></div></div>';
 	}
 
 	public function dashboard_page() {
@@ -159,5 +192,6 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 	}
 }
