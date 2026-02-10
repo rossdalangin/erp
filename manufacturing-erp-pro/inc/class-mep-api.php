@@ -34,6 +34,18 @@ class MEP_API {
 			'callback'            => array( $this, 'get_work_orders' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_bom' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/mrp/run', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'run_mrp' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -70,5 +82,22 @@ class MEP_API {
 		}
 
 		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_bom( $request ) {
+		$product_id = $request['id'];
+		$tree = MEP_BOM::get_bom_tree( $product_id );
+		$cost = MEP_BOM::calculate_roll_up_cost( $product_id );
+
+		return new WP_REST_Response( array(
+			'product_id' => $product_id,
+			'bom'        => $tree,
+			'total_cost' => $cost
+		), 200 );
+	}
+
+	public function run_mrp( $request ) {
+		$suggestions = MEP_MRP::run();
+		return new WP_REST_Response( $suggestions, 200 );
 	}
 }
