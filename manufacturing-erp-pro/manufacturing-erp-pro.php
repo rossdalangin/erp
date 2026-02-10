@@ -57,6 +57,7 @@ class Manufacturing_ERP_Pro {
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-procurement.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-equipment.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-reports.php';
+		require_once MEP_PLUGIN_DIR . 'inc/class-mep-importer.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-seeder.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-api.php';
 
@@ -70,6 +71,7 @@ class Manufacturing_ERP_Pro {
 	 */
 	private function init_hooks() {
 		register_activation_hook( __FILE__, array( 'MEP_DB', 'create_tables' ) );
+		register_activation_hook( __FILE__, array( $this, 'register_roles' ) );
 
 		add_action( 'plugins_loaded', array( $this, 'init_modules' ) );
 	}
@@ -84,6 +86,33 @@ class Manufacturing_ERP_Pro {
 		if ( is_admin() ) {
 			MEP_Admin::get_instance();
 		}
+	}
+
+	/**
+	 * Register custom ERP roles.
+	 */
+	public function register_roles() {
+		add_role( 'mep_administrator', __( 'ERP Administrator', 'manufacturing-erp-pro' ), array(
+			'read' => true,
+			'manage_options' => true,
+			'mep_manage_all' => true
+		) );
+
+		add_role( 'mep_production_manager', __( 'ERP Production Manager', 'manufacturing-erp-pro' ), array(
+			'read' => true,
+			'mep_manage_production' => true,
+			'mep_manage_bom' => true
+		) );
+
+		add_role( 'mep_warehouse_clerk', __( 'ERP Warehouse Clerk', 'manufacturing-erp-pro' ), array(
+			'read' => true,
+			'mep_manage_inventory' => true
+		) );
+
+		add_role( 'mep_quality_inspector', __( 'ERP Quality Inspector', 'manufacturing-erp-pro' ), array(
+			'read' => true,
+			'mep_manage_quality' => true
+		) );
 	}
 }
 

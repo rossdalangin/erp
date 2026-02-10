@@ -126,7 +126,11 @@ Real-time tiles for Production Output, Scrap Rate, Inventory Value, and OEE.
 Multi-step Setup Wizard for UOM, Warehouse setup, and Sample Data ("LeatherCraft Co.") injection.
 
 ## 3. Security & Governance
-Role-Based Access Control (RBAC) with dedicated roles: Production Manager, Warehouse Clerk, Quality Inspector.
+Role-Based Access Control (RBAC) with dedicated roles:
+- **ERP Administrator**: Full system access, settings, and destructive resets.
+- **Production Manager**: Manage BOMs, Work Orders, Routes, and Capacity.
+- **Warehouse Clerk**: Bin transfers, Inventory movements, and Receipts.
+- **Quality Inspector**: View QC tasks, record results, and generate NCRs.
 
 ---
 
@@ -149,6 +153,9 @@ Comprehensive environment with multi-level BOMs, historical transactions, and ac
 - `/bom/{id}` (GET/POST)
 - `/mrp/run` (POST)
 - `/reports/kpis` (GET)
+- `/reports/inventory-csv` (GET)
+- `/qc/trace/{lot}/report` (GET)
+- `/equipment/capacity` (GET)
 
 ## 2. Data Flow: Production Workflow
 `[Forecast] -> [MRP Engine] -> [Purchase/Work Orders] -> [Inventory Issuance] -> [Production] -> [QC] -> [Stock]`

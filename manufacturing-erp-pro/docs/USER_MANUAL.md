@@ -47,6 +47,17 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 - **Load Monitoring**: The Executive Dashboard displays a real-time "Resource Capacity" chart.
 - **Bottleneck Alerts**: Machines exceeding 90% load are highlighted in Red, allowing you to reassign work orders before delays occur.
 
+### 6. Master Data Importer
+- **Transitioning from Excel**: Access `ERP Pro > System Utilities`.
+- **Bulk Import**: Paste your material data in CSV format (Name, SKU, UOM, Cost) to populate your catalog in seconds.
+
+### 7. Roles & Security
+- **Access Control**: We provide 4 specialized roles:
+  - **ERP Administrator**: Master control.
+  - **Production Manager**: Oversees the floor and BOMs.
+  - **Warehouse Clerk**: Focuses on material movements.
+  - **Quality Inspector**: Manages checks and traceability.
+
 ---
 
 ## Part 3: Marketing & Sales Strategy

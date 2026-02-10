@@ -125,6 +125,16 @@ class MEP_Admin {
 			<h1><?php _e( 'System Utilities & Safeguards', 'manufacturing-erp-pro' ); ?></h1>
 
 			<div class="card">
+				<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
+				<p><?php _e( 'Import Materials from a CSV file. Header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>
+				<form method="post">
+					<?php wp_nonce_field( 'mep_import_data', 'mep_nonce' ); ?>
+					<textarea name="mep_import_csv" style="width:100%; height:100px;" placeholder="Name,SKU,UOM,Cost"></textarea><br><br>
+					<input type="submit" name="mep_action_import" class="button button-secondary" value="<?php _e( 'Import Materials', 'manufacturing-erp-pro' ); ?>">
+				</form>
+			</div>
+
+			<div class="card">
 				<h2><?php _e( 'Sample Data Seeder', 'manufacturing-erp-pro' ); ?></h2>
 				<p><?php _e( 'Populate the system with "LeatherCraft Manufacturing Co." demo data.', 'manufacturing-erp-pro' ); ?></p>
 				<form method="post">
@@ -172,6 +182,14 @@ class MEP_Admin {
 			MEP_Seeder::seed();
 			add_action( 'admin_notices', function() {
 				echo '<div class="updated"><p>' . __( 'Sample data seeded successfully!', 'manufacturing-erp-pro' ) . '</p></div>';
+			} );
+		}
+
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_import_data' ) && isset( $_POST['mep_action_import'] ) ) {
+			$csv = sanitize_textarea_field( $_POST['mep_import_csv'] );
+			$count = MEP_Importer::import_materials( $csv );
+			add_action( 'admin_notices', function() use ( $count ) {
+				echo '<div class="updated"><p>' . sprintf( __( '%d materials imported successfully!', 'manufacturing-erp-pro' ), $count ) . '</p></div>';
 			} );
 		}
 

@@ -32,8 +32,11 @@ const Dashboard = () => {
 
     if (loading) return wp.element.createElement('p', null, 'Loading ERP Dashboard...');
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-dashboard-grid' },
         wp.element.createElement('div', {
+            title: helpMode ? 'KPI Tiles: Real-time snapshots of factory performance, stock value, and output.' : '',
             style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }
         },
             wp.element.createElement(KPICard, { label: 'Production Output', value: kpis.production_output, color: '#2271b1' }),
@@ -42,7 +45,10 @@ const Dashboard = () => {
             wp.element.createElement(KPICard, { label: 'On-Time Delivery', value: kpis.on_time_delivery, color: '#673ab7' })
         ),
         wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' } },
-            wp.element.createElement('div', { style: { padding: '20px', background: '#fff', border: '1px solid #ccc' } },
+            wp.element.createElement('div', {
+                title: helpMode ? 'Capacity Planner: Monitor machine load. Red bars indicate resources that are over-capacity.' : '',
+                style: { padding: '20px', background: '#fff', border: '1px solid #ccc' }
+            },
                 wp.element.createElement('h3', null, 'Resource Capacity (Load vs. Capacity)'),
                 capacity.length > 0 ? capacity.map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
                     wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '5px' } },

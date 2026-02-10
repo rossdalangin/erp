@@ -51,9 +51,14 @@ const WarehouseLayout = () => {
     if (loading) return wp.element.createElement('p', null, 'Loading Warehouse View...');
     if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-warehouse-layout' },
         wp.element.createElement('div', { className: 'mep-wh-toolbar', style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-            wp.element.createElement('div', { className: 'mep-wh-selector' },
+            wp.element.createElement('div', {
+                className: 'mep-wh-selector',
+                title: helpMode ? 'Warehouse Selector: Choose a location to view its current bin levels.' : ''
+            },
                 wp.element.createElement('label', null, 'Select Warehouse: '),
                 wp.element.createElement('select', {
                     value: selectedWh,
@@ -69,6 +74,7 @@ const WarehouseLayout = () => {
         ),
         wp.element.createElement('div', {
             className: 'mep-bins-grid',
+            title: helpMode ? 'Warehouse Grid: Shows bin occupancy. Red bins indicate high stock density.' : '',
             style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }
         },
             bins.map(bin => wp.element.createElement(Bin, { key: bin.id, bin: bin }))

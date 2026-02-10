@@ -23,8 +23,14 @@ const Traceability = () => {
             });
     };
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-traceability-view' },
-        wp.element.createElement('div', { className: 'mep-trace-search', style: { marginBottom: '30px', display: 'flex', gap: '10px' } },
+        wp.element.createElement('div', {
+            className: 'mep-trace-search',
+            title: helpMode ? 'Lot Search: Enter a lot number to see its entire production history.' : '',
+            style: { marginBottom: '30px', display: 'flex', gap: '10px' }
+        },
             wp.element.createElement('input', {
                 type: 'text',
                 placeholder: 'Enter Lot Number...',
@@ -37,7 +43,10 @@ const Traceability = () => {
 
         loading && wp.element.createElement('p', null, 'Tracing lot genealogy...'),
 
-        trace && wp.element.createElement('div', { className: 'mep-trace-results' },
+        trace && wp.element.createElement('div', {
+            className: 'mep-trace-results',
+            title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot.' : ''
+        },
             wp.element.createElement('h3', null, `Genealogy for Lot: ${trace.lot}`),
             wp.element.createElement('div', { className: 'mep-trace-graph', style: { border: '1px solid #ccc', padding: '20px', background: '#fff' } },
                 wp.element.createElement('h4', null, 'Transaction History'),
