@@ -83,32 +83,38 @@ class MEP_Admin {
 
 	public function traceability_page() {
 		echo '<div class="wrap"><h1>' . __( 'Lot & Batch Traceability', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div id="mep-traceability-root"></div></div>';
 	}
 
 	public function mrp_planning_page() {
 		echo '<div class="wrap"><h1>' . __( 'MRP Planning & Procurement', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div id="mep-mrp-suggestions-root"></div></div>';
 	}
 
 	public function pegging_page() {
 		echo '<div class="wrap"><h1>' . __( 'Demand Pegging Visualization', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div id="mep-pegging-root"></div></div>';
 	}
 
 	public function inventory_page() {
 		echo '<div class="wrap"><h1>' . __( 'Warehouse & Inventory Management', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div id="mep-warehouse-root"></div></div>';
 	}
 
 	public function production_page() {
 		echo '<div class="wrap"><h1>' . __( 'Production Planning & Kanban', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div id="mep-kanban-root"></div></div>';
 	}
 
 	public function bom_builder_page() {
 		$product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 		echo '<div class="wrap"><h1>' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		if ( ! $product_id ) {
 			echo '<p>' . __( 'Please select a product from the Products list to edit its BOM.', 'manufacturing-erp-pro' ) . '</p>';
 			return;
@@ -119,6 +125,7 @@ class MEP_Admin {
 	public function dashboard_page() {
 		$help_mode = get_option( 'mep_help_mode', 'off' );
 		echo '<div class="wrap"><h1>' . __( 'Manufacturing ERP Pro Dashboard', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
 		echo '<div class="mep-help-toggle-container" style="background: #fff; padding: 10px; border: 1px solid #ccc; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
 				<strong>' . __( 'Interactive Help Mode:', 'manufacturing-erp-pro' ) . '</strong>
 				<form method="post" style="display:inline;">
@@ -131,11 +138,18 @@ class MEP_Admin {
 		echo '<div id="mep-dashboard-root"></div></div>';
 	}
 
+	public function maybe_show_demo_badge() {
+		$has_sample = get_posts( array( 'post_type' => 'mep_material', 'meta_key' => '_mep_is_sample_data', 'numberposts' => 1 ) );
+		if ( ! empty( $has_sample ) ) {
+			echo '<div class="mep-demo-badge" style="background: #dba617; color: #fff; padding: 5px 15px; border-radius: 20px; display: inline-block; font-weight: bold; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🚀 ' . __( 'DEMO MODE ACTIVE: LeatherCraft Co.', 'manufacturing-erp-pro' ) . '</div>';
+		}
+	}
+
 	public function utilities_page() {
 		?>
 		<div class="wrap">
 			<h1><?php _e( 'System Utilities & Safeguards', 'manufacturing-erp-pro' ); ?></h1>
-
+			<?php $this->maybe_show_demo_badge(); ?>
 			<div class="card">
 				<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
 				<p><?php _e( 'Import Materials from a CSV file. Header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>

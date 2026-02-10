@@ -107,6 +107,12 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/equipment', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_equipment' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/reports/inventory-csv', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_inventory_csv' ),
@@ -286,6 +292,19 @@ class MEP_API {
 
 	public function get_equipment_capacity( $request ) {
 		$data = MEP_Equipment::get_capacity_data();
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_equipment( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_equipment', 'numberposts' => -1 ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array(
+				'id' => $post->ID,
+				'name' => $post->post_title,
+				'labor_rate' => get_post_meta($post->ID, '_mep_labor_rate', true) ?: 0.5
+			);
+		}
 		return new WP_REST_Response( $data, 200 );
 	}
 

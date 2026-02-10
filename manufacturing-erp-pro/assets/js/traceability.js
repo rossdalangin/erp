@@ -7,10 +7,11 @@ const { useState } = wp.element;
 const TraceNode = ({ label, type, date, qty }) => {
     return wp.element.createElement('div', {
         className: 'mep-trace-node',
-        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }
+        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'relative', zIndex: 2, minWidth: '200px' }
     },
-        wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1' } }, label),
-        wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, `${type} | ${date} | Qty: ${qty}`)
+        wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1', marginBottom: '5px' } }, label),
+        wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, `${type}`),
+        wp.element.createElement('div', { style: { fontSize: '10px', color: '#999', marginTop: '3px' } }, `${date} | Qty: ${qty}`)
     );
 };
 
@@ -58,17 +59,26 @@ const Traceability = () => {
             title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot.' : ''
         },
             wp.element.createElement('h3', null, `Genealogy Graph for Lot: ${trace.lot}`),
-            wp.element.createElement('div', { className: 'mep-trace-graph-layout', style: { padding: '20px', background: '#f6f7f7', borderRadius: '8px' } },
+            wp.element.createElement('div', { className: 'mep-trace-graph-layout', style: { padding: '40px', background: '#f0f0f1', borderRadius: '8px', overflowX: 'auto' } },
                 trace.history.length > 0 ?
-                    trace.history.map((h, i) => wp.element.createElement('div', { key: i, style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
-                        wp.element.createElement(TraceNode, {
-                            label: h.transaction_type,
-                            type: `Material #${h.material_id}`,
-                            date: h.created_at,
-                            qty: h.quantity
-                        }),
-                        i < trace.history.length - 1 && wp.element.createElement('div', { style: { height: '20px', borderLeft: '2px dashed #ccc', marginBottom: '10px' } })
-                    )) :
+                    wp.element.createElement('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
+                        trace.history.map((h, i) => wp.element.createElement(wp.element.Fragment, { key: i },
+                            wp.element.createElement(TraceNode, {
+                                label: h.transaction_type,
+                                type: `Material #${h.material_id}`,
+                                date: h.created_at,
+                                qty: h.quantity
+                            }),
+                            i < trace.history.length - 1 && wp.element.createElement('div', {
+                                className: 'mep-trace-connector',
+                                style: { height: '30px', width: '2px', background: '#2271b1', position: 'relative' }
+                            },
+                                wp.element.createElement('div', {
+                                    style: { position: 'absolute', bottom: '-5px', left: '-4px', borderTop: '6px solid #2271b1', borderLeft: '5px solid transparent', borderRight: '5px solid transparent' }
+                                })
+                            )
+                        ))
+                    ) :
                     wp.element.createElement('p', null, 'No history found.')
             ),
             wp.element.createElement('div', { style: { marginTop: '20px' } },

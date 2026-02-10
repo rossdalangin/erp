@@ -69,10 +69,14 @@ class MEP_BOM {
 			if ( $component['type'] === 'material' ) {
 				$unit_cost = (float) get_post_meta( $component['id'], '_mep_cost_avg', true );
 				$total_cost += $unit_cost * $adjusted_qty;
-			} else {
+			} elseif ( $component['type'] === 'product' ) {
 				// Sub-assembly
 				$unit_cost = static::calculate_roll_up_cost( $component['id'] );
 				$total_cost += $unit_cost * $adjusted_qty;
+			} elseif ( $component['type'] === 'operation' ) {
+				// Calculate labor/machine cost for the operation
+				$labor_rate = (float) get_post_meta( $component['id'], '_mep_labor_rate', true ) ?: 0.5;
+				$total_cost += $adjusted_qty * $labor_rate; // adjusted_qty is 'time' for ops
 			}
 		}
 
