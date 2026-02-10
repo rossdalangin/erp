@@ -42,6 +42,11 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 - **Workflow**: Move Work Orders from "Backlog" to "In Progress" when materials are released. Advance to "QC" once production is finished.
 - **Assignment**: Use the card details to assign specific operators or machines to a production run.
 
+### 5. Equipment & Capacity Planning
+- **Machine Catalog**: Manage your factory assets in `Equipment`. Set the "Daily Capacity" in minutes for each machine.
+- **Load Monitoring**: The Executive Dashboard displays a real-time "Resource Capacity" chart.
+- **Bottleneck Alerts**: Machines exceeding 90% load are highlighted in Red, allowing you to reassign work orders before delays occur.
+
 ---
 
 ## Part 3: Marketing & Sales Strategy

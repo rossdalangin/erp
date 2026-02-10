@@ -82,6 +82,12 @@ class MEP_API {
 			'callback'            => array( $this, 'get_lot_trace' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/equipment/capacity', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_equipment_capacity' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -175,6 +181,11 @@ class MEP_API {
 	public function get_lot_trace( $request ) {
 		$lot = $request['lot'];
 		$data = MEP_Quality::trace_lot( $lot );
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_equipment_capacity( $request ) {
+		$data = MEP_Equipment::get_capacity_data();
 		return new WP_REST_Response( $data, 200 );
 	}
 

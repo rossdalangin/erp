@@ -16,12 +16,54 @@ class MEP_Procurement {
 	 * @return array
 	 */
 	public static function calculate_supplier_score( $supplier_id ) {
-		// In a real system, this would analyze PO lead times and QC pass rates.
-		// For this implementation, we return a mock performance object.
+		// 1. Quality Rate calculation
+		$qc_checks = get_posts( array(
+			'post_type'  => 'mep_qc_check',
+			'meta_query' => array(
+				array( 'key' => '_mep_qc_supplier_id', 'value' => $supplier_id )
+			),
+			'numberposts' => -1
+		) );
+
+		$total_qc = count( $qc_checks );
+		$passed_qc = 0;
+		foreach ( $qc_checks as $qc ) {
+			if ( get_post_meta( $qc->ID, '_mep_qc_status', true ) === 'PASS' ) {
+				$passed_qc++;
+			}
+		}
+		$quality_rate = $total_qc > 0 ? ( $passed_qc / $total_qc ) : 1.0;
+
+		// 2. OTD (On-Time Delivery) calculation
+		$pos = get_posts( array(
+			'post_type'  => 'mep_po',
+			'meta_query' => array(
+				array( 'key' => '_mep_supplier_id', 'value' => $supplier_id )
+			),
+			'post_status' => 'any',
+			'numberposts' => -1
+		) );
+
+		$total_received = 0;
+		$on_time = 0;
+		foreach ( $pos as $po ) {
+			$actual = get_post_meta( $po->ID, '_mep_received_date', true );
+			$expected = get_post_meta( $po->ID, '_mep_expected_date', true );
+			if ( $actual && $expected ) {
+				$total_received++;
+				if ( strtotime( $actual ) <= strtotime( $expected ) ) {
+					$on_time++;
+				}
+			}
+		}
+		$otd_rate = $total_received > 0 ? ( $on_time / $total_received ) : 1.0;
+
+		$overall_score = round( ( ( $quality_rate * 0.6 ) + ( $otd_rate * 0.4 ) ) * 100 );
+
 		return array(
-			'quality_rate' => 0.95, // 95% pass rate
-			'on_time_rate' => 0.88, // 88% on-time delivery
-			'score'        => 92,   // Overall score
+			'quality_rate' => $quality_rate,
+			'on_time_rate' => $otd_rate,
+			'score'        => $overall_score,
 		);
 	}
 

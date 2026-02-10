@@ -16,14 +16,18 @@ const KPICard = ({ label, value, color }) => {
 
 const Dashboard = () => {
     const [kpis, setKpis] = useState(null);
+    const [capacity, setCapacity] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        wp.apiFetch({ path: '/mep/v1/reports/kpis' })
-            .then(data => {
-                setKpis(data);
-                setLoading(false);
-            });
+        Promise.all([
+            wp.apiFetch({ path: '/mep/v1/reports/kpis' }),
+            wp.apiFetch({ path: '/mep/v1/equipment/capacity' })
+        ]).then(([kpiData, capData]) => {
+            setKpis(kpiData);
+            setCapacity(capData);
+            setLoading(false);
+        });
     }, []);
 
     if (loading) return wp.element.createElement('p', null, 'Loading ERP Dashboard...');
@@ -37,9 +41,25 @@ const Dashboard = () => {
             wp.element.createElement(KPICard, { label: 'Inventory Value', value: kpis.inventory_value, color: '#dba617' }),
             wp.element.createElement(KPICard, { label: 'On-Time Delivery', value: kpis.on_time_delivery, color: '#673ab7' })
         ),
-        wp.element.createElement('div', { style: { marginTop: '30px', padding: '20px', background: '#fff', border: '1px solid #ccc' } },
-            wp.element.createElement('h3', null, 'Active Production Insights'),
-            wp.element.createElement('p', null, `Currently tracking ${kpis.active_orders} live work orders on the production floor.`)
+        wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' } },
+            wp.element.createElement('div', { style: { padding: '20px', background: '#fff', border: '1px solid #ccc' } },
+                wp.element.createElement('h3', null, 'Resource Capacity (Load vs. Capacity)'),
+                capacity.length > 0 ? capacity.map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
+                    wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '5px' } },
+                        wp.element.createElement('span', null, item.name),
+                        wp.element.createElement('span', null, `${item.load} / ${item.capacity} mins (${item.percent}%)`)
+                    ),
+                    wp.element.createElement('div', { style: { height: '10px', background: '#eee', borderRadius: '5px', overflow: 'hidden' } },
+                        wp.element.createElement('div', { style: { height: '100%', width: `${Math.min(item.percent, 100)}%`, background: item.percent > 90 ? '#d63638' : '#2271b1' } })
+                    )
+                )) : wp.element.createElement('p', null, 'No equipment data available.')
+            ),
+            wp.element.createElement('div', { style: { padding: '20px', background: '#fff', border: '1px solid #ccc' } },
+                wp.element.createElement('h3', null, 'Active Production Insights'),
+                wp.element.createElement('p', null, `Currently tracking ${kpis.active_orders} live work orders on the production floor.`),
+                wp.element.createElement('p', null, `Reported Production Output: ${kpis.production_output} units.`),
+                wp.element.createElement('p', null, `Current Scrap Rate: ${kpis.scrap_rate}.`)
+            )
         )
     );
 };
