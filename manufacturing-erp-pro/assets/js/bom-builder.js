@@ -81,9 +81,15 @@ const BOMBuilder = ({ productId }) => {
 
     if (loading) return wp.element.createElement('p', null, 'Loading Interactive BOM Builder...');
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-bom-editor-layout', style: { display: 'flex', gap: '20px' } },
         // Left Sidebar: Material Library
-        wp.element.createElement('div', { className: 'mep-material-library', style: { width: '250px', border: '1px solid #ccc', padding: '10px' } },
+        wp.element.createElement('div', {
+            className: 'mep-material-library',
+            title: helpMode ? 'Library: Drag materials from here into the canvas on the right to build your assembly.' : '',
+            style: { width: '250px', border: '1px solid #ccc', padding: '10px' }
+        },
             wp.element.createElement('h3', null, 'Material Library'),
             wp.element.createElement('p', { style: { fontSize: '11px', color: '#666' } }, 'Drag materials to the canvas'),
             materials.map(mat => wp.element.createElement('div', {
@@ -105,6 +111,7 @@ const BOMBuilder = ({ productId }) => {
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
+                title: helpMode ? 'Canvas: Drop materials here. You can remove them or add sub-assemblies to create complex multi-level BOMs.' : '',
                 onDragOver: onDragOver,
                 onDrop: onDrop,
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }

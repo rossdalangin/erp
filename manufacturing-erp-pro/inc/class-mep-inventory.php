@@ -16,7 +16,15 @@ class MEP_Inventory {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
 
-		$wpdb->insert( $table_name, array(
+		$wpdb->query( 'START TRANSACTION' );
+
+		// Pessimistic Lock: Ensure no other process is calculating levels for this material simultaneously
+		$wpdb->get_row( $wpdb->prepare(
+			"SELECT id FROM $table_name WHERE material_id = %d FOR UPDATE",
+			$data['material_id']
+		) );
+
+		$inserted = $wpdb->insert( $table_name, array(
 			'material_id'      => $data['material_id'],
 			'warehouse_id'     => $data['warehouse_id'],
 			'bin_id'           => $data['bin_id'],
@@ -26,7 +34,16 @@ class MEP_Inventory {
 			'lot_number'       => isset( $data['lot_number'] ) ? $data['lot_number'] : null,
 		) );
 
-		return $wpdb->insert_id;
+		$id = $wpdb->insert_id;
+
+		if ( $inserted ) {
+			MEP_DB::log_audit( 'inventory', $id, 'TRANSACTION_' . $data['type'], '', $data );
+			$wpdb->query( 'COMMIT' );
+		} else {
+			$wpdb->query( 'ROLLBACK' );
+		}
+
+		return $id;
 	}
 
 	/**

@@ -64,4 +64,19 @@ class MEP_DB {
 		) $charset_collate;";
 		dbDelta( $sql );
 	}
+
+	/**
+	 * Record an audit log entry.
+	 */
+	public static function log_audit( $object_type, $object_id, $action, $old_value = '', $new_value = '' ) {
+		global $wpdb;
+		$wpdb->insert( $wpdb->prefix . 'mep_audit_logs', array(
+			'user_id'     => get_current_user_id(),
+			'object_type' => $object_type,
+			'object_id'   => $object_id,
+			'action'      => $action,
+			'old_value'   => is_scalar( $old_value ) ? $old_value : json_encode( $old_value ),
+			'new_value'   => is_scalar( $new_value ) ? $new_value : json_encode( $new_value ),
+		) );
+	}
 }

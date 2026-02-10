@@ -76,6 +76,12 @@ class MEP_API {
 			'callback'            => array( $this, 'get_kpis' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/qc/trace/(?P<lot>[a-zA-Z0-9\-_]+)', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_lot_trace' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -118,10 +124,13 @@ class MEP_API {
 		$id = $request['id'];
 		$status = $request['status'];
 
+		$old_status = get_post_field( 'post_status', $id );
 		wp_update_post( array(
 			'ID'          => $id,
 			'post_status' => $status
 		) );
+
+		MEP_DB::log_audit( 'work_order', $id, 'STATUS_CHANGE', $old_status, $status );
 
 		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
@@ -163,6 +172,12 @@ class MEP_API {
 		return new WP_REST_Response( $data, 200 );
 	}
 
+	public function get_lot_trace( $request ) {
+		$lot = $request['lot'];
+		$data = MEP_Quality::trace_lot( $lot );
+		return new WP_REST_Response( $data, 200 );
+	}
+
 	public function update_bom( $request ) {
 		$product_id = $request['id'];
 		$components = $request->get_param( 'components' );
@@ -186,7 +201,10 @@ class MEP_API {
 			$bom_id = $bom_posts[0]->ID;
 		}
 
+		$old_components = get_post_meta( $bom_id, '_mep_components', true );
 		update_post_meta( $bom_id, '_mep_components', $components );
+
+		MEP_DB::log_audit( 'bom', $bom_id, 'UPDATE_COMPONENTS', $old_components, $components );
 
 		return new WP_REST_Response( array( 'success' => true, 'bom_id' => $bom_id ), 200 );
 	}

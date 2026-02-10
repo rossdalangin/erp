@@ -60,8 +60,11 @@ const KanbanBoard = () => {
 
     if (loading) return wp.element.createElement('p', null, 'Loading Kanban Board...');
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', {
         className: 'mep-kanban-board',
+        title: helpMode ? 'Production Board: Drag Work Order cards between columns to update their manufacturing status.' : '',
         style: { display: 'flex', gap: '20px', alignItems: 'flex-start' }
     },
         columns.map(col => wp.element.createElement('div', {

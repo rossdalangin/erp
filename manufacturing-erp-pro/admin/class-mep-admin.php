@@ -79,11 +79,25 @@ class MEP_Admin {
 			'mep-wizard',
 			array( $this, 'wizard_page' )
 		);
+
+		add_submenu_page(
+			'mep-dashboard',
+			__( 'Traceability', 'manufacturing-erp-pro' ),
+			__( 'Traceability', 'manufacturing-erp-pro' ),
+			'manage_options',
+			'mep-traceability',
+			array( $this, 'traceability_page' )
+		);
 	}
 
 	public function wizard_page() {
 		echo '<div class="wrap"><h1>' . __( 'ERP Pro Setup Wizard', 'manufacturing-erp-pro' ) . '</h1>';
 		echo '<div id="mep-wizard-root"></div></div>';
+	}
+
+	public function traceability_page() {
+		echo '<div class="wrap"><h1>' . __( 'Lot & Batch Traceability', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-traceability-root"></div></div>';
 	}
 
 	public function inventory_page() {
@@ -107,7 +121,17 @@ class MEP_Admin {
 	}
 
 	public function dashboard_page() {
+		$help_mode = get_option( 'mep_help_mode', 'off' );
 		echo '<div class="wrap"><h1>' . __( 'Manufacturing ERP Pro Dashboard', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div class="mep-help-toggle-container" style="background: #fff; padding: 10px; border: 1px solid #ccc; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+				<strong>' . __( 'Interactive Help Mode:', 'manufacturing-erp-pro' ) . '</strong>
+				<form method="post" style="display:inline;">
+					<input type="hidden" name="mep_action_toggle_help" value="1">
+					' . wp_nonce_field( 'mep_toggle_help', 'mep_nonce', true, false ) . '
+					<button type="submit" class="button ' . ( $help_mode === 'on' ? 'button-primary' : '' ) . '">' . ( $help_mode === 'on' ? 'ON' : 'OFF' ) . '</button>
+				</form>
+				<small>' . __( 'When ON, hover over elements to see guided instructions.', 'manufacturing-erp-pro' ) . '</small>
+			  </div>';
 		echo '<div id="mep-dashboard-root"></div></div>';
 	}
 
@@ -150,11 +174,17 @@ class MEP_Admin {
 	}
 
 	public function handle_utilities() {
-		if ( ! isset( $_POST['mep_nonce'] ) || ! wp_verify_nonce( $_POST['mep_nonce'], 'mep_seed_data' ) && ! wp_verify_nonce( $_POST['mep_nonce'], 'mep_reset_db' ) ) {
+		if ( ! isset( $_POST['mep_nonce'] ) ) {
 			return;
 		}
 
-		if ( isset( $_POST['mep_action_seed'] ) ) {
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_toggle_help' ) && isset( $_POST['mep_action_toggle_help'] ) ) {
+			$current = get_option( 'mep_help_mode', 'off' );
+			update_option( 'mep_help_mode', $current === 'on' ? 'off' : 'on' );
+			return;
+		}
+
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_seed_data' ) && isset( $_POST['mep_action_seed'] ) ) {
 			MEP_Seeder::seed();
 			add_action( 'admin_notices', function() {
 				echo '<div class="updated"><p>' . __( 'Sample data seeded successfully!', 'manufacturing-erp-pro' ) . '</p></div>';
@@ -193,5 +223,10 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+
+		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
+			'helpMode' => get_option( 'mep_help_mode', 'off' )
+		) );
 	}
 }
