@@ -208,10 +208,22 @@ class MEP_API {
 		$tree = MEP_BOM::get_bom_tree( $product_id );
 		$cost = MEP_BOM::calculate_roll_up_cost( $product_id );
 
+		// Get latest version
+		$bom_posts = get_posts( array(
+			'post_type'   => 'mep_bom',
+			'post_parent' => $product_id,
+			'post_status' => 'publish',
+			'numberposts' => 1,
+			'orderby'     => 'ID',
+			'order'       => 'DESC'
+		) );
+		$version = ! empty( $bom_posts ) ? (int) get_post_meta( $bom_posts[0]->ID, '_mep_version', true ) : 1;
+
 		return new WP_REST_Response( array(
 			'product_id' => $product_id,
 			'bom'        => $tree,
-			'total_cost' => $cost
+			'total_cost' => $cost,
+			'version'    => $version ?: 1
 		), 200 );
 	}
 
@@ -327,27 +339,36 @@ class MEP_API {
 	public function update_bom( $request ) {
 		$product_id = $request['id'];
 		$components = $request->get_param( 'components' );
+		$new_version = $request->get_param( 'create_new_version' );
 
 		if ( ! is_array( $components ) ) {
 			return new WP_Error( 'invalid_data', 'BOM components must be an array.', array( 'status' => 400 ) );
 		}
 
-		// Find or create BOM post
+		// Find latest version
 		$bom_posts = get_posts( array(
 			'post_type'   => 'mep_bom',
 			'post_parent' => $product_id,
 			'post_status' => 'any',
 			'numberposts' => 1,
+			'orderby'     => 'ID',
+			'order'       => 'DESC'
 		) );
 
-		if ( empty( $bom_posts ) ) {
+		$latest_version = ! empty( $bom_posts ) ? (int) get_post_meta( $bom_posts[0]->ID, '_mep_version', true ) : 0;
+
+		if ( empty( $bom_posts ) || $new_version ) {
+			// Create new post for new version
+			$version = $latest_version + 1;
 			$bom_id = wp_insert_post( array(
 				'post_type'   => 'mep_bom',
-				'post_title'  => sprintf( __( 'BOM for Product #%d', 'manufacturing-erp-pro' ), $product_id ),
+				'post_title'  => sprintf( __( 'BOM for Product #%d (v%d)', 'manufacturing-erp-pro' ), $product_id, $version ),
 				'post_parent' => $product_id,
 				'post_status' => 'publish',
 			) );
+			update_post_meta( $bom_id, '_mep_version', $version );
 		} else {
+			// Update existing latest post
 			$bom_id = $bom_posts[0]->ID;
 		}
 
@@ -356,6 +377,6 @@ class MEP_API {
 
 		MEP_DB::log_audit( 'bom', $bom_id, 'UPDATE_COMPONENTS', $old_components, $components );
 
-		return new WP_REST_Response( array( 'success' => true, 'bom_id' => $bom_id ), 200 );
+		return new WP_REST_Response( array( 'success' => true, 'bom_id' => $bom_id, 'version' => get_post_meta($bom_id, '_mep_version', true) ), 200 );
 	}
 }

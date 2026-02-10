@@ -4,10 +4,13 @@
 
 const { useState } = wp.element;
 
-const TraceNode = ({ label, type, date, qty }) => {
+const TraceNode = ({ label, type, date, qty, onDragStart, onDragEnd }) => {
     return wp.element.createElement('div', {
         className: 'mep-trace-node',
-        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'relative', zIndex: 2, minWidth: '200px' }
+        draggable: true,
+        onDragStart: onDragStart,
+        onDragEnd: onDragEnd,
+        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'relative', zIndex: 2, minWidth: '200px', cursor: 'grab' }
     },
         wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1', marginBottom: '5px' } }, label),
         wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, `${type}`),
@@ -59,7 +62,11 @@ const Traceability = () => {
             title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot.' : ''
         },
             wp.element.createElement('h3', null, `Genealogy Graph for Lot: ${trace.lot}`),
-            wp.element.createElement('div', { className: 'mep-trace-graph-layout', style: { padding: '40px', background: '#f0f0f1', borderRadius: '8px', overflowX: 'auto' } },
+            wp.element.createElement('div', {
+                className: 'mep-trace-graph-layout',
+                onDragOver: (e) => e.preventDefault(),
+                style: { padding: '40px', background: '#f0f0f1', borderRadius: '8px', overflowX: 'auto', minHeight: '400px' }
+            },
                 trace.history.length > 0 ?
                     wp.element.createElement('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
                         trace.history.map((h, i) => wp.element.createElement(wp.element.Fragment, { key: i },
@@ -67,7 +74,14 @@ const Traceability = () => {
                                 label: h.transaction_type,
                                 type: `Material #${h.material_id}`,
                                 date: h.created_at,
-                                qty: h.quantity
+                                qty: h.quantity,
+                                onDragStart: (e) => {
+                                    e.target.style.opacity = '0.5';
+                                    e.dataTransfer.setData('text/plain', i);
+                                },
+                                onDragEnd: (e) => {
+                                    e.target.style.opacity = '1';
+                                }
                             }),
                             i < trace.history.length - 1 && wp.element.createElement('div', {
                                 className: 'mep-trace-connector',

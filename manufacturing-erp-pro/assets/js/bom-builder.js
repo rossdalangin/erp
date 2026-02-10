@@ -53,9 +53,10 @@ const BOMNode = ({ item, depth, onRemove, onMarkSubstitute, onUpdate }) => {
 };
 
 const BOMBuilder = ({ productId }) => {
-    const [bom, setBom] = useState({ bom: [], total_cost: 0 });
+    const [bom, setBom] = useState({ bom: [], total_cost: 0, version: 1 });
     const [materials, setMaterials] = useState([]);
     const [equipment, setEquipment] = useState([]);
+    const [newVersion, setNewVersion] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -140,9 +141,13 @@ const BOMBuilder = ({ productId }) => {
         wp.apiFetch({
             path: `/mep/v1/bom/${productId}`,
             method: 'POST',
-            data: { components: bom.bom }
+            data: {
+                components: bom.bom,
+                create_new_version: newVersion
+            }
         }).then(() => {
             alert('BOM Saved Successfully!');
+            setNewVersion(false);
             wp.apiFetch({ path: `/mep/v1/bom/${productId}` }).then(setBom);
         });
     };
@@ -196,8 +201,17 @@ const BOMBuilder = ({ productId }) => {
                     bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent })) :
                     wp.element.createElement('p', { className: 'empty-msg' }, 'Drag materials or operations here to start building...')
             ),
-            wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px' } },
-                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, 'Save BOM Structure')
+            wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px' } },
+                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, 'Save BOM Structure'),
+                wp.element.createElement('label', null,
+                    wp.element.createElement('input', {
+                        type: 'checkbox',
+                        checked: newVersion,
+                        onChange: (e) => setNewVersion(e.target.checked)
+                    }),
+                    ' Save as New Version'
+                ),
+                wp.element.createElement('span', { style: { color: '#666' } }, `Current Version: ${bom.version || 1}`)
             )
         )
     );

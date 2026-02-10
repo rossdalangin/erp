@@ -29,6 +29,7 @@ class MEP_DB {
 			transaction_type varchar(50) NOT NULL,
 			reference_id bigint(20) DEFAULT NULL,
 			lot_number varchar(100) DEFAULT NULL,
+			batch_id bigint(20) DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
 			PRIMARY KEY  (id)
 		) $charset_collate;";

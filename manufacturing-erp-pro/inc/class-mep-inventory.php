@@ -32,6 +32,7 @@ class MEP_Inventory {
 			'transaction_type' => $data['type'], // RECEIVE, ISSUE, TRANSFER, ADJUST
 			'reference_id'     => isset( $data['reference_id'] ) ? $data['reference_id'] : null,
 			'lot_number'       => isset( $data['lot_number'] ) ? $data['lot_number'] : null,
+			'batch_id'         => isset( $data['batch_id'] ) ? $data['batch_id'] : null,
 		) );
 
 		$id = $wpdb->insert_id;
