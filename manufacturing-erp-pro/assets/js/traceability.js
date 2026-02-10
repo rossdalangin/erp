@@ -1,8 +1,18 @@
 /**
- * MEP Lot Traceability - Genealogy Visualization
+ * MEP Lot Traceability - Graphical Genealogy Visualization
  */
 
 const { useState } = wp.element;
+
+const TraceNode = ({ label, type, date, qty }) => {
+    return wp.element.createElement('div', {
+        className: 'mep-trace-node',
+        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }
+    },
+        wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1' } }, label),
+        wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, `${type} | ${date} | Qty: ${qty}`)
+    );
+};
 
 const Traceability = () => {
     const [lot, setLot] = useState('');
@@ -47,29 +57,19 @@ const Traceability = () => {
             className: 'mep-trace-results',
             title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot.' : ''
         },
-            wp.element.createElement('h3', null, `Genealogy for Lot: ${trace.lot}`),
-            wp.element.createElement('div', { className: 'mep-trace-graph', style: { border: '1px solid #ccc', padding: '20px', background: '#fff' } },
-                wp.element.createElement('h4', null, 'Transaction History'),
-                wp.element.createElement('table', { className: 'wp-list-table widefat fixed striped' },
-                    wp.element.createElement('thead', null,
-                        wp.element.createElement('tr', null,
-                            wp.element.createElement('th', null, 'Date'),
-                            wp.element.createElement('th', null, 'Type'),
-                            wp.element.createElement('th', null, 'Qty'),
-                            wp.element.createElement('th', null, 'Warehouse')
-                        )
-                    ),
-                    wp.element.createElement('tbody', null,
-                        trace.history.length > 0 ?
-                            trace.history.map((h, i) => wp.element.createElement('tr', { key: i },
-                                wp.element.createElement('td', null, h.created_at),
-                                wp.element.createElement('td', null, h.transaction_type),
-                                wp.element.createElement('td', null, h.quantity),
-                                wp.element.createElement('td', null, h.warehouse_id)
-                            )) :
-                            wp.element.createElement('tr', null, wp.element.createElement('td', { colSpan: 4 }, 'No history found.'))
-                    )
-                )
+            wp.element.createElement('h3', null, `Genealogy Graph for Lot: ${trace.lot}`),
+            wp.element.createElement('div', { className: 'mep-trace-graph-layout', style: { padding: '20px', background: '#f6f7f7', borderRadius: '8px' } },
+                trace.history.length > 0 ?
+                    trace.history.map((h, i) => wp.element.createElement('div', { key: i, style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
+                        wp.element.createElement(TraceNode, {
+                            label: h.transaction_type,
+                            type: `Material #${h.material_id}`,
+                            date: h.created_at,
+                            qty: h.quantity
+                        }),
+                        i < trace.history.length - 1 && wp.element.createElement('div', { style: { height: '20px', borderLeft: '2px dashed #ccc', marginBottom: '10px' } })
+                    )) :
+                    wp.element.createElement('p', null, 'No history found.')
             ),
             wp.element.createElement('div', { style: { marginTop: '20px' } },
                 wp.element.createElement('button', {

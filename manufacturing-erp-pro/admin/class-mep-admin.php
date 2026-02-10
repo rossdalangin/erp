@@ -67,6 +67,8 @@ class MEP_Admin {
 		add_submenu_page( 'mep-dashboard', __( 'Suppliers', 'manufacturing-erp-pro' ), __( 'Suppliers', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_supplier' );
 		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_po' );
 		add_submenu_page( 'mep-dashboard', __( 'Forecasts', 'manufacturing-erp-pro' ), __( 'Forecasts', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_forecast' );
+		add_submenu_page( 'mep-dashboard', __( 'MRP Planning', 'manufacturing-erp-pro' ), __( 'MRP Planning', 'manufacturing-erp-pro' ), 'manage_options', 'mep-mrp-planning', array( $this, 'mrp_planning_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Pegging View', 'manufacturing-erp-pro' ), __( 'Pegging View', 'manufacturing-erp-pro' ), 'manage_options', 'mep-pegging', array( $this, 'pegging_page' ) );
 
 		// --- SETTINGS ---
 		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
@@ -82,6 +84,16 @@ class MEP_Admin {
 	public function traceability_page() {
 		echo '<div class="wrap"><h1>' . __( 'Lot & Batch Traceability', 'manufacturing-erp-pro' ) . '</h1>';
 		echo '<div id="mep-traceability-root"></div></div>';
+	}
+
+	public function mrp_planning_page() {
+		echo '<div class="wrap"><h1>' . __( 'MRP Planning & Procurement', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-mrp-suggestions-root"></div></div>';
+	}
+
+	public function pegging_page() {
+		echo '<div class="wrap"><h1>' . __( 'Demand Pegging Visualization', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-pegging-root"></div></div>';
 	}
 
 	public function inventory_page() {
@@ -226,6 +238,8 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 
 		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )

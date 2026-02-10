@@ -4,7 +4,7 @@
 
 const { useState, useEffect } = wp.element;
 
-const BOMNode = ({ item, depth, onRemove }) => {
+const BOMNode = ({ item, depth, onRemove, onMarkSubstitute }) => {
     return wp.element.createElement('div', {
         className: 'mep-bom-node',
         style: { marginLeft: `${depth * 20}px`, borderLeft: '2px solid #ccc', padding: '10px', marginBottom: '5px', background: '#f9f9f9' }
@@ -12,13 +12,19 @@ const BOMNode = ({ item, depth, onRemove }) => {
         wp.element.createElement('span', { className: 'mep-node-type' }, item.type === 'material' ? '📦 ' : '⚙️ '),
         wp.element.createElement('strong', null, item.name || `Item #${item.id}`),
         wp.element.createElement('span', null, ` - Qty: ${item.qty}`),
+        item.substitute_name && wp.element.createElement('span', { style: { color: 'green', marginLeft: '10px', fontSize: '11px' } }, `(Alt: ${item.substitute_name})`),
         wp.element.createElement('button', {
             className: 'button-link-delete',
             style: { marginLeft: '10px', fontSize: '11px' },
             onClick: () => onRemove(item.id)
         }, 'Remove'),
+        item.type === 'material' && !item.substitute_id && wp.element.createElement('button', {
+            className: 'button-secondary',
+            style: { marginLeft: '10px', fontSize: '11px' },
+            onClick: () => onMarkSubstitute(item.id)
+        }, 'Add Substitute'),
         item.sub_bom && item.sub_bom.length > 0 &&
-            item.sub_bom.map((child, i) => wp.element.createElement(BOMNode, { key: i, item: child, depth: depth + 1, onRemove }))
+            item.sub_bom.map((child, i) => wp.element.createElement(BOMNode, { key: i, item: child, depth: depth + 1, onRemove, onMarkSubstitute }))
     );
 };
 
@@ -71,6 +77,16 @@ const BOMBuilder = ({ productId }) => {
         setBom(prev => ({ ...prev, bom: prev.bom.filter(item => item.id !== id) }));
     };
 
+    const markSubstitute = (id) => {
+        const subId = prompt("Enter Material ID for Substitute:");
+        if (subId) {
+            setBom(prev => ({
+                ...prev,
+                bom: prev.bom.map(item => item.id === id ? { ...item, substitute_id: subId, substitute_name: `Alt Material #${subId}` } : item)
+            }));
+        }
+    };
+
     const saveBom = () => {
         wp.apiFetch({
             path: `/mep/v1/bom/${productId}`,
@@ -121,7 +137,7 @@ const BOMBuilder = ({ productId }) => {
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }
             },
                 bom.bom.length > 0 ?
-                    bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, depth: 0, onRemove: removeComponent })) :
+                    bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute })) :
                     wp.element.createElement('p', { className: 'empty-msg' }, 'Drag materials here to start building...')
             ),
             wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px' } },

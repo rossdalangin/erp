@@ -39,8 +39,9 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 
 ### 4. MRP (Demand Planning)
 - **Forecasting**: Enter sales targets in `ERP Pro > Forecasts`.
-- **Running MRP**: Access the `Dashboard` and trigger an MRP run. The system will "explode" your BOMs and compare demand vs. current stock.
-- **Automation**: One-click generation of Purchase Orders from MRP suggestions to replenish your warehouse.
+- **MRP Planning**: Use `ERP Pro > MRP Planning` to see a prioritized list of material requirements.
+- **Interactive POs**: Drag material suggestions into the "Basket" and click "Generate Purchase Orders" to automate procurement.
+- **Pegging**: Use the `Pegging View` to trace *exactly* which customer forecast or order triggered a specific material requirement.
 
 ### 5. Equipment & Capacity Planning
 - **Machine Catalog**: Manage your factory assets in `Equipment`. Set the "Daily Capacity" in minutes for each machine.
@@ -57,6 +58,10 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
   - **Production Manager**: Oversees the floor and BOMs.
   - **Warehouse Clerk**: Focuses on material movements.
   - **Quality Inspector**: Manages checks and traceability.
+
+### 8. B2B & Customers
+- **Customer CRM**: Manage your B2B relationships in `ERP Pro > Customers`.
+- **Demand Link**: Link forecasts to specific customers to improve pegging accuracy and demand planning.
 
 ---
 

@@ -51,6 +51,7 @@
 | `mep_equipment` | Equipment | **Asset Tracking** | `serial_num`, `maintenance_log` | Available, Maintenance, Down |
 | `mep_route` | Routes | **Factory Map** | `steps` (JSON), `estimated_total_time` | Active, Inactive |
 | `mep_forecast` | Forecasts | **Future Planning** | `period`, `forecast_qty` | Draft, Approved |
+| `mep_customer` | Customers | **B2B Management** | `contact_info`, `credit_limit` | Active, Inactive |
 
 ---
 
@@ -114,6 +115,7 @@ Node-based historical graph showing the journey of a specific Lot from Raw Mater
 ## 2. Procurement & Supplier Management
 - **Supplier Scoring**: Automated tracking of Quality Rate, OTD (On-Time Delivery), and Price Variance.
 - **Auto-PO**: Generates POs from MRP suggestions with one-click approval.
+- **Pegging View**: Visualizes the chain of demand from forecasts to raw materials.
 
 ---
 

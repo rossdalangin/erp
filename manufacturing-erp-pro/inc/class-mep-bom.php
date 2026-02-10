@@ -41,6 +41,11 @@ class MEP_BOM {
 			if ( $component['type'] === 'product' ) {
 				$component['sub_bom'] = static::get_bom_tree( $component['id'], $depth + 1 );
 			}
+
+			// Load substitutes if they exist
+			if ( isset( $component['substitute_id'] ) ) {
+				$component['substitute_name'] = get_the_title( $component['substitute_id'] );
+			}
 		}
 
 		return $components;

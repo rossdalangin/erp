@@ -38,6 +38,7 @@ class MEP_CPT {
 			'mep_equipment'   => __( 'Equipment', 'manufacturing-erp-pro' ),
 			'mep_route'       => __( 'Routes', 'manufacturing-erp-pro' ),
 			'mep_forecast'    => __( 'Forecasts', 'manufacturing-erp-pro' ),
+			'mep_customer'    => __( 'Customers', 'manufacturing-erp-pro' ),
 		);
 
 		foreach ( $types as $slug => $label ) {

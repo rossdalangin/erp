@@ -100,6 +100,18 @@ class MEP_API {
 			'callback'            => array( $this, 'get_inventory_csv' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/customers', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_customers' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/procurement/po-from-items', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'create_po_from_items' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -179,6 +191,21 @@ class MEP_API {
 		return new WP_REST_Response( $data, 200 );
 	}
 
+	public function create_po_from_items( $request ) {
+		$items = $request->get_param( 'items' );
+		if ( empty( $items ) ) {
+			return new WP_Error( 'empty_items', 'No items provided for PO.', array( 'status' => 400 ) );
+		}
+
+		$po_ids = MEP_Procurement::generate_pos_from_mrp( $items );
+
+		foreach ( $po_ids as $id ) {
+			MEP_DB::log_audit( 'po', $id, 'CREATE_FROM_MRP', '', $items );
+		}
+
+		return new WP_REST_Response( array( 'success' => true, 'po_ids' => $po_ids ), 200 );
+	}
+
 	public function get_warehouse_bins( $request ) {
 		$warehouse_id = $request['id'];
 		$data = MEP_Inventory::get_bins_with_inventory( $warehouse_id );
@@ -207,6 +234,15 @@ class MEP_API {
 
 	public function get_equipment_capacity( $request ) {
 		$data = MEP_Equipment::get_capacity_data();
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_customers( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_customer', 'numberposts' => -1 ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+		}
 		return new WP_REST_Response( $data, 200 );
 	}
 
