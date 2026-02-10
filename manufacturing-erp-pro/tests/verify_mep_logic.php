@@ -6,7 +6,10 @@
 define('ABSPATH', __DIR__ . '/');
 
 // Mock WordPress functions
-function get_posts($args) { return array(); }
+function get_posts($args) {
+    if ($args['post_type'] === 'mep_supplier') return array((object)array('ID' => 888));
+    return array();
+}
 function get_post_meta($id, $key, $single = true) {
     if ($key === '_mep_cost_avg') return 10.0;
     return array();
@@ -23,6 +26,8 @@ class MEP_Inventory {
 
 require_once __DIR__ . '/../inc/class-mep-bom.php';
 require_once __DIR__ . '/../inc/class-mep-mrp.php';
+require_once __DIR__ . '/../inc/class-mep-procurement.php';
+require_once __DIR__ . '/../inc/class-mep-reports.php';
 
 // Test 1: BOM Tree Retrieval (Mocked)
 echo "Testing BOM Logic...\n";
@@ -75,4 +80,31 @@ if ($suggestions[0]['needed'] == 6.0) {
     echo "MRP Netting Logic: PASSED\n";
 } else {
     echo "MRP Netting Logic: FAILED\n";
+}
+
+// Test 3: Procurement Logic
+echo "\nTesting Procurement Logic...\n";
+$suggestions = array(
+    array('material_id' => 101, 'needed' => 10, 'type' => 'PURCHASE')
+);
+// Mocking get_post_meta for supplier
+function update_post_meta($id, $key, $val) {}
+function wp_insert_post($args) { return 999; }
+function get_the_title($id) { return "Test Supplier"; }
+function is_wp_error($thing) { return false; }
+
+$po_ids = MEP_Procurement::generate_pos_from_mrp($suggestions);
+if (!empty($po_ids) && $po_ids[0] == 999) {
+    echo "Auto-PO Generation: PASSED\n";
+} else {
+    echo "Auto-PO Generation: FAILED\n";
+}
+
+// Test 4: Reporting Logic
+echo "\nTesting Reporting Logic...\n";
+$kpis = MEP_Reports::get_kpis();
+if (isset($kpis['production_output']) && $kpis['production_output'] == 1250) {
+    echo "KPI Retrieval: PASSED\n";
+} else {
+    echo "KPI Retrieval: FAILED\n";
 }

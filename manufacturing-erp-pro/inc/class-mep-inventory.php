@@ -46,4 +46,37 @@ class MEP_Inventory {
 
 		return (float) $wpdb->get_var( $wpdb->prepare( $query, $params ) );
 	}
+
+	/**
+	 * Get bin details including inventory levels.
+	 */
+	public static function get_bins_with_inventory( $warehouse_id ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+
+		$bins = get_posts( array(
+			'post_type'   => 'mep_bin',
+			'post_parent' => $warehouse_id,
+			'numberposts' => -1
+		) );
+
+		$data = array();
+		foreach ( $bins as $bin ) {
+			$on_hand = $wpdb->get_results( $wpdb->prepare(
+				"SELECT material_id, SUM(quantity) as qty
+				 FROM $table_name
+				 WHERE bin_id = %d
+				 GROUP BY material_id HAVING qty > 0",
+				$bin->ID
+			) );
+
+			$data[] = array(
+				'id'    => $bin->ID,
+				'name'  => $bin->post_title,
+				'items' => $on_hand
+			);
+		}
+
+		return $data;
+	}
 }

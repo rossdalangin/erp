@@ -35,15 +35,45 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/work-orders/(?P<id>\d+)/status', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'update_work_order_status' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_bom' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'update_bom' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/mrp/run', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'run_mrp' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/warehouses', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_warehouses' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/warehouses/(?P<id>\d+)/bins', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_warehouse_bins' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/reports/kpis', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_kpis' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 	}
@@ -70,7 +100,7 @@ class MEP_API {
 	}
 
 	public function get_work_orders( $request ) {
-		$posts = get_posts( array( 'post_type' => 'mep_work_order', 'numberposts' => -1 ) );
+		$posts = get_posts( array( 'post_type' => 'mep_work_order', 'numberposts' => -1, 'post_status' => 'any' ) );
 		$data  = array();
 
 		foreach ( $posts as $post ) {
@@ -82,6 +112,18 @@ class MEP_API {
 		}
 
 		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function update_work_order_status( $request ) {
+		$id = $request['id'];
+		$status = $request['status'];
+
+		wp_update_post( array(
+			'ID'          => $id,
+			'post_status' => $status
+		) );
+
+		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
 	public function get_bom( $request ) {
@@ -99,5 +141,53 @@ class MEP_API {
 	public function run_mrp( $request ) {
 		$suggestions = MEP_MRP::run();
 		return new WP_REST_Response( $suggestions, 200 );
+	}
+
+	public function get_warehouses( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_warehouse', 'numberposts' => -1 ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+		}
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_warehouse_bins( $request ) {
+		$warehouse_id = $request['id'];
+		$data = MEP_Inventory::get_bins_with_inventory( $warehouse_id );
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_kpis( $request ) {
+		$data = MEP_Reports::get_kpis();
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function update_bom( $request ) {
+		$product_id = $request['id'];
+		$components = $request->get_param( 'components' );
+
+		// Find or create BOM post
+		$bom_posts = get_posts( array(
+			'post_type'   => 'mep_bom',
+			'post_parent' => $product_id,
+			'post_status' => 'any',
+			'numberposts' => 1,
+		) );
+
+		if ( empty( $bom_posts ) ) {
+			$bom_id = wp_insert_post( array(
+				'post_type'   => 'mep_bom',
+				'post_title'  => sprintf( __( 'BOM for Product #%d', 'manufacturing-erp-pro' ), $product_id ),
+				'post_parent' => $product_id,
+				'post_status' => 'publish',
+			) );
+		} else {
+			$bom_id = $bom_posts[0]->ID;
+		}
+
+		update_post_meta( $bom_id, '_mep_components', $components );
+
+		return new WP_REST_Response( array( 'success' => true, 'bom_id' => $bom_id ), 200 );
 	}
 }

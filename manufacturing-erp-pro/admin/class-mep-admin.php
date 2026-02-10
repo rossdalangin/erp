@@ -37,6 +37,24 @@ class MEP_Admin {
 
 		add_submenu_page(
 			'mep-dashboard',
+			__( 'Inventory', 'manufacturing-erp-pro' ),
+			__( 'Inventory', 'manufacturing-erp-pro' ),
+			'manage_options',
+			'mep-inventory',
+			array( $this, 'inventory_page' )
+		);
+
+		add_submenu_page(
+			'mep-dashboard',
+			__( 'Production', 'manufacturing-erp-pro' ),
+			__( 'Production', 'manufacturing-erp-pro' ),
+			'manage_options',
+			'mep-production',
+			array( $this, 'production_page' )
+		);
+
+		add_submenu_page(
+			'mep-dashboard',
 			__( 'System Utilities', 'manufacturing-erp-pro' ),
 			__( 'System Utilities', 'manufacturing-erp-pro' ),
 			'manage_options',
@@ -45,9 +63,19 @@ class MEP_Admin {
 		);
 	}
 
+	public function inventory_page() {
+		echo '<div class="wrap"><h1>' . __( 'Warehouse & Inventory Management', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-warehouse-root"></div></div>';
+	}
+
+	public function production_page() {
+		echo '<div class="wrap"><h1>' . __( 'Production Planning & Kanban', 'manufacturing-erp-pro' ) . '</h1>';
+		echo '<div id="mep-kanban-root"></div></div>';
+	}
+
 	public function dashboard_page() {
 		echo '<div class="wrap"><h1>' . __( 'Manufacturing ERP Pro Dashboard', 'manufacturing-erp-pro' ) . '</h1>';
-		echo '<p>' . __( 'Welcome to your manufacturing command center.', 'manufacturing-erp-pro' ) . '</p></div>';
+		echo '<div id="mep-dashboard-root"></div></div>';
 	}
 
 	public function utilities_page() {
@@ -127,7 +155,9 @@ class MEP_Admin {
 		wp_enqueue_style( 'mep-admin-style', MEP_PLUGIN_URL . 'assets/css/mep-admin.css', array(), MEP_VERSION );
 
 		// Scaffolding for React components
-		wp_enqueue_script( 'mep-bom-builder', MEP_PLUGIN_URL . 'assets/js/bom-builder.js', array( 'wp-element' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', array( 'wp-element' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-bom-builder', MEP_PLUGIN_URL . 'assets/js/bom-builder.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 	}
 }

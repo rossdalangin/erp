@@ -54,6 +54,8 @@ class Manufacturing_ERP_Pro {
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-bom.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-mrp.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-quality.php';
+		require_once MEP_PLUGIN_DIR . 'inc/class-mep-procurement.php';
+		require_once MEP_PLUGIN_DIR . 'inc/class-mep-reports.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-seeder.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-api.php';
 
