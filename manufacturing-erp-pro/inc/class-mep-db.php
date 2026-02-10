@@ -63,6 +63,19 @@ class MEP_DB {
 			PRIMARY KEY  (id)
 		) $charset_collate;";
 		dbDelta( $sql );
+
+		// Stock Reservations Table
+		$table_name = $wpdb->prefix . 'mep_stock_reservations';
+		$sql = "CREATE TABLE $table_name (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			material_id bigint(20) NOT NULL,
+			work_order_id bigint(20) NOT NULL,
+			quantity decimal(18,4) NOT NULL,
+			status varchar(50) DEFAULT 'ACTIVE',
+			created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+			PRIMARY KEY  (id)
+		) $charset_collate;";
+		dbDelta( $sql );
 	}
 
 	/**

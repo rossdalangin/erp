@@ -39,7 +39,7 @@ class MEP_MRP {
 		$suggestions = array();
 		foreach ( $requirements as $mat_id => $total_needed ) {
 			$on_hand = MEP_Inventory::get_stock_level( $mat_id );
-			$reserved = 0; // Placeholder for reservation logic
+			$reserved = MEP_Inventory::get_reserved_qty( $mat_id );
 
 			$net_needed = $total_needed - ( $on_hand - $reserved );
 

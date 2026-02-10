@@ -58,4 +58,22 @@ class MEP_Equipment {
 
 		return $total_load;
 	}
+
+	/**
+	 * Log maintenance for a piece of equipment.
+	 */
+	public static function log_maintenance( $equipment_id, $description, $cost = 0 ) {
+		$logs = get_post_meta( $equipment_id, '_mep_maintenance_logs', true );
+		if ( ! is_array( $logs ) ) $logs = array();
+
+		$logs[] = array(
+			'date'        => current_time( 'mysql' ),
+			'description' => $description,
+			'cost'        => $cost,
+			'user_id'     => get_current_user_id()
+		);
+
+		update_post_meta( $equipment_id, '_mep_maintenance_logs', $logs );
+		MEP_DB::log_audit( 'equipment', $equipment_id, 'MAINTENANCE_LOG', '', $description );
+	}
 }

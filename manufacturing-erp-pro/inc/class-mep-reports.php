@@ -43,8 +43,25 @@ class MEP_Reports {
 			'on_time_delivery'  => '94%', // Placeholder for complex logic
 			'active_orders'     => $active_count,
 			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 ),
-			'cost_variance'     => static::get_cost_variance()
+			'cost_variance'     => static::get_cost_variance(),
+			'at_risk_materials' => static::get_at_risk_count()
 		);
+	}
+
+	/**
+	 * Count materials below safety stock.
+	 */
+	public static function get_at_risk_count() {
+		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
+		$at_risk_count = 0;
+		foreach ( $materials as $mat ) {
+			$stock = MEP_Inventory::get_stock_level( $mat->ID );
+			$safety = (float) get_post_meta( $mat->ID, '_mep_safety_stock', true );
+			if ( $safety > 0 && $stock < $safety ) {
+				$at_risk_count++;
+			}
+		}
+		return $at_risk_count;
 	}
 
 	/**

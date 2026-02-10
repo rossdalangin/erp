@@ -47,6 +47,55 @@ class MEP_Inventory {
 	}
 
 	/**
+	 * Reserve stock for a work order.
+	 */
+	public static function reserve_stock( $material_id, $work_order_id, $qty ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_stock_reservations';
+
+		$inserted = $wpdb->insert( $table_name, array(
+			'material_id'   => $material_id,
+			'work_order_id' => $work_order_id,
+			'quantity'      => $qty,
+			'status'        => 'ACTIVE'
+		) );
+
+		if ( $inserted ) {
+			MEP_DB::log_audit( 'reservation', $wpdb->insert_id, 'RESERVE', '', array( 'mat' => $material_id, 'wo' => $work_order_id, 'qty' => $qty ) );
+		}
+		return $inserted;
+	}
+
+	/**
+	 * Release a stock reservation.
+	 */
+	public static function release_reservation( $work_order_id ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_stock_reservations';
+
+		$wpdb->update(
+			$table_name,
+			array( 'status' => 'RELEASED' ),
+			array( 'work_order_id' => $work_order_id, 'status' => 'ACTIVE' )
+		);
+
+		MEP_DB::log_audit( 'reservation', $work_order_id, 'RELEASE', 'ACTIVE', 'RELEASED' );
+	}
+
+	/**
+	 * Get total reserved quantity for a material.
+	 */
+	public static function get_reserved_qty( $material_id ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_stock_reservations';
+
+		return (float) $wpdb->get_var( $wpdb->prepare(
+			"SELECT SUM(quantity) FROM $table_name WHERE material_id = %d AND status = 'ACTIVE'",
+			$material_id
+		) );
+	}
+
+	/**
 	 * Get on-hand quantity for a material.
 	 */
 	public static function get_stock_level( $material_id, $warehouse_id = 0 ) {
