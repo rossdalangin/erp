@@ -110,11 +110,61 @@ Don't let spreadsheet chaos kill your growth.
 
 ## Part 5: Launch Campaign & Content
 
-### 1. 30-Day Social Media Calendar
+### 1. 30-Day Social Media Calendar & "Content that Converts"
 - **Week 1**: Problem Awareness (The hidden costs of manufacturing chaos).
 - **Week 2**: Feature Spotlights (Visual BOM, MRP Engine).
 - **Week 3**: Case Studies & Social Proof.
 - **Week 4**: Urgency & Launch Offers.
+
+#### LinkedIn Post Templates (High Conversion)
+
+1. **The "Efficiency Gap" Post**
+   "Your factory floor is leaking profit. 💸 Most SMEs lose 15% of their margins simply because they don't have real-time visibility into their material costs. Spreadsheets worked when you had 5 SKUs. They're killing you now that you have 50. It’s time to digitalize. [Link to Demo]"
+
+2. **The "BOM Stress" Post**
+   "Building a multi-level BOM shouldn't feel like doing advanced calculus. 🧮 Our new Visual BOM Builder for WordPress makes product costing as easy as drag-and-drop. See your cost roll-ups in real-time and stop guessing your margins. #Manufacturing #ERP"
+
+3. **The "Traceability" Post**
+   "What happens if a customer reports a defect today? 📉 Can you trace that specific component back to the batch and supplier in under 60 seconds? If not, your brand is at risk. World-class traceability is no longer just for the 'big guys.' Meet Manufacturing ERP Pro."
+
+4. **The "MRP Brain" Post**
+   "Stop over-ordering raw materials. 🛑 Your cash flow is tied up in excess inventory because your planning is reactive, not proactive. Our MRP engine 'explodes' your demand and gives you a surgical shopping list. Buy what you need, when you need it."
+
+5. **The "WordPress Advantage" Post**
+   "Why spend $50k on a legacy ERP that requires a dedicated IT team? 🖥️ Manufacturing ERP Pro gives you enterprise power with the simplicity of WordPress. Scale your factory on the platform you already know and love."
+
+#### Twitter Thread Templates (Educational)
+
+1. **Thread: The 5 Spreadsheet Traps for Manufacturers**
+   - 1/5: Why Excel is the #1 enemy of your scaling factory.
+   - 2/5: Version control chaos: Who has the 'real' BOM?
+   - 3/5: The hidden cost of manual data entry errors.
+   - 4/5: Why spreadsheets can't handle real-time inventory netting.
+   - 5/5: The solution: A dedicated MRP engine in WordPress. [Link]
+
+2. **Thread: How to Calculate Your 'Real' Product Cost**
+   - 1/4: Most SMEs only account for raw material costs. They forget 'The Hidden Three.'
+   - 2/4: 1. Yield Loss & Scrap: That 5% waste adds up.
+   - 3/4: 2. Routing Labor: Every minute at the stitching station has a price.
+   - 4/4: 3. Recursive Roll-ups: Costing sub-assemblies accurately. ERP Pro does this for you automatically.
+
+3. **Thread: The 60-Second Recall Challenge**
+   - 1/3: In a crisis, speed is everything.
+   - 2/3: Lot Genealogy isn't just paperwork; it's insurance for your brand.
+   - 3/3: How we visualised the journey from Raw Material -> Finished Good in ERP Pro. [Screenshot/Link]
+
+4. **Thread: Inventory vs. Cash Flow**
+   - 1/5: Inventory is just 'frozen cash' on your warehouse shelves. ❄️
+   - 2/5: How Safety Stock alerts prevent the 'Panic Buy.'
+   - 3/5: Why FIFO matters for material aging (especially in leather/textiles).
+   - 4/5: Moving from reactive to proactive procurement.
+   - 5/5: Ready to unfreeze your cash? Let's talk MRP.
+
+5. **Thread: The SME Scaling Blueprint**
+   - 1/4: You've hit your first $1M in revenue. What's next?
+   - 2/4: You can't scale manual processes. You need a 'System of Record.'
+   - 3/4: Why modular ERPs are better for growth than all-in-one monoliths.
+   - 4/4: Start with Inventory, grow into MRP. [Link to ERP Pro Tiers]
 
 ### 2. 7-Day Promotional Email Series
 - **Day 1**: The Spreadsheet Trap (Why Excel is killing your growth).

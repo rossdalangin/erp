@@ -37,7 +37,33 @@ class MEP_Seeder {
 		) );
 
 		// 6. Create BOM
-		self::create_post( 'mep_bom', 'BOM for Handbag V1', $bag );
+		$bom_id = self::create_post( 'mep_bom', 'BOM for Handbag V1', $bag );
+		update_post_meta( $bom_id, '_mep_components', array(
+			array('id' => $leather, 'type' => 'material', 'qty' => 1.5, 'scrap' => 0.05)
+		) );
+
+		// 7. Create Additional Work Orders
+		$statuses = array('publish', 'in-progress', 'in-progress', 'completed', 'publish');
+		foreach ($statuses as $i => $status) {
+			wp_insert_post( array(
+				'post_type'   => 'mep_work_order',
+				'post_title'  => "Work Order #100" . ($i + 1),
+				'post_status' => $status,
+				'meta_input'  => array('_mep_is_sample_data' => 1)
+			) );
+		}
+
+		// 8. Create Additional Inventory Transactions
+		for ($i = 0; $i < 15; $i++) {
+			MEP_Inventory::record_transaction( array(
+				'material_id'  => $leather,
+				'warehouse_id' => ($i % 2 == 0) ? $wh_main : $wh_prod,
+				'bin_id'       => ($i % 2 == 0) ? 1 : 2, // Mocked bin IDs
+				'quantity'     => rand(10, 50),
+				'type'         => 'RECEIVE',
+				'lot_number'   => 'LOT-ABC-' . rand(100, 999)
+			) );
+		}
 	}
 
 	/**
