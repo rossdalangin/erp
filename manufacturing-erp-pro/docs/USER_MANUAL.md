@@ -38,6 +38,7 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 ### 3. Production Planning (Kanban)
 - **The Board**: Go to `ERP Pro > Production Board`.
 - **Status Flow**: Drag-and-drop Work Order cards between columns.
+- **Operator Assignment**: When moving an order to "In Progress", the system prompts for an Operator ID to assign responsibility.
 - **Completion & Yield**: When moving to "Completed", the system prompts for actual scrap and labor time. This data is used for **Cost Variance Analysis**.
 - **Printing**: You can generate a professional shop-floor traveler by visiting the Work Order's "Print" view via the API or Admin link.
 

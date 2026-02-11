@@ -9,18 +9,21 @@ const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
     return wp.element.createElement('div', {
         className: 'mep-wo-card',
         draggable: true,
-        title: helpMode ? 'Work Order: Drag this card to a new column to update the manufacturing status of this order.' : '',
+        title: helpMode ? __('Work Order: Drag this card to a new column to update the manufacturing status of this order.', 'manufacturing-erp-pro') : '',
         onDragStart: (e) => onDragStart(e, wo.id),
         style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px', cursor: 'grab' }
     },
         wp.element.createElement('h4', null, wo.title),
-        wp.element.createElement('p', { style: { fontSize: '12px' } }, `ID: #${wo.id}`),
+        wp.element.createElement('p', { style: { fontSize: '12px', margin: '2px 0' } }, `ID: #${wo.id} | ${__('Qty', 'manufacturing-erp-pro')}: ${wo.qty || 1}`),
+        wo.due_date && wp.element.createElement('p', { style: { fontSize: '11px', color: '#d63638', fontWeight: 'bold' } }, `${__('Due', 'manufacturing-erp-pro')}: ${wo.due_date}`),
+        wp.element.createElement('p', { style: { fontSize: '11px', color: '#666' } }, `${__('Operator', 'manufacturing-erp-pro')}: ${wo.operator_name || __('Unassigned', 'manufacturing-erp-pro')}`),
         wp.element.createElement('span', { className: 'mep-badge', style: { fontSize: '10px', background: '#eee', padding: '2px 5px' } }, wo.status)
     );
 };
 
 const KanbanBoard = () => {
     const [workOrders, setWorkOrders] = useState([]);
+    const [operators, setOperators] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -31,13 +34,16 @@ const KanbanBoard = () => {
     ];
 
     useEffect(() => {
-        wp.apiFetch({ path: '/mep/v1/work-orders' })
-            .then(data => {
-                setWorkOrders(data);
+        Promise.all([
+            wp.apiFetch({ path: '/mep/v1/work-orders' }),
+            wp.apiFetch({ path: '/mep/v1/operators' })
+        ]).then(([woData, opData]) => {
+                setWorkOrders(woData);
+                setOperators(opData);
                 setLoading(false);
             })
             .catch(err => {
-                setError('Failed to load Work Orders.');
+                setError(__('Failed to load Work Orders or Operators.', 'manufacturing-erp-pro'));
                 setLoading(false);
                 console.error(err);
             });
@@ -58,10 +64,14 @@ const KanbanBoard = () => {
 
     const updateOrderStatus = (id, nextStatus) => {
         let extraData = {};
+        if (nextStatus === 'in-progress') {
+            const opId = prompt(__('Enter Operator ID (optional):', 'manufacturing-erp-pro'));
+            if (opId) extraData.operator_id = opId;
+        }
         if (nextStatus === 'completed') {
             const scrap = prompt(__('Enter scrap quantity (if any):', 'manufacturing-erp-pro'), "0");
             const labor = prompt(__('Enter total labor minutes spent:', 'manufacturing-erp-pro'), "60");
-            extraData = { scrap_qty: scrap, labor_mins: labor };
+            extraData = { ...extraData, scrap_qty: scrap, labor_mins: labor };
         }
 
         wp.apiFetch({
@@ -69,7 +79,17 @@ const KanbanBoard = () => {
             method: 'POST',
             data: { status: nextStatus, ...extraData }
         }).then(() => {
-            setWorkOrders(workOrders.map(o => o.id == id ? { ...o, status: nextStatus } : o));
+            setWorkOrders(workOrders.map(o => {
+                if (o.id == id) {
+                    const updated = { ...o, status: nextStatus };
+                    if (extraData.operator_id) {
+                        const op = operators.find(u => u.id == extraData.operator_id);
+                        updated.operator_name = op ? op.name : `User #${extraData.operator_id}`;
+                    }
+                    return updated;
+                }
+                return o;
+            }));
         });
     };
 

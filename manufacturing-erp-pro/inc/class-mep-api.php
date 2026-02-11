@@ -178,6 +178,12 @@ class MEP_API {
 			'callback'            => array( $this, 'get_supplier_score' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/operators', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_operators' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -206,10 +212,14 @@ class MEP_API {
 		$data  = array();
 
 		foreach ( $posts as $post ) {
+			$operator = get_userdata( $post->post_author );
 			$data[] = array(
-				'id'     => $post->ID,
-				'title'  => $post->post_title,
-				'status' => $post->post_status,
+				'id'            => $post->ID,
+				'title'         => $post->post_title,
+				'status'        => $post->post_status,
+				'qty'           => get_post_meta( $post->ID, '_mep_work_order_qty', true ),
+				'due_date'      => get_post_meta( $post->ID, '_mep_due_date', true ),
+				'operator_name' => $operator ? $operator->display_name : '',
 			);
 		}
 
@@ -222,10 +232,21 @@ class MEP_API {
 		$params = $request->get_params();
 
 		$old_status = get_post_field( 'post_status', $id );
-		wp_update_post( array(
+
+		$update_data = array(
 			'ID'          => $id,
 			'post_status' => $status
-		) );
+		);
+
+		if ( isset( $params['operator_id'] ) ) {
+			$update_data['post_author'] = intval( $params['operator_id'] );
+		}
+
+		wp_update_post( $update_data );
+
+		if ( isset( $params['equipment_id'] ) ) {
+			update_post_meta( $id, '_mep_assigned_equipment_id', intval( $params['equipment_id'] ) );
+		}
 
 		if ( isset( $params['scrap_qty'] ) ) {
 			update_post_meta( $id, '_mep_actual_scrap', (float) $params['scrap_qty'] );
@@ -354,6 +375,15 @@ class MEP_API {
 		$data = array();
 		foreach ( $posts as $post ) {
 			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+		}
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_operators( $request ) {
+		$users = get_users( array( 'role__in' => array( 'mep_production_manager', 'administrator', 'editor' ) ) );
+		$data = array();
+		foreach ( $users as $user ) {
+			$data[] = array( 'id' => $user->ID, 'name' => $user->display_name );
 		}
 		return new WP_REST_Response( $data, 200 );
 	}
