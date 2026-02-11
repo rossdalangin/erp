@@ -1,4 +1,4 @@
-# Manufacturing ERP Pro - COMPLETE SYSTEM SPECIFICATION
+# Manufacturing ERP Pro - COMPLETE SYSTEM SPECIFICATION (v1.7.0)
 
 ## Table of Contents
 1. [Core System Architecture](#1-core-system-architecture)
@@ -168,6 +168,8 @@ All endpoints prefixed with `/wp-json/mep/v1`.
 | `/procurement/supplier-score/{id}` | GET | Returns Quality/OTD performance metrics. |
 | `/reports/kpis` | GET | Dashboard data (Output, Aging, Variance). |
 | `/qc/trace/{lot}` | GET | Fetch lot genealogy graph data. |
+| `/reports/quality` | GET | QC Pass Rates, Defect Pareto, Active NCRs. |
+| `/equipment/detailed`| GET | Detailed capacity and maintenance logs. |
 
 ## 2. Data Flow: Production Loop
 `[Forecast] -> [MRP Engine] -> [Purchase/Work Orders] -> [Inventory Issuance] -> [Shop Floor Production] -> [QC Check] -> [Finished Stock]`

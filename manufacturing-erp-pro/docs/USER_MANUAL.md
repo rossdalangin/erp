@@ -52,6 +52,7 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 ### 5. Equipment & Capacity Planning
 - **Machine Catalog**: Manage your factory assets in `Equipment`. Set the "Daily Capacity" in minutes for each machine.
 - **Maintenance**: Log repairs and services directly under each machine to track uptime and maintenance costs.
+- **Capacity Planner**: Access the dedicated `Capacity Planner` view to see detailed machine schedules for the current week and historical maintenance records.
 - **Load Monitoring**: The Executive Dashboard displays a real-time "Resource Capacity" chart.
 - **Bottleneck Alerts**: Machines exceeding 90% load are highlighted in Red, allowing you to reassign work orders before delays occur.
 
@@ -206,6 +207,7 @@ Don't let spreadsheet chaos kill your growth.
 
 ### 9. Quality & Rework
 - **QC Gateway**: Record inspection results for batches or individual items.
+- **Quality Dashboard**: View real-time analytics on pass rates, active Non-Conformance Reports (NCRs), and defect distribution (Pareto analysis).
 - **Rework Trigger**: If a QC check fails, the system can automatically generate a "REWORK" order to correct the defect.
 - **Traceability**: Enter a Lot/Batch number in the `Traceability` module to see a visual graph of its genealogy, including all upstream movements.
 

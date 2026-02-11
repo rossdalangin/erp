@@ -6,7 +6,7 @@ const { useState } = wp.element;
 
 const Wizard = () => {
     const [step, setStep] = useState(1);
-    const [data, setData] = useState({ uom: 'metric', warehouse: 'Main Factory' });
+    const [data, setData] = useState({ uom: 'metric', valuation: 'fifo', warehouse: 'Main Factory' });
 
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
@@ -35,6 +35,15 @@ const Wizard = () => {
             },
                 wp.element.createElement('option', { value: 'metric' }, 'Metric (kg, m, cm)'),
                 wp.element.createElement('option', { value: 'imperial' }, 'Imperial (lb, ft, in)')
+            ),
+            wp.element.createElement('p', null, 'Default Inventory Valuation:'),
+            wp.element.createElement('select', {
+                value: data.valuation,
+                onChange: (e) => setData({ ...data, valuation: e.target.value }),
+                style: { width: '100%', padding: '10px', marginBottom: '20px' }
+            },
+                wp.element.createElement('option', { value: 'fifo' }, 'FIFO (First-In-First-Out)'),
+                wp.element.createElement('option', { value: 'lifo' }, 'LIFO (Last-In-First-Out)')
             ),
             wp.element.createElement('button', { className: 'button button-primary', onClick: nextStep }, 'Next: Locations →')
         ),
