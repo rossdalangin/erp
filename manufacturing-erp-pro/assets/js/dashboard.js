@@ -82,7 +82,21 @@ const Dashboard = () => {
                                 )
                             ))
                         )
-                    ) : wp.element.createElement('p', null, 'No production history yet for cost variance analysis.')
+                    ) : wp.element.createElement('p', null, 'No production history yet for cost variance analysis.'),
+
+                wp.element.createElement('h3', { style: { marginTop: '30px' } }, 'Inventory Aging (Units by Receipt Age)'),
+                kpis.inventory_aging ?
+                    wp.element.createElement('div', { style: { display: 'flex', gap: '5px', height: '100px', alignItems: 'flex-end', paddingTop: '20px' } },
+                        Object.keys(kpis.inventory_aging).map(bucket => {
+                            const val = kpis.inventory_aging[bucket];
+                            const max = Math.max(...Object.values(kpis.inventory_aging), 1);
+                            const height = (val / max) * 100;
+                            return wp.element.createElement('div', { key: bucket, style: { flex: 1, textAlign: 'center' } },
+                                wp.element.createElement('div', { style: { background: '#2271b1', height: `${height}%`, borderRadius: '3px 3px 0 0' } }),
+                                wp.element.createElement('div', { style: { fontSize: '9px', marginTop: '5px' } }, bucket)
+                            );
+                        })
+                    ) : wp.element.createElement('p', null, 'No inventory aging data.')
             )
         )
     );

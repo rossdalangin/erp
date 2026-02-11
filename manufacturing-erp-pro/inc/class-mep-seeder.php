@@ -53,7 +53,43 @@ class MEP_Seeder {
 			) );
 		}
 
-		// 8. Create Additional Inventory Transactions
+		// 8. Create Equipment
+		$eq_cutting = self::create_post( 'mep_equipment', 'Heavy Duty Laser Cutter', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 0.75
+		) );
+		$eq_stitching = self::create_post( 'mep_equipment', 'Industrial Stitching Machine', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 0.50
+		) );
+
+		// 9. Create Routes
+		$route_id = self::create_post( 'mep_route', 'Standard Bag Assembly Route', $bag );
+		update_post_meta( $route_id, '_mep_steps', array(
+			array('work_center' => $eq_cutting, 'time' => 15, 'desc' => 'Cutting pattern'),
+			array('work_center' => $eq_stitching, 'time' => 45, 'desc' => 'Main stitching')
+		) );
+
+		// 10. Create Customers
+		$cust_a = self::create_post( 'mep_customer', 'Luxury Boutiques Inc.' );
+
+		// 11. Create Forecasts
+		self::create_post( 'mep_forecast', 'Q4 Sales Forecast', $bag, array(
+			'_mep_forecast_qty' => 500,
+			'_mep_customer_id' => $cust_a
+		) );
+
+		// 12. Create QC Checks
+		$qc_id = MEP_Quality::record_qc_result( array(
+			'object_name' => 'Leather Handbag Batch #1',
+			'object_id' => $bag,
+			'object_type' => 'product',
+			'status' => 'FAIL',
+			'defects' => 'Loose threads on handle',
+			'trigger_rework' => 1
+		) );
+
+		// 13. Create Additional Inventory Transactions
 		for ($i = 0; $i < 15; $i++) {
 			MEP_Inventory::record_transaction( array(
 				'material_id'  => $leather,

@@ -44,8 +44,59 @@ class MEP_Reports {
 			'active_orders'     => $active_count,
 			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 ),
 			'cost_variance'     => static::get_cost_variance(),
-			'at_risk_materials' => static::get_at_risk_count()
+			'at_risk_materials' => static::get_at_risk_count(),
+			'inventory_aging'   => static::get_inventory_aging()
 		);
+	}
+
+	/**
+	 * Calculate Inventory Aging (Stock grouped by receipt date).
+	 */
+	public static function get_inventory_aging() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+
+		$aging = array(
+			'0-30 days'  => 0,
+			'31-60 days' => 0,
+			'61-90 days' => 0,
+			'90+ days'   => 0
+		);
+
+		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
+		foreach ( $materials as $mat ) {
+			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			if ( $on_hand <= 0 ) continue;
+
+			$receipts = $wpdb->get_results( $wpdb->prepare(
+				"SELECT quantity, created_at FROM $table_name
+				 WHERE material_id = %d AND transaction_type = 'RECEIVE'
+				 ORDER BY created_at DESC",
+				$mat->ID
+			) );
+
+			$remaining = $on_hand;
+			foreach ( $receipts as $receipt ) {
+				$qty = (float) $receipt->quantity;
+				$take = min( $qty, $remaining );
+
+				$days_old = round( ( time() - strtotime( $receipt->created_at ) ) / ( 60 * 60 * 24 ) );
+
+				if ( $days_old <= 30 ) $aging['0-30 days'] += $take;
+				elseif ( $days_old <= 60 ) $aging['31-60 days'] += $take;
+				elseif ( $days_old <= 90 ) $aging['61-90 days'] += $take;
+				else $aging['90+ days'] += $take;
+
+				$remaining -= $take;
+				if ( $remaining <= 0 ) break;
+			}
+
+			if ( $remaining > 0 ) {
+				$aging['90+ days'] += $remaining; // Assume initial stock is old
+			}
+		}
+
+		return $aging;
 	}
 
 	/**
