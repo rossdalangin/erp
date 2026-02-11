@@ -120,6 +120,7 @@ React-based interactive canvas for product engineering.
 ## 1. MRP (Material Requirements Planning) Engine
 **Netting Logic**: `Net Needed = Gross Demand - (On Hand - Reserved)`.
 - **BOM Explosion**: Recursive traversal of multi-level BOMs.
+- **Asynchronous Execution**: Heavy MRP runs are offloaded to background workers with state-polling via REST API.
 - **Pegging View**: Hierarchical visualization tracing demand sources (Forecasts) to material requirements.
 
 ---
@@ -172,7 +173,9 @@ All endpoints prefixed with `/wp-json/mep/v1`.
 | `/inventory/transfer` | POST | Atomic bin-to-bin stock movement. |
 | `/procurement/supplier-score/{id}` | GET | Returns Quality/OTD performance metrics. |
 | `/reports/kpis` | GET | Dashboard data (Output, Aging, Variance). |
+| `/reports/diagnostic-export` | GET | Full database backup as diagnostic text. |
 | `/qc/trace/{lot}` | GET | Fetch lot genealogy graph data. |
+| `/inventory/receive` | POST | Records goods receipt from Purchase Order. |
 
 ## 2. Data Flow: Production Loop
 `[Forecast] -> [MRP Engine] -> [Purchase/Work Orders] -> [Inventory Issuance] -> [Shop Floor Production] -> [QC Check] -> [Finished Stock]`

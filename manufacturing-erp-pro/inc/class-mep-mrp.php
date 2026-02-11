@@ -130,6 +130,35 @@ class MEP_MRP {
 	}
 
 	/**
+	 * Start a background MRP run.
+	 */
+	public static function start_background_run() {
+		set_transient( 'mep_mrp_status', 'processing', HOUR_IN_SECONDS );
+		self::schedule_mrp_run();
+	}
+
+	/**
+	 * Run the MRP Engine and save results.
+	 */
+	public static function run_and_cache() {
+		$results = self::run();
+		set_transient( 'mep_mrp_results', $results, DAY_IN_SECONDS );
+		set_transient( 'mep_mrp_last_run', current_time( 'mysql' ), DAY_IN_SECONDS );
+		set_transient( 'mep_mrp_status', 'idle', HOUR_IN_SECONDS );
+	}
+
+	/**
+	 * Get current MRP status and results.
+	 */
+	public static function get_status() {
+		return array(
+			'status'   => get_transient( 'mep_mrp_status' ) ?: 'idle',
+			'last_run' => get_transient( 'mep_mrp_last_run' ) ?: 'Never',
+			'results'  => get_transient( 'mep_mrp_results' ) ?: array()
+		);
+	}
+
+	/**
 	 * Background Task Scaffolding using WP Cron.
 	 */
 	public static function schedule_mrp_run() {
@@ -140,4 +169,4 @@ class MEP_MRP {
 }
 
 // Hook into the scheduled event
-add_action( 'mep_run_mrp_event', array( 'MEP_MRP', 'run' ) );
+add_action( 'mep_run_mrp_event', array( 'MEP_MRP', 'run_and_cache' ) );

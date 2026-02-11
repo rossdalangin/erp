@@ -278,4 +278,32 @@ class MEP_Reports {
 
 		fclose( $fp );
 	}
+
+	/**
+	 * Export all custom ERP tables as a single diagnostic text file.
+	 */
+	public static function export_erp_diagnostic() {
+		global $wpdb;
+		$tables = array(
+			'mep_inventory_transactions',
+			'mep_audit_logs',
+			'mep_production_logs',
+			'mep_stock_reservations'
+		);
+
+		foreach ( $tables as $table ) {
+			echo "--- TABLE: $table ---\n";
+			$rows = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}$table", ARRAY_A );
+			if ( ! empty( $rows ) ) {
+				$fp = fopen( 'php://output', 'w' );
+				fputcsv( $fp, array_keys( $rows[0] ) );
+				foreach ( $rows as $row ) {
+					fputcsv( $fp, $row );
+				}
+			} else {
+				echo "No data.\n";
+			}
+			echo "\n\n";
+		}
+	}
 }

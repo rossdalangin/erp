@@ -65,6 +65,12 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/mrp/status', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_mrp_status' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/mrp/pegging', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_pegging_data' ),
@@ -74,6 +80,12 @@ class MEP_API {
 		register_rest_route( 'mep/v1', '/inventory/transfer', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'transfer_inventory' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/inventory/receive', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'receive_inventory' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
@@ -122,6 +134,12 @@ class MEP_API {
 		register_rest_route( 'mep/v1', '/reports/inventory-csv', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_inventory_csv' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/reports/diagnostic-export', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_diagnostic_export' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
@@ -284,8 +302,13 @@ class MEP_API {
 	}
 
 	public function run_mrp( $request ) {
-		$suggestions = MEP_MRP::run();
-		return new WP_REST_Response( $suggestions, 200 );
+		MEP_MRP::start_background_run();
+		return new WP_REST_Response( array( 'success' => true ), 200 );
+	}
+
+	public function get_mrp_status( $request ) {
+		$status = MEP_MRP::get_status();
+		return new WP_REST_Response( $status, 200 );
 	}
 
 	public function get_pegging_data( $request ) {
@@ -306,6 +329,12 @@ class MEP_API {
 
 		$success = MEP_Inventory::transfer( $params );
 		return new WP_REST_Response( array( 'success' => $success ), $success ? 200 : 400 );
+	}
+
+	public function receive_inventory( $request ) {
+		$params = $request->get_params();
+		$id = MEP_Inventory::record_transaction( $params );
+		return new WP_REST_Response( array( 'success' => (bool)$id, 'transaction_id' => $id ), $id ? 200 : 400 );
 	}
 
 	public function get_warehouses( $request ) {
@@ -404,6 +433,13 @@ class MEP_API {
 		header( 'Content-Type: text/csv' );
 		header( 'Content-Disposition: attachment; filename="inventory-export.csv"' );
 		MEP_Reports::export_inventory_csv();
+		exit;
+	}
+
+	public function get_diagnostic_export( $request ) {
+		header( 'Content-Type: text/plain' );
+		header( 'Content-Disposition: attachment; filename="erp-diagnostic.txt"' );
+		MEP_Reports::export_erp_diagnostic();
 		exit;
 	}
 

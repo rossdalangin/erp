@@ -67,6 +67,7 @@ class MEP_Admin {
 		add_submenu_page( 'mep-dashboard', __( 'Suppliers', 'manufacturing-erp-pro' ), __( 'Suppliers', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_supplier' );
 		add_submenu_page( 'mep-dashboard', __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), 'manage_options', 'mep-supplier-scorecard', array( $this, 'supplier_scorecard_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_po' );
+		add_submenu_page( 'mep-dashboard', __( 'Receive Shipments', 'manufacturing-erp-pro' ), __( 'Receive Shipments', 'manufacturing-erp-pro' ), 'manage_options', 'mep-po-receiving', array( $this, 'po_receiving_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Forecasts', 'manufacturing-erp-pro' ), __( 'Forecasts', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_forecast' );
 		add_submenu_page( 'mep-dashboard', __( 'MRP Planning', 'manufacturing-erp-pro' ), __( 'MRP Planning', 'manufacturing-erp-pro' ), 'manage_options', 'mep-mrp-planning', array( $this, 'mrp_planning_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Pegging View', 'manufacturing-erp-pro' ), __( 'Pegging View', 'manufacturing-erp-pro' ), 'manage_options', 'mep-pegging', array( $this, 'pegging_page' ) );
@@ -86,6 +87,12 @@ class MEP_Admin {
 		echo '<div class="wrap"><h1>' . __( 'Vendor Performance Analysis', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
 		echo '<div id="mep-supplier-scorecard-root"></div></div>';
+	}
+
+	public function po_receiving_page() {
+		echo '<div class="wrap"><h1>' . __( 'Visual Goods Receipt Workspace', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
+		echo '<div id="mep-po-receiving-root"></div></div>';
 	}
 
 	public function traceability_page() {
@@ -185,6 +192,37 @@ class MEP_Admin {
 			</div>
 
 			<div class="card">
+				<h2><?php _e( 'System Audit Logs (Recent 20)', 'manufacturing-erp-pro' ); ?></h2>
+				<table class="wp-list-table widefat fixed striped">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>User</th>
+							<th>Object</th>
+							<th>Action</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						global $wpdb;
+						$logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}mep_audit_logs ORDER BY created_at DESC LIMIT 20" );
+						foreach ( $logs as $log ) :
+							$user = get_userdata( $log->user_id );
+							?>
+							<tr>
+								<td><?php echo esc_html( $log->created_at ); ?></td>
+								<td><?php echo esc_html( $user ? $user->display_name : 'System' ); ?></td>
+								<td><?php echo esc_html( strtoupper( $log->object_type ) . ' #' . $log->object_id ); ?></td>
+								<td><?php echo esc_html( $log->action ); ?></td>
+								<td><small><?php echo esc_html( substr( $log->new_value, 0, 50 ) ); ?>...</small></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="card">
 				<h2><?php _e( 'Sample Data Seeder', 'manufacturing-erp-pro' ); ?></h2>
 				<p><?php _e( 'Populate the system with "LeatherCraft Manufacturing Co." demo data.', 'manufacturing-erp-pro' ); ?></p>
 				<form method="post">
@@ -211,6 +249,7 @@ class MEP_Admin {
 					</p>
 					<input type="submit" name="mep_action_reset_hard" class="button button-link-delete" value="<?php _e( 'Hard Reset (Delete All)', 'manufacturing-erp-pro' ); ?>">
 					<input type="submit" name="mep_action_reset_soft" class="button button-secondary" value="<?php _e( 'Soft Reset (Keep Master Data)', 'manufacturing-erp-pro' ); ?>">
+					<a href="<?php echo esc_url( rest_url('mep/v1/reports/diagnostic-export') ); ?>?_wpnonce=<?php echo wp_create_nonce('wp_rest'); ?>" class="button"><?php _e( 'Export ERP Database (Backup)', 'manufacturing-erp-pro' ); ?></a>
 				</form>
 			</div>
 		</div>
@@ -286,6 +325,7 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 
 		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )

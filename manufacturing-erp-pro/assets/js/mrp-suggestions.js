@@ -18,6 +18,8 @@ const SuggestionItem = ({ item, onDragStart }) => {
 };
 
 const MRPSuggestions = () => {
+    const [status, setStatus] = useState('idle');
+    const [lastRun, setLastRun] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [basket, setBasket] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,18 +27,37 @@ const MRPSuggestions = () => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    useEffect(() => {
-        wp.apiFetch({ path: '/mep/v1/mrp/run', method: 'POST' })
+    const fetchStatus = () => {
+        wp.apiFetch({ path: '/mep/v1/mrp/status' })
             .then(data => {
-                setSuggestions(data);
+                setStatus(data.status);
+                setLastRun(data.last_run);
+                setSuggestions(data.results);
                 setLoading(false);
             })
             .catch(err => {
-                setError('Failed to run MRP Engine.');
+                setError('Failed to fetch MRP Status.');
                 setLoading(false);
-                console.error(err);
             });
+    };
+
+    useEffect(() => {
+        fetchStatus();
     }, []);
+
+    useEffect(() => {
+        let interval;
+        if (status === 'processing') {
+            interval = setInterval(fetchStatus, 3000);
+        }
+        return () => clearInterval(interval);
+    }, [status]);
+
+    const runMRP = () => {
+        setLoading(true);
+        wp.apiFetch({ path: '/mep/v1/mrp/run', method: 'POST' })
+            .then(() => fetchStatus());
+    };
 
     const onDragStart = (e, item) => {
         e.dataTransfer.setData('suggestion', JSON.stringify(item));
@@ -66,10 +87,26 @@ const MRPSuggestions = () => {
         });
     };
 
-    if (loading) return wp.element.createElement('p', null, 'Running MRP engine and calculating suggestions...');
+    if (loading && status !== 'processing') return wp.element.createElement('p', null, 'Loading MRP Planning...');
     if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
-    return wp.element.createElement('div', { className: 'mep-mrp-planner', style: { display: 'flex', gap: '30px' } },
+    return wp.element.createElement('div', { className: 'mep-mrp-planner' },
+        wp.element.createElement('header', { style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '15px', border: '1px solid #ccc' } },
+            wp.element.createElement('div', null,
+                wp.element.createElement('strong', null, 'MRP Engine Status: '),
+                wp.element.createElement('span', { style: { color: status === 'processing' ? '#dba617' : '#46b450', fontWeight: 'bold' } }, status.toUpperCase()),
+                wp.element.createElement('span', { style: { marginLeft: '20px', color: '#666', fontSize: '12px' } }, `Last Run: ${lastRun}`)
+            ),
+            wp.element.createElement('button', {
+                className: 'button button-primary',
+                onClick: runMRP,
+                disabled: status === 'processing'
+            }, status === 'processing' ? 'Calculating...' : 'Recalculate MRP Results')
+        ),
+
+        status === 'processing' && wp.element.createElement('div', { className: 'notice notice-info' }, wp.element.createElement('p', null, 'The MRP engine is exploding BOMs and netting inventory in the background. Results will refresh automatically.')),
+
+        wp.element.createElement('div', { style: { display: 'flex', gap: '30px' } },
         wp.element.createElement('div', {
             className: 'mep-suggestions-list',
             style: { flex: 1 },

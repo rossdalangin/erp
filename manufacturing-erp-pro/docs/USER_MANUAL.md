@@ -44,6 +44,7 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 ### 4. MRP (Demand Planning)
 - **Forecasting**: Enter sales targets in `ERP Pro > Forecasts`.
 - **MRP Planning**: Use `ERP Pro > MRP Planning` to see a prioritized list of material requirements.
+- **Asynchronous Recalculation**: Heavy demand explosions run in the background. Click "Recalculate MRP Results" to trigger a fresh analysis without freezing your browser.
 - **Interactive POs**: Drag material suggestions into the "Basket" and click "Generate Purchase Orders" to automate procurement.
 - **Pegging**: Use the `Pegging View` to trace *exactly* which customer forecast or order triggered a specific material requirement.
 - **Stock Reservations**: The MRP engine accounts for stock already reserved for active Work Orders, ensuring procurement is accurate.
@@ -210,6 +211,11 @@ Don't let spreadsheet chaos kill your growth.
 
 ### 10. Vendor Performance
 - **Scorecards**: Visit `ERP Pro > Supplier Scorecard` to see a visual analysis of Quality and On-Time Delivery performance per vendor.
+- **Visual Receiving**: Go to `ERP Pro > Receive Shipments` to visually drag items from an open Purchase Order into a Warehouse Bin, completing the goods receipt transaction.
+
+### 11. Accountability & Forensics
+- **Audit Logs**: Access the full history of system actions via `ERP Pro > System Utilities`. Track who changed what and when.
+- **Backups**: Before performing a system reset, use the "Export ERP Database" button to download a diagnostic backup of all ERP-specific transaction tables.
 
 ---
 
