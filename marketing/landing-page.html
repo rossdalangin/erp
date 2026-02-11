@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manufacturing ERP Pro - Enterprise Power, WordPress Simplicity</title>
+    <style>
+        :root {
+            --primary: #2271b1;
+            --secondary: #1d2327;
+            --accent: #dba617;
+            --success: #46b450;
+            --light: #f6f7f7;
+            --text: #3c434a;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: var(--text); margin: 0; padding: 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        header { background: var(--secondary); color: #fff; padding: 20px 0; border-bottom: 4px solid var(--primary); }
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; text-decoration: none; }
+        .hero { padding: 80px 0; background: linear-gradient(135deg, #1d2327 0%, #2c3338 100%); color: #fff; text-align: center; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1; }
+        .hero p { font-size: 1.25rem; color: #a7aaad; max-width: 800px; margin: 0 auto 40px; }
+        .btn { display: inline-block; padding: 15px 35px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s; border: none; cursor: pointer; }
+        .btn:hover { background: #135e96; transform: translateY(-2px); }
+        .btn-large { font-size: 1.2rem; }
+        .features { padding: 80px 0; background: #fff; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feature-card { padding: 30px; border: 1px solid #dcdcde; border-radius: 8px; transition: box-shadow 0.3s; }
+        .feature-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .feature-card h3 { color: var(--primary); margin-top: 0; }
+        .demo-section { padding: 80px 0; background: var(--light); text-align: center; }
+        .dashboard-mockup { background: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); max-width: 900px; margin: 40px auto; padding: 10px; }
+        .pricing { padding: 80px 0; }
+        .pricing-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .price-card { background: #fff; border: 1px solid #dcdcde; padding: 40px; border-radius: 8px; width: 300px; text-align: center; position: relative; }
+        .price-card.popular { border: 3px solid var(--primary); transform: scale(1.05); z-index: 1; }
+        .price-card.popular::before { content: "MOST POPULAR"; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 5px 15px; font-size: 0.75rem; border-radius: 20px; font-weight: bold; }
+        .price { font-size: 3rem; font-weight: bold; margin: 20px 0; }
+        .price span { font-size: 1rem; color: #646970; }
+        footer { background: var(--secondary); color: #fff; padding: 40px 0; text-align: center; }
+        .trust-badges { margin-top: 20px; display: flex; gap: 20px; justify-content: center; opacity: 0.5; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .price-card.popular { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container nav">
+        <a href="#" class="logo">Manufacturing ERP Pro</a>
+        <a href="#buy" class="btn">Get Started</a>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <h1>Digitalize Your Factory Floor in 10 Minutes</h1>
+        <p>Stop managing your factory with spreadsheets. Manufacturing ERP Pro is the first enterprise-grade MRP system built natively for WordPress.</p>
+        <a href="#buy" class="btn btn-large">Try the 14-Day Production Trial</a>
+        <p style="font-size: 0.9rem; margin-top: 15px; color: #646970;">No credit card required. Includes LeatherCraft Co. Sample Data.</p>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 50px; font-size: 2rem;">Why SME Manufacturers Love Us</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Visual BOM Builder</h3>
+                <p>Drag materials and operations into a tree. Watch your cost roll-up update in real-time. Recursive nesting for complex sub-assemblies.</p>
+            </div>
+            <div class="feature-card">
+                <h3>MRP Intelligence</h3>
+                <p>An automated "Brain" that explodes your forecasts into material requirements. Never run out of leather or soles again.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Production Kanban</h3>
+                <p>Ditch the paper. Manage work orders via drag-and-drop. Track labor hours, machine time, and scrap rates per operator.</p>
+            </div>
+            <div class="feature-card">
+                <h3>World-Class Traceability</h3>
+                <p>Interactive Lot Genealogy. Trace any defect back to the supplier batch in under 60 seconds. Protect your brand reputation.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Warehouse Heatmaps</h3>
+                <p>Visual 2D floorplan showing bin occupancy. Color-coded alerts for safety stock and expiring lots.</p>
+            </div>
+            <div class="feature-card">
+                <h3>WordPress Native</h3>
+                <p>Easy to install. Familiar UI. Modular design that scales with your growth. No expensive proprietary IT team required.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <div class="container">
+        <h2>Beautiful, ERP-Grade UX</h2>
+        <p>Designed for tablets and shop-floor productivity.</p>
+        <div class="dashboard-mockup">
+            <!-- Simulated Interface Image Placeholder -->
+            <div style="background: #f0f0f1; height: 400px; display: flex; align-items: center; justify-content: center; color: #999;">
+                [ High-Res Visual BOM Builder GIF ]
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pricing" id="buy">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 50px;">Simple Pricing for Growing Factories</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>Starter</h3>
+                <div class="price">$149<span>/mo</span></div>
+                <ul style="text-align: left; padding: 0; list-style: none; color: #646970;">
+                    <li>✓ 1 Warehouse</li>
+                    <li>✓ 500 SKUs</li>
+                    <li>✓ Visual BOM Builder</li>
+                    <li>✓ Inventory & Bins</li>
+                </ul>
+                <a href="#" class="btn" style="background: var(--secondary); margin-top: 20px; width: 80%;">Choose Starter</a>
+            </div>
+            <div class="price-card popular">
+                <h3>Professional</h3>
+                <div class="price">$399<span>/mo</span></div>
+                <ul style="text-align: left; padding: 0; list-style: none;">
+                    <li>✓ Unlimited Warehouses</li>
+                    <li>✓ Full MRP Engine</li>
+                    <li>✓ Quality Dashboard</li>
+                    <li>✓ Capacity Planning</li>
+                    <li>✓ Audit Logging</li>
+                </ul>
+                <a href="#" class="btn" style="margin-top: 20px; width: 80%;">Choose Pro</a>
+            </div>
+            <div class="price-card">
+                <h3>Enterprise</h3>
+                <div class="price">Custom</div>
+                <ul style="text-align: left; padding: 0; list-style: none; color: #646970;">
+                    <li>✓ Priority Support</li>
+                    <li>✓ Custom API Hooks</li>
+                    <li>✓ Multi-Site Sync</li>
+                    <li>✓ On-Site Training</li>
+                </ul>
+                <a href="#" class="btn" style="background: var(--secondary); margin-top: 20px; width: 80%;">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2023 Manufacturing ERP Pro. All rights reserved.</p>
+        <div class="trust-badges">
+            <span>WP-Approved</span>
+            <span>GDPR Compliant</span>
+            <span>Enterprise-Safe</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -209,9 +209,6 @@ class MEP_Reports {
 	}
 
 	/**
-	 * Calculate Inventory Valuation using LIFO.
-	 */
-	/**
 	 * Calculate On-Time Delivery percentage.
 	 */
 	public static function calculate_real_otd() {
@@ -275,6 +272,9 @@ class MEP_Reports {
 		);
 	}
 
+	/**
+	 * Calculate Inventory Valuation using LIFO.
+	 */
 	public static function get_lifo_valuation() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
