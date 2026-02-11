@@ -4,7 +4,7 @@
 
 const { useState, useEffect } = wp.element;
 
-const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop }) => {
+const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop, helpMode }) => {
     const bgColor = bin.occupancy > 90 ? '#fff0f0' : (bin.occupancy > 70 ? '#fffcf0' : '#fcfcfc');
     const borderColor = bin.occupancy > 90 ? '#d63638' : (bin.occupancy > 70 ? '#dba617' : '#ccc');
 
@@ -12,6 +12,7 @@ const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop }) => {
         className: 'mep-bin-card',
         onDragOver: onDragOver,
         onDrop: (e) => onDrop(e, bin.id),
+        title: helpMode ? `Bin (${bin.name}): Shows current material levels. Drag materials out of this bin to transfer them elsewhere.` : '',
         style: { border: `2px solid ${borderColor}`, padding: '15px', minWidth: '180px', background: bgColor, borderRadius: '4px' }
     },
         wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' } },
@@ -127,7 +128,8 @@ const WarehouseLayout = () => {
                 bin: bin,
                 onDragStart,
                 onDragOver,
-                onDrop
+                onDrop,
+                helpMode
             }))
         )
     );

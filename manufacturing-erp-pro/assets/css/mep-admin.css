@@ -93,15 +93,26 @@
 }
 
 /* Warehouse View */
+.mep-bins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
 .mep-bin-card {
     background: #fff;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s;
+}
+
+.mep-bin-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .mep-bin-card h4 {
     border-bottom: 1px solid #eee;
-    margin: 0 0 10px 0;
+    margin: 0;
     padding-bottom: 5px;
     color: var(--mep-primary);
 }
@@ -110,6 +121,12 @@
 .card {
     max-width: 100% !important;
     margin-top: 20px !important;
+}
+
+/* Traceability & Pegging */
+.mep-trace-graph-layout, .mep-pegging-container {
+    overflow-x: auto;
+    padding-bottom: 20px;
 }
 
 /* Mobile & Tablet Optimizations */
@@ -125,11 +142,12 @@
 
     .mep-kanban-board {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
 
     .mep-kanban-column {
         min-height: auto !important;
+        width: 100% !important;
     }
 
     .mep-kpi-card {
@@ -138,6 +156,10 @@
 
     .mep-kpi-card p {
         font-size: 20px !important;
+    }
+
+    .mep-bins-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -149,5 +171,15 @@
     .mep-wizard-card {
         padding: 20px !important;
         margin: 10px auto !important;
+    }
+
+    .mep-bins-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mep-wh-toolbar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
     }
 }

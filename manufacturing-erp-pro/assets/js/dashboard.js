@@ -41,7 +41,7 @@ const Dashboard = () => {
         },
             wp.element.createElement(KPICard, { label: 'Production Output', value: kpis.production_output, color: '#2271b1' }),
             wp.element.createElement(KPICard, { label: 'Scrap Rate', value: kpis.scrap_rate, color: '#d63638' }),
-            wp.element.createElement(KPICard, { label: 'Inventory Value', value: kpis.inventory_value, color: '#dba617' }),
+            wp.element.createElement(KPICard, { label: `Valuation (${kpis.valuation_method})`, value: kpis.inventory_valuation, color: '#dba617' }),
             wp.element.createElement(KPICard, { label: 'At-Risk Materials', value: kpis.at_risk_materials, color: kpis.at_risk_materials > 0 ? '#d63638' : '#46b450' })
         ),
         wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' } },

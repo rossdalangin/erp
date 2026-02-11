@@ -4,10 +4,11 @@
 
 const { useState, useEffect } = wp.element;
 
-const WorkOrderCard = ({ wo, onDragStart }) => {
+const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
     return wp.element.createElement('div', {
         className: 'mep-wo-card',
         draggable: true,
+        title: helpMode ? 'Work Order: Drag this card to a new column to update the manufacturing status of this order.' : '',
         onDragStart: (e) => onDragStart(e, wo.id),
         style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px', cursor: 'grab' }
     },
@@ -84,13 +85,14 @@ const KanbanBoard = () => {
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
             className: 'mep-kanban-column',
+            title: helpMode ? `Column (${col.label}): Drop Work Orders here to set them to ${col.label} status.` : '',
             onDragOver: onDragOver,
             onDrop: (e) => onDrop(e, col.id),
             style: { flex: 1, background: '#f0f0f1', padding: '15px', minHeight: '500px', border: '2px dashed transparent' }
         },
             wp.element.createElement('h3', null, col.label),
             workOrders.filter(wo => wo.status === col.id).map(wo =>
-                wp.element.createElement(WorkOrderCard, { key: wo.id, wo: wo, onDragStart: onDragStart })
+                wp.element.createElement(WorkOrderCard, { key: wo.id, wo: wo, onDragStart: onDragStart, helpMode: helpMode })
             )
         ))
     );

@@ -33,6 +33,7 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 - **Sub-Assemblies**: Nest BOMs seamlessly. (e.g., "Strap Assembly" inside "Leather Bag").
 - **Costing**: Watch the "Roll-up Cost" update live as you adjust quantities, times, or scrap factors.
 - **Versioning**: Use the "Save as New Version" checkbox to archive the current structure and start a new iteration (e.g., v1, v2).
+- **Reordering**: Drag existing BOM nodes (Materials or Operations) to change their sequence. This updates the production flow logic for shop floor travelers.
 
 ### 3. Production Planning (Kanban)
 - **The Board**: Go to `ERP Pro > Production Board`.
@@ -56,6 +57,10 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 ### 6. Master Data Importer
 - **Transitioning from Excel**: Access `ERP Pro > System Utilities`.
 - **Bulk Import**: Paste your material data in CSV format (Name, SKU, UOM, Cost) to populate your catalog in seconds.
+
+### 7. Valuation Settings
+- **Methodology**: In `System Utilities`, you can toggle between **FIFO** (First-In-First-Out) and **LIFO** (Last-In-First-Out) valuation.
+- **Financial Impact**: The Executive Dashboard KPI for "Inventory Valuation" automatically updates based on your chosen method and historical transaction costs.
 
 ### 7. Roles & Security
 - **Access Control**: We provide 4 specialized roles (Admin, Production, Warehouse, Quality). See `GOVERNANCE.md` for the full permission matrix.

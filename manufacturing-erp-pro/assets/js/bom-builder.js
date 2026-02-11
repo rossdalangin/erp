@@ -4,13 +4,29 @@
 
 const { useState, useEffect } = wp.element;
 
-const BOMNode = ({ item, depth, onRemove, onMarkSubstitute, onUpdate }) => {
+const BOMNode = ({ item, index, depth, onRemove, onMarkSubstitute, onUpdate, onReorder }) => {
     const isOp = item.type === 'operation';
     const icon = item.type === 'material' ? '📦 ' : (isOp ? '⚡ ' : '⚙️ ');
 
     return wp.element.createElement('div', {
         className: 'mep-bom-node',
-        style: { marginLeft: `${depth * 20}px`, borderLeft: '2px solid #ccc', padding: '10px', marginBottom: '5px', background: isOp ? '#f0f8ff' : '#f9f9f9' }
+        draggable: true,
+        onDragStart: (e) => {
+            e.stopPropagation();
+            e.dataTransfer.setData('reorderIndex', index);
+        },
+        onDragOver: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        },
+        onDrop: (e) => {
+            e.stopPropagation();
+            const fromIndex = e.dataTransfer.getData('reorderIndex');
+            if (fromIndex !== "") {
+                onReorder(parseInt(fromIndex), index);
+            }
+        },
+        style: { marginLeft: `${depth * 20}px`, borderLeft: '2px solid #ccc', padding: '10px', marginBottom: '5px', background: isOp ? '#f0f8ff' : '#f9f9f9', cursor: 'move' }
     },
         wp.element.createElement('span', { className: 'mep-node-type' }, icon),
         wp.element.createElement('strong', null, item.name || `Item #${item.id}`),
@@ -48,7 +64,7 @@ const BOMNode = ({ item, depth, onRemove, onMarkSubstitute, onUpdate }) => {
         }, 'Add Substitute'),
 
         item.sub_bom && item.sub_bom.length > 0 &&
-            item.sub_bom.map((child, i) => wp.element.createElement(BOMNode, { key: i, item: child, depth: depth + 1, onRemove, onMarkSubstitute, onUpdate }))
+            item.sub_bom.map((child, i) => wp.element.createElement(BOMNode, { key: i, item: child, index: i, depth: depth + 1, onRemove, onMarkSubstitute, onUpdate, onReorder }))
     );
 };
 
@@ -123,6 +139,13 @@ const BOMBuilder = ({ productId }) => {
         }));
     };
 
+    const reorderComponents = (fromIndex, toIndex) => {
+        const newBom = [...bom.bom];
+        const [movedItem] = newBom.splice(fromIndex, 1);
+        newBom.splice(toIndex, 0, movedItem);
+        setBom({ ...bom, bom: newBom });
+    };
+
     const removeComponent = (id) => {
         setBom(prev => ({ ...prev, bom: prev.bom.filter(item => item.id !== id) }));
     };
@@ -161,6 +184,7 @@ const BOMBuilder = ({ productId }) => {
         // Left Sidebar: Material & Operation Library
         wp.element.createElement('div', {
             className: 'mep-material-library',
+            title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure.' : '',
             style: { width: '250px', border: '1px solid #ccc', padding: '10px' }
         },
             wp.element.createElement('h3', null, 'Materials'),
@@ -185,20 +209,23 @@ const BOMBuilder = ({ productId }) => {
         wp.element.createElement('div', { className: 'mep-bom-main', style: { flex: 1 } },
             wp.element.createElement('header', { className: 'mep-bom-header', style: { marginBottom: '20px' } },
                 wp.element.createElement('h2', null, `Visual BOM Editor: Product #${productId}`),
-                wp.element.createElement('div', { className: 'mep-cost-roll-up' },
+                wp.element.createElement('div', {
+                    className: 'mep-cost-roll-up',
+                    title: helpMode ? 'Cost Roll-up: This value is calculated in real-time by aggregating the costs of all materials and labor operations in the tree below.' : ''
+                },
                     wp.element.createElement('strong', null, 'Estimated Roll-up Cost: '),
                     wp.element.createElement('span', { className: 'price', style: { color: '#2271b1', fontSize: '1.2em' } }, `$${bom.total_cost}`)
                 )
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
-                title: helpMode ? 'Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them.' : '',
+                title: helpMode ? 'Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence.' : '',
                 onDragOver: onDragOver,
                 onDrop: onDrop,
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }
             },
                 bom.bom.length > 0 ?
-                    bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent })) :
+                    bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :
                     wp.element.createElement('p', { className: 'empty-msg' }, 'Drag materials or operations here to start building...')
             ),
             wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px' } },

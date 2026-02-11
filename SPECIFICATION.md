@@ -103,6 +103,7 @@ React-based interactive canvas for product engineering.
 - **Operations Support**: Drag "Work Centers" into the BOM to define routing and labor costs.
 - **Inline Editing**: Click quantities or scrap factors to edit values directly on the canvas.
 - **Version Control**: "Save as New Version" functionality to track recipe iterations.
+- **Sequence Control**: Drag-and-drop reordering of BOM nodes to define the exact production sequence.
 
 ## 2. Visual Warehouse Layout
 - **Occupancy Heatmapping**: Bins change color (Yellow/Red) as they approach capacity.
@@ -140,6 +141,7 @@ Interactive node graph showing the journey of a specific Lot from Raw Material r
 - **KPI Tiles**: Output, Scrap Rate, Inventory Value, At-Risk Materials.
 - **Inventory Aging**: Bar chart showing stock by age buckets.
 - **Cost Variance**: Comparison of BOM estimates vs. actual performance.
+- **Dynamic Valuation**: Real-time inventory value calculated via FIFO or LIFO based on admin settings.
 
 ## 2. Onboarding & Demo Mode
 - **Setup Wizard**: 3-step onboarding process.

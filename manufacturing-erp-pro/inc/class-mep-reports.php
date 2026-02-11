@@ -36,13 +36,18 @@ class MEP_Reports {
 		$active_orders = wp_count_posts( 'mep_work_order' );
 		$active_count  = (int) $active_orders->publish + (int) $active_orders->{'in-progress'};
 
+		// 4. Valuation based on setting
+		$valuation_method = get_option( 'mep_valuation_method', 'fifo' );
+		$inventory_valuation = ( $valuation_method === 'lifo' ) ? static::get_lifo_valuation() : static::get_fifo_valuation();
+
 		return array(
 			'production_output' => $output,
 			'scrap_rate'        => $scrap_rate,
 			'inventory_value'   => '$' . number_format( $inventory_value, 2 ),
 			'on_time_delivery'  => '94%', // Placeholder for complex logic
 			'active_orders'     => $active_count,
-			'valuation_fifo'    => '$' . number_format( static::get_fifo_valuation(), 2 ),
+			'inventory_valuation' => '$' . number_format( $inventory_valuation, 2 ),
+			'valuation_method'  => strtoupper( $valuation_method ),
 			'cost_variance'     => static::get_cost_variance(),
 			'at_risk_materials' => static::get_at_risk_count(),
 			'inventory_aging'   => static::get_inventory_aging()
@@ -165,7 +170,8 @@ class MEP_Reports {
 			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
 			if ( $on_hand <= 0 ) continue;
 
-			// Get recent receipts in reverse order to find the cost of remaining items
+			// FIFO logic: we assume the oldest items were sold first.
+			// So the value of remaining stock is based on the NEWEST receipts.
 			$receipts = $wpdb->get_results( $wpdb->prepare(
 				"SELECT quantity, reference_id FROM $table_name
 				 WHERE material_id = %d AND transaction_type = 'RECEIVE'
@@ -178,10 +184,8 @@ class MEP_Reports {
 				$qty = (float) $receipt->quantity;
 				$take = min( $qty, $remaining );
 
-				// Get cost at time of receipt (from PO or current avg if PO missing)
 				$unit_cost = 0;
 				if ( $receipt->reference_id ) {
-					// Logic to get cost from PO line
 					$unit_cost = (float) get_post_meta( $receipt->reference_id, '_mep_unit_cost', true );
 				}
 				if ( ! $unit_cost ) {
@@ -193,7 +197,54 @@ class MEP_Reports {
 				if ( $remaining <= 0 ) break;
 			}
 
-			// If we still have remaining (e.g. from initial balance), use avg cost
+			if ( $remaining > 0 ) {
+				$total_value += ( $remaining * (float) get_post_meta( $mat->ID, '_mep_cost_avg', true ) );
+			}
+		}
+
+		return $total_value;
+	}
+
+	/**
+	 * Calculate Inventory Valuation using LIFO.
+	 */
+	public static function get_lifo_valuation() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
+		$total_value = 0;
+
+		foreach ( $materials as $mat ) {
+			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			if ( $on_hand <= 0 ) continue;
+
+			// LIFO logic: we assume the newest items were sold first.
+			// So the value of remaining stock is based on the OLDEST receipts.
+			$receipts = $wpdb->get_results( $wpdb->prepare(
+				"SELECT quantity, reference_id FROM $table_name
+				 WHERE material_id = %d AND transaction_type = 'RECEIVE'
+				 ORDER BY created_at ASC",
+				$mat->ID
+			) );
+
+			$remaining = $on_hand;
+			foreach ( $receipts as $receipt ) {
+				$qty = (float) $receipt->quantity;
+				$take = min( $qty, $remaining );
+
+				$unit_cost = 0;
+				if ( $receipt->reference_id ) {
+					$unit_cost = (float) get_post_meta( $receipt->reference_id, '_mep_unit_cost', true );
+				}
+				if ( ! $unit_cost ) {
+					$unit_cost = (float) get_post_meta( $mat->ID, '_mep_cost_avg', true );
+				}
+
+				$total_value += ( $take * $unit_cost );
+				$remaining -= $take;
+				if ( $remaining <= 0 ) break;
+			}
+
 			if ( $remaining > 0 ) {
 				$total_value += ( $remaining * (float) get_post_meta( $mat->ID, '_mep_cost_avg', true ) );
 			}

@@ -157,6 +157,23 @@ class MEP_Admin {
 		<div class="wrap">
 			<h1><?php _e( 'System Utilities & Safeguards', 'manufacturing-erp-pro' ); ?></h1>
 			<?php $this->maybe_show_demo_badge(); ?>
+
+			<div class="card">
+				<h2><?php _e( 'General ERP Settings', 'manufacturing-erp-pro' ); ?></h2>
+				<form method="post">
+					<?php wp_nonce_field( 'mep_save_settings', 'mep_nonce' ); ?>
+					<p>
+						<label><?php _e( 'Inventory Valuation Method:', 'manufacturing-erp-pro' ); ?><br>
+							<select name="mep_valuation_method">
+								<option value="fifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'fifo' ); ?>>FIFO (First-In-First-Out)</option>
+								<option value="lifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'lifo' ); ?>>LIFO (Last-In-First-Out)</option>
+							</select>
+						</label>
+					</p>
+					<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Save Settings', 'manufacturing-erp-pro' ); ?>">
+				</form>
+			</div>
+
 			<div class="card">
 				<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
 				<p><?php _e( 'Import Materials from a CSV file. Header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>
@@ -209,6 +226,13 @@ class MEP_Admin {
 			$current = get_option( 'mep_help_mode', 'off' );
 			update_option( 'mep_help_mode', $current === 'on' ? 'off' : 'on' );
 			return;
+		}
+
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_save_settings' ) && isset( $_POST['mep_action_save_settings'] ) ) {
+			update_option( 'mep_valuation_method', sanitize_text_field( $_POST['mep_valuation_method'] ) );
+			add_action( 'admin_notices', function() {
+				echo '<div class="updated"><p>' . __( 'Settings saved.', 'manufacturing-erp-pro' ) . '</p></div>';
+			} );
 		}
 
 		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_seed_data' ) && isset( $_POST['mep_action_seed'] ) ) {
