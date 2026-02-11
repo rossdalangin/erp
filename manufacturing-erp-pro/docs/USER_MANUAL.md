@@ -28,23 +28,28 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 
 ### 2. The Visual BOM Builder
 - **Building a Product**: Navigate to `ERP Pro > BOM Builder`.
-- **Interactive Canvas**: Drag raw materials from the left library into the central assembly tree.
+- **Interactive Canvas**: Drag materials and **Operations** (Work Centers) from the left library into the assembly tree.
+- **Operations**: Adding an operation allows you to factor in labor time and machine costs into the product's total cost.
 - **Sub-Assemblies**: Nest BOMs seamlessly. (e.g., "Strap Assembly" inside "Leather Bag").
-- **Costing**: Watch the "Roll-up Cost" update live as you adjust quantities or change materials.
+- **Costing**: Watch the "Roll-up Cost" update live as you adjust quantities, times, or scrap factors.
+- **Versioning**: Use the "Save as New Version" checkbox to archive the current structure and start a new iteration (e.g., v1, v2).
 
 ### 3. Production Planning (Kanban)
 - **The Board**: Go to `ERP Pro > Production Board`.
-- **Status Flow**: Drag-and-drop Work Order cards from "Backlog" to "In Progress" and finally to "Completed".
-- **Real-time Updates**: Moving a card automatically logs the status change in the Audit Trail for management review.
+- **Status Flow**: Drag-and-drop Work Order cards between columns.
+- **Completion & Yield**: When moving to "Completed", the system prompts for actual scrap and labor time. This data is used for **Cost Variance Analysis**.
+- **Printing**: You can generate a professional shop-floor traveler by visiting the Work Order's "Print" view via the API or Admin link.
 
 ### 4. MRP (Demand Planning)
 - **Forecasting**: Enter sales targets in `ERP Pro > Forecasts`.
 - **MRP Planning**: Use `ERP Pro > MRP Planning` to see a prioritized list of material requirements.
 - **Interactive POs**: Drag material suggestions into the "Basket" and click "Generate Purchase Orders" to automate procurement.
 - **Pegging**: Use the `Pegging View` to trace *exactly* which customer forecast or order triggered a specific material requirement.
+- **Stock Reservations**: The MRP engine accounts for stock already reserved for active Work Orders, ensuring procurement is accurate.
 
 ### 5. Equipment & Capacity Planning
 - **Machine Catalog**: Manage your factory assets in `Equipment`. Set the "Daily Capacity" in minutes for each machine.
+- **Maintenance**: Log repairs and services directly under each machine to track uptime and maintenance costs.
 - **Load Monitoring**: The Executive Dashboard displays a real-time "Resource Capacity" chart.
 - **Bottleneck Alerts**: Machines exceeding 90% load are highlighted in Red, allowing you to reassign work orders before delays occur.
 
@@ -53,11 +58,8 @@ Manufacturing ERP Pro isn't just a database; it's a **Growth Engine**.
 - **Bulk Import**: Paste your material data in CSV format (Name, SKU, UOM, Cost) to populate your catalog in seconds.
 
 ### 7. Roles & Security
-- **Access Control**: We provide 4 specialized roles:
-  - **ERP Administrator**: Master control.
-  - **Production Manager**: Oversees the floor and BOMs.
-  - **Warehouse Clerk**: Focuses on material movements.
-  - **Quality Inspector**: Manages checks and traceability.
+- **Access Control**: We provide 4 specialized roles (Admin, Production, Warehouse, Quality). See `GOVERNANCE.md` for the full permission matrix.
+- **Audit Logs**: Every transaction is recorded. View them in `System Utilities` or the DB for full accountability.
 
 ### 8. B2B & Customers
 - **Customer CRM**: Manage your B2B relationships in `ERP Pro > Customers`.
@@ -195,6 +197,14 @@ Don't let spreadsheet chaos kill your growth.
 - **Day 5**: The ROI of ERP (Hard numbers on savings).
 - **Day 6**: FAQ & Objection Handling.
 - **Day 7**: Last Call (Launch discount expires).
+
+### 9. Quality & Rework
+- **QC Gateway**: Record inspection results for batches or individual items.
+- **Rework Trigger**: If a QC check fails, the system can automatically generate a "REWORK" order to correct the defect.
+- **Traceability**: Enter a Lot/Batch number in the `Traceability` module to see a visual graph of its genealogy, including all upstream movements.
+
+### 10. Vendor Performance
+- **Scorecards**: Visit `ERP Pro > Supplier Scorecard` to see a visual analysis of Quality and On-Time Delivery performance per vendor.
 
 ---
 

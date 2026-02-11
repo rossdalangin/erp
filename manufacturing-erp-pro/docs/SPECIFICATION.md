@@ -88,9 +88,9 @@ Handles allocation of material for released orders.
 ### `wp_mep_audit_logs`
 - `id`: BIGINT
 - `user_id`: BIGINT
-- `object_type`: VARCHAR(50)
+- `object_type`: VARCHAR
 - `object_id`: BIGINT
-- `action`: VARCHAR(50)
+- `action`: VARCHAR
 - `old_value`: LONGTEXT
 - `new_value`: LONGTEXT
 
@@ -106,7 +106,7 @@ React-based interactive canvas for product engineering.
 
 ## 2. Visual Warehouse Layout
 - **Occupancy Heatmapping**: Bins change color (Yellow/Red) as they approach capacity.
-- **Drag-and-Drop Transfers**: Move stock cards between bins visually.
+- **Drag-and-Drop Transfers**: Move stock cards between bins to trigger transactions.
 
 ## 3. Production Planning Board (Kanban)
 - **Kanban Flow**: Move Work Orders from Backlog -> In Progress -> Completed.
@@ -134,23 +134,20 @@ Interactive node graph showing the journey of a specific Lot from Raw Material r
 
 ---
 
-# 7. Reporting, Onboarding & Governance
+# 7. Reporting & Analytics
 
 ## 1. Executive Dashboard
 - **KPI Tiles**: Output, Scrap Rate, Inventory Value, At-Risk Materials.
-- **Inventory Aging**: Bar chart showing stock by age buckets.
-- **Cost Variance**: Comparison of BOM estimates vs. actual performance.
-
-## 2. Onboarding & Demo Mode
-- **Setup Wizard**: 3-step onboarding process.
-- **Demo Mode**: Persistent badge when "LeatherCraft Co." sample data is detected.
+- **Inventory Aging**: Bar chart showing stock by age buckets (0-30, 31-60, etc.).
+- **Cost Variance**: Comparison of BOM estimates vs. actual floor performance.
 
 ---
 
 # 8. Admin Tools & Safeguards
 
 - **Multi-Step Reset**: Hard wipe requires typed phrase confirmation: `RESET PRODUCTION ENVIRONMENT`.
-- **Audit Logging**: Mandatory tracking of all transactional and administrative actions.
+- **Setup Wizard**: 3-step onboarding for UOM, initial warehouse, and sample data injection.
+- **Demo Mode**: Persistent badge indicates when "LeatherCraft Co." sample data is active.
 
 ---
 

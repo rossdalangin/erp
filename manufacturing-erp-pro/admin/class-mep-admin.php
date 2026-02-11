@@ -65,6 +65,7 @@ class MEP_Admin {
 		// --- PROCUREMENT & MRP ---
 		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Suppliers', 'manufacturing-erp-pro' ), __( 'Suppliers', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_supplier' );
+		add_submenu_page( 'mep-dashboard', __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), 'manage_options', 'mep-supplier-scorecard', array( $this, 'supplier_scorecard_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_po' );
 		add_submenu_page( 'mep-dashboard', __( 'Forecasts', 'manufacturing-erp-pro' ), __( 'Forecasts', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_forecast' );
 		add_submenu_page( 'mep-dashboard', __( 'MRP Planning', 'manufacturing-erp-pro' ), __( 'MRP Planning', 'manufacturing-erp-pro' ), 'manage_options', 'mep-mrp-planning', array( $this, 'mrp_planning_page' ) );
@@ -79,6 +80,12 @@ class MEP_Admin {
 	public function wizard_page() {
 		echo '<div class="wrap"><h1>' . __( 'ERP Pro Setup Wizard', 'manufacturing-erp-pro' ) . '</h1>';
 		echo '<div id="mep-wizard-root"></div></div>';
+	}
+
+	public function supplier_scorecard_page() {
+		echo '<div class="wrap"><h1>' . __( 'Vendor Performance Analysis', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
+		echo '<div id="mep-supplier-scorecard-root"></div></div>';
 	}
 
 	public function traceability_page() {
@@ -254,6 +261,7 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 
 		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )

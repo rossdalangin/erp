@@ -41,6 +41,12 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/work-orders/(?P<id>\d+)/print', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'print_work_order' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_bom' ),
@@ -130,6 +136,18 @@ class MEP_API {
 			'callback'            => array( $this, 'create_po_from_items' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/suppliers', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_suppliers' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/procurement/supplier-score/(?P<id>\d+)', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_supplier_score' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -203,6 +221,44 @@ class MEP_API {
 		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
+	public function print_work_order( $request ) {
+		$id = $request['id'];
+		$wo = get_post( $id );
+		if ( ! $wo ) return new WP_Error( 'not_found', 'Work Order not found', array( 'status' => 404 ) );
+
+		$product_id = (int) $wo->post_parent;
+
+		// Gather data
+		$data = array(
+			'id'           => $id,
+			'status'       => $wo->post_status,
+			'qty'          => get_post_meta( $id, '_mep_work_order_qty', true ),
+			'start_date'   => get_post_meta( $id, '_mep_start_date', true ),
+			'assignee'     => get_the_author_meta( 'display_name', $wo->post_author ),
+			'product_name' => get_the_title( $product_id ),
+			'product_sku'  => get_post_meta( $product_id, '_mep_sku', true ),
+			'batch_code'   => get_post_meta( $id, '_mep_batch_code', true ) ?: 'N/A',
+			'bom'          => MEP_BOM::get_bom_tree( $product_id ),
+			'route'        => array()
+		);
+
+		// Get Routing Steps
+		$route_posts = get_posts( array( 'post_type' => 'mep_route', 'post_parent' => $product_id, 'numberposts' => 1 ) );
+		if ( ! empty( $route_posts ) ) {
+			$steps = get_post_meta( $route_posts[0]->ID, '_mep_steps', true );
+			if ( is_array( $steps ) ) {
+				foreach ( $steps as $step ) {
+					$step['work_center_name'] = get_the_title( $step['work_center'] );
+					$data['route'][] = $step;
+				}
+			}
+		}
+
+		header( 'Content-Type: text/html' );
+		include MEP_PLUGIN_DIR . 'templates/work-order-print.php';
+		exit;
+	}
+
 	public function get_bom( $request ) {
 		$product_id = $request['id'];
 		$tree = MEP_BOM::get_bom_tree( $product_id );
@@ -259,6 +315,21 @@ class MEP_API {
 			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
 		}
 		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_suppliers( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_supplier', 'numberposts' => -1 ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+		}
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_supplier_score( $request ) {
+		$id = $request['id'];
+		$score = MEP_Procurement::calculate_supplier_score( $id );
+		return new WP_REST_Response( $score, 200 );
 	}
 
 	public function create_po_from_items( $request ) {
