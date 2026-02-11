@@ -3,6 +3,7 @@
  */
 
 const { useState, useEffect } = wp.element;
+const { __ } = wp.i18n;
 
 const BOMNode = ({ item, index, depth, onRemove, onMarkSubstitute, onUpdate, onReorder }) => {
     const isOp = item.type === 'operation';
@@ -38,30 +39,30 @@ const BOMNode = ({ item, index, depth, onRemove, onMarkSubstitute, onUpdate, onR
                 const newVal = prompt(`Enter ${isOp ? 'Time (mins)' : 'Quantity'}:`, item.qty);
                 if (newVal !== null) onUpdate(item.id, { qty: parseFloat(newVal) });
             }
-        }, ` ${isOp ? 'Time' : 'Qty'}: ${item.qty}`),
+        }, ` ${isOp ? __('Time', 'manufacturing-erp-pro') : __('Qty', 'manufacturing-erp-pro')}: ${item.qty}`),
 
         // Editable Scrap/Yield
         wp.element.createElement('span', {
             style: { cursor: 'pointer', marginLeft: '10px', borderBottom: '1px dashed #999', fontSize: '11px' },
             onClick: () => {
-                const newVal = prompt(`Enter ${isOp ? 'Yield Loss %' : 'Scrap %'}:`, (item.scrap || 0) * 100);
+                const newVal = prompt(`${isOp ? __('Enter Yield Loss %', 'manufacturing-erp-pro') : __('Enter Scrap %', 'manufacturing-erp-pro')}:`, (item.scrap || 0) * 100);
                 if (newVal !== null) onUpdate(item.id, { scrap: parseFloat(newVal) / 100 });
             }
-        }, ` ${isOp ? 'Loss' : 'Scrap'}: ${(item.scrap || 0) * 100}%`),
+        }, ` ${isOp ? __('Loss', 'manufacturing-erp-pro') : __('Scrap', 'manufacturing-erp-pro')}: ${(item.scrap || 0) * 100}%`),
 
-        item.substitute_name && wp.element.createElement('span', { style: { color: 'green', marginLeft: '10px', fontSize: '11px' } }, `(Alt: ${item.substitute_name})`),
+        item.substitute_name && wp.element.createElement('span', { style: { color: 'green', marginLeft: '10px', fontSize: '11px' } }, `(${__('Alt', 'manufacturing-erp-pro')}: ${item.substitute_name})`),
 
         wp.element.createElement('button', {
             className: 'button-link-delete',
             style: { marginLeft: '10px', fontSize: '11px' },
             onClick: () => onRemove(item.id)
-        }, 'Remove'),
+        }, __('Remove', 'manufacturing-erp-pro')),
 
         item.type === 'material' && !item.substitute_id && wp.element.createElement('button', {
             className: 'button-secondary',
             style: { marginLeft: '10px', fontSize: '11px' },
             onClick: () => onMarkSubstitute(item.id)
-        }, 'Add Substitute'),
+        }, __('Add Substitute', 'manufacturing-erp-pro')),
 
         item.sub_bom && item.sub_bom.length > 0 &&
             item.sub_bom.map((child, i) => wp.element.createElement(BOMNode, { key: i, item: child, index: i, depth: depth + 1, onRemove, onMarkSubstitute, onUpdate, onReorder }))
@@ -151,11 +152,13 @@ const BOMBuilder = ({ productId }) => {
     };
 
     const markSubstitute = (id) => {
-        const subId = prompt("Enter Material ID for Substitute:");
+        const subId = prompt(__('Enter Material ID for Substitute:', 'manufacturing-erp-pro'));
         if (subId) {
+            const material = materials.find(m => m.id == subId);
+            const subName = material ? material.name : `${__('Alt Material', 'manufacturing-erp-pro')} #${subId}`;
             setBom(prev => ({
                 ...prev,
-                bom: prev.bom.map(item => item.id === id ? { ...item, substitute_id: subId, substitute_name: `Alt Material #${subId}` } : item)
+                bom: prev.bom.map(item => item.id === id ? { ...item, substitute_id: subId, substitute_name: subName } : item)
             }));
         }
     };
@@ -175,7 +178,7 @@ const BOMBuilder = ({ productId }) => {
         });
     };
 
-    if (loading) return wp.element.createElement('p', null, 'Loading Interactive BOM Builder...');
+    if (loading) return wp.element.createElement('p', null, __('Loading Interactive BOM Builder...', 'manufacturing-erp-pro'));
     if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
@@ -187,7 +190,7 @@ const BOMBuilder = ({ productId }) => {
             title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure.' : '',
             style: { width: '250px', border: '1px solid #ccc', padding: '10px' }
         },
-            wp.element.createElement('h3', null, 'Materials'),
+            wp.element.createElement('h3', null, __('Materials', 'manufacturing-erp-pro')),
             materials.map(mat => wp.element.createElement('div', {
                 key: mat.id,
                 className: 'mep-library-item',
@@ -196,7 +199,7 @@ const BOMBuilder = ({ productId }) => {
                 style: { padding: '8px', border: '1px solid #eee', marginBottom: '5px', cursor: 'grab', background: '#fff' }
             }, mat.name)),
 
-            wp.element.createElement('h3', { style: { marginTop: '20px' } }, 'Work Centers (Operations)'),
+            wp.element.createElement('h3', { style: { marginTop: '20px' } }, __('Work Centers (Operations)', 'manufacturing-erp-pro')),
             equipment.map(eq => wp.element.createElement('div', {
                 key: eq.id,
                 className: 'mep-library-item',
@@ -208,37 +211,37 @@ const BOMBuilder = ({ productId }) => {
         // Central Canvas
         wp.element.createElement('div', { className: 'mep-bom-main', style: { flex: 1 } },
             wp.element.createElement('header', { className: 'mep-bom-header', style: { marginBottom: '20px' } },
-                wp.element.createElement('h2', null, `Visual BOM Editor: Product #${productId}`),
+                wp.element.createElement('h2', null, `${__('Visual BOM Editor: Product', 'manufacturing-erp-pro')} #${productId}`),
                 wp.element.createElement('div', {
                     className: 'mep-cost-roll-up',
-                    title: helpMode ? 'Cost Roll-up: This value is calculated in real-time by aggregating the costs of all materials and labor operations in the tree below.' : ''
+                    title: helpMode ? __('Cost Roll-up: This value is calculated in real-time by aggregating the costs of all materials and labor operations in the tree below.', 'manufacturing-erp-pro') : ''
                 },
-                    wp.element.createElement('strong', null, 'Estimated Roll-up Cost: '),
+                    wp.element.createElement('strong', null, __('Estimated Roll-up Cost: ', 'manufacturing-erp-pro')),
                     wp.element.createElement('span', { className: 'price', style: { color: '#2271b1', fontSize: '1.2em' } }, `$${bom.total_cost}`)
                 )
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
-                title: helpMode ? 'Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence.' : '',
+                title: helpMode ? __('Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence.', 'manufacturing-erp-pro') : '',
                 onDragOver: onDragOver,
                 onDrop: onDrop,
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }
             },
                 bom.bom.length > 0 ?
                     bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :
-                    wp.element.createElement('p', { className: 'empty-msg' }, 'Drag materials or operations here to start building...')
+                    wp.element.createElement('p', { className: 'empty-msg' }, __('Drag materials or operations here to start building...', 'manufacturing-erp-pro'))
             ),
             wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px' } },
-                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, 'Save BOM Structure'),
+                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, __('Save BOM Structure', 'manufacturing-erp-pro')),
                 wp.element.createElement('label', null,
                     wp.element.createElement('input', {
                         type: 'checkbox',
                         checked: newVersion,
                         onChange: (e) => setNewVersion(e.target.checked)
                     }),
-                    ' Save as New Version'
+                    ` ${__('Save as New Version', 'manufacturing-erp-pro')}`
                 ),
-                wp.element.createElement('span', { style: { color: '#666' } }, `Current Version: ${bom.version || 1}`)
+                wp.element.createElement('span', { style: { color: '#666' } }, `${__('Current Version', 'manufacturing-erp-pro')}: ${bom.version || 1}`)
             )
         )
     );

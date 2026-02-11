@@ -10,7 +10,7 @@
     <title>Work Order #<?php echo esc_html( $data['id'] ); ?> - Manufacturing ERP Pro</title>
     <style>
         body { font-family: sans-serif; padding: 30px; color: #222; line-height: 1.4; }
-        .header { display: flex; justify-content: space-between; border-bottom: 3px solid #2271b1; padding-bottom: 15px; margin-bottom: 25px; }
+        .header { display: flex; justify-content: space-between; border-bottom: 3px solid #2271b1; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-start; }
         h1 { margin: 0; color: #2271b1; }
         .badge { background: #eee; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
         .section { margin-bottom: 30px; }
@@ -32,8 +32,15 @@
         <div>
             <h1>WORK ORDER</h1>
             <p><strong>#<?php echo esc_html( $data['id'] ); ?></strong></p>
+            <div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; display: inline-block; text-align: center;">
+                <div style="font-family: 'Courier New', Courier, monospace; letter-spacing: 5px; font-weight: bold;">|| ||| | ||| || ||</div>
+                <div style="font-size: 10px; margin-top: 5px;">WO-<?php echo esc_html( $data['id'] ); ?></div>
+            </div>
         </div>
         <div style="text-align: right;">
+            <div style="width: 80px; height: 80px; border: 2px solid #222; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 10px; text-align: center; margin-left: auto;">
+                QR SCAN<br>TO LOG
+            </div>
             <span class="badge"><?php echo esc_html( $data['status'] ); ?></span>
             <p>Date: <?php echo date('Y-m-d'); ?></p>
         </div>
@@ -63,6 +70,7 @@
                     <th>Type</th>
                     <th>Required Qty</th>
                     <th>UOM</th>
+                    <th>Substitute / Alt</th>
                     <th>Picked [ ]</th>
                 </tr>
             </thead>
@@ -73,6 +81,7 @@
                         <td><?php echo esc_html( $item['type'] ); ?></td>
                         <td><?php echo esc_html( $item['qty'] * $data['qty'] ); ?></td>
                         <td><?php echo esc_html( $item['uom'] ?? '' ); ?></td>
+                        <td><?php echo esc_html( $item['substitute_name'] ?? 'None' ); ?></td>
                         <td style="width: 60px;"></td>
                     </tr>
                 <?php endforeach; ?>

@@ -36,7 +36,10 @@ class MEP_Reports {
 		$active_orders = wp_count_posts( 'mep_work_order' );
 		$active_count  = (int) $active_orders->publish + (int) $active_orders->{'in-progress'};
 
-		// 4. Valuation based on setting
+		// 4. Real OTD (On-Time Delivery)
+		$otd_percentage = static::calculate_real_otd();
+
+		// 5. Valuation based on setting
 		$valuation_method = get_option( 'mep_valuation_method', 'fifo' );
 		$inventory_valuation = ( $valuation_method === 'lifo' ) ? static::get_lifo_valuation() : static::get_fifo_valuation();
 
@@ -44,7 +47,7 @@ class MEP_Reports {
 			'production_output' => $output,
 			'scrap_rate'        => $scrap_rate,
 			'inventory_value'   => '$' . number_format( $inventory_value, 2 ),
-			'on_time_delivery'  => '94%', // Placeholder for complex logic
+			'on_time_delivery'  => $otd_percentage . '%',
 			'active_orders'     => $active_count,
 			'inventory_valuation' => '$' . number_format( $inventory_valuation, 2 ),
 			'valuation_method'  => strtoupper( $valuation_method ),
@@ -208,6 +211,70 @@ class MEP_Reports {
 	/**
 	 * Calculate Inventory Valuation using LIFO.
 	 */
+	/**
+	 * Calculate On-Time Delivery percentage.
+	 */
+	public static function calculate_real_otd() {
+		global $wpdb;
+		$logs_table = $wpdb->prefix . 'mep_production_logs';
+
+		// Find all completed work orders in the last 30 days
+		$logs = $wpdb->get_results( "SELECT work_order_id, created_at FROM $logs_table WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)" );
+
+		if ( empty( $logs ) ) return 100;
+
+		$total = count( $logs );
+		$on_time = 0;
+
+		foreach ( $logs as $log ) {
+			$due_date = get_post_meta( $log->work_order_id, '_mep_due_date', true );
+			if ( ! $due_date ) {
+				$on_time++; // Assume on-time if no due date set
+				continue;
+			}
+
+			if ( strtotime( $log->created_at ) <= strtotime( $due_date . ' 23:59:59' ) ) {
+				$on_time++;
+			}
+		}
+
+		return round( ( $on_time / $total ) * 100 );
+	}
+
+	/**
+	 * Get detailed quality metrics.
+	 */
+	public static function get_quality_metrics() {
+		$checks = get_posts( array( 'post_type' => 'mep_qc_check', 'numberposts' => -1 ) );
+		$total = count( $checks );
+		$pass  = 0;
+		$fail  = 0;
+		$defects = array();
+
+		foreach ( $checks as $check ) {
+			$status = get_post_meta( $check->ID, '_mep_qc_status', true );
+			if ( $status === 'PASS' ) $pass++;
+			if ( $status === 'FAIL' ) {
+				$fail++;
+				$desc = get_post_meta( $check->ID, '_mep_qc_defects', true );
+				if ( $desc ) {
+					$defects[] = $desc;
+				}
+			}
+		}
+
+		$ncrs = wp_count_posts( 'mep_ncr' );
+
+		return array(
+			'total_checks' => $total,
+			'pass_count'   => $pass,
+			'fail_count'   => $fail,
+			'pass_rate'    => $total > 0 ? round( ( $pass / $total ) * 100, 1 ) . '%' : '100%',
+			'active_ncrs'  => (int) $ncrs->publish + (int) $ncrs->{'in-progress'},
+			'defects_log'  => array_slice( $defects, 0, 10 )
+		);
+	}
+
 	public static function get_lifo_valuation() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mep_inventory_transactions';

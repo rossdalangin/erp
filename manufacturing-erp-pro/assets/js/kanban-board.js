@@ -3,6 +3,7 @@
  */
 
 const { useState, useEffect } = wp.element;
+const { __ } = wp.i18n;
 
 const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
     return wp.element.createElement('div', {
@@ -24,9 +25,9 @@ const KanbanBoard = () => {
     const [error, setError] = useState(null);
 
     const columns = [
-        { id: 'publish', label: 'Backlog' },
-        { id: 'in-progress', label: 'In Progress' },
-        { id: 'completed', label: 'Completed' }
+        { id: 'publish', label: __('Backlog', 'manufacturing-erp-pro') },
+        { id: 'in-progress', label: __('In Progress', 'manufacturing-erp-pro') },
+        { id: 'completed', label: __('Completed', 'manufacturing-erp-pro') }
     ];
 
     useEffect(() => {
@@ -58,8 +59,8 @@ const KanbanBoard = () => {
     const updateOrderStatus = (id, nextStatus) => {
         let extraData = {};
         if (nextStatus === 'completed') {
-            const scrap = prompt("Enter scrap quantity (if any):", "0");
-            const labor = prompt("Enter total labor minutes spent:", "60");
+            const scrap = prompt(__('Enter scrap quantity (if any):', 'manufacturing-erp-pro'), "0");
+            const labor = prompt(__('Enter total labor minutes spent:', 'manufacturing-erp-pro'), "60");
             extraData = { scrap_qty: scrap, labor_mins: labor };
         }
 

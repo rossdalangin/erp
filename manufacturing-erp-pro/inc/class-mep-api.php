@@ -107,6 +107,12 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/reports/quality', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_quality_reports' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/qc/trace/(?P<lot>[a-zA-Z0-9\-_]+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_lot_trace' ),
@@ -128,6 +134,12 @@ class MEP_API {
 		register_rest_route( 'mep/v1', '/equipment', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_equipment' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
+
+		register_rest_route( 'mep/v1', '/equipment/detailed', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_equipment_detailed' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
 
@@ -387,6 +399,11 @@ class MEP_API {
 		return new WP_REST_Response( $data, 200 );
 	}
 
+	public function get_quality_reports( $request ) {
+		$data = MEP_Reports::get_quality_metrics();
+		return new WP_REST_Response( $data, 200 );
+	}
+
 	public function get_lot_trace( $request ) {
 		$lot = $request['lot'];
 		$data = MEP_Quality::trace_lot( $lot );
@@ -415,6 +432,20 @@ class MEP_API {
 				'id' => $post->ID,
 				'name' => $post->post_title,
 				'labor_rate' => get_post_meta($post->ID, '_mep_labor_rate', true) ?: 0.5
+			);
+		}
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_equipment_detailed( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_equipment', 'numberposts' => -1 ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array(
+				'id'               => $post->ID,
+				'name'             => $post->post_title,
+				'capacity'         => get_post_meta($post->ID, '_mep_daily_capacity_mins', true) ?: 480,
+				'maintenance_logs' => get_post_meta($post->ID, '_mep_maintenance_logs', true) ?: array()
 			);
 		}
 		return new WP_REST_Response( $data, 200 );

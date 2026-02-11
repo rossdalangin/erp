@@ -56,10 +56,12 @@ class MEP_Admin {
 		add_submenu_page( 'mep-dashboard', __( 'Products & BOMs', 'manufacturing-erp-pro' ), __( 'Products', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_product' );
 		add_submenu_page( 'mep-dashboard', __( 'BOM Builder', 'manufacturing-erp-pro' ), __( 'BOM Builder', 'manufacturing-erp-pro' ), 'manage_options', 'mep-bom-builder', array( $this, 'bom_builder_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Production Board', 'manufacturing-erp-pro' ), __( 'Production Board', 'manufacturing-erp-pro' ), 'manage_options', 'mep-production', array( $this, 'production_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Capacity Planner', 'manufacturing-erp-pro' ), __( 'Capacity Planner', 'manufacturing-erp-pro' ), 'manage_options', 'mep-capacity', array( $this, 'capacity_page' ) );
 
 		// --- QUALITY MODULE ---
 		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Quality Checks', 'manufacturing-erp-pro' ), __( 'Quality Checks', 'manufacturing-erp-pro' ), 'manage_options', 'edit.php?post_type=mep_qc_check' );
+		add_submenu_page( 'mep-dashboard', __( 'Quality Dashboard', 'manufacturing-erp-pro' ), __( 'Quality Dashboard', 'manufacturing-erp-pro' ), 'manage_options', 'mep-quality-dashboard', array( $this, 'quality_dashboard_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Traceability', 'manufacturing-erp-pro' ), __( 'Traceability', 'manufacturing-erp-pro' ), 'manage_options', 'mep-traceability', array( $this, 'traceability_page' ) );
 
 		// --- PROCUREMENT & MRP ---
@@ -95,10 +97,22 @@ class MEP_Admin {
 		echo '<div id="mep-po-receiving-root"></div></div>';
 	}
 
+	public function quality_dashboard_page() {
+		echo '<div class="wrap"><h1>' . __( 'Quality & Compliance Analytics', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
+		echo '<div id="mep-quality-dashboard-root"></div></div>';
+	}
+
 	public function traceability_page() {
 		echo '<div class="wrap"><h1>' . __( 'Lot & Batch Traceability', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
 		echo '<div id="mep-traceability-root"></div></div>';
+	}
+
+	public function capacity_page() {
+		echo '<div class="wrap"><h1>' . __( 'Resource Capacity & Maintenance', 'manufacturing-erp-pro' ) . '</h1>';
+		$this->maybe_show_demo_badge();
+		echo '<div id="mep-capacity-root"></div></div>';
 	}
 
 	public function mrp_planning_page() {
@@ -326,6 +340,8 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-quality-dashboard', MEP_PLUGIN_URL . 'assets/js/quality-dashboard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
 
 		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )
