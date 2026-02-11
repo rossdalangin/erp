@@ -63,6 +63,7 @@ class Manufacturing_ERP_Pro {
 
 		if ( is_admin() ) {
 			require_once MEP_PLUGIN_DIR . 'admin/class-mep-admin.php';
+			require_once MEP_PLUGIN_DIR . 'inc/class-mep-admin-ui.php';
 		}
 	}
 
@@ -85,6 +86,7 @@ class Manufacturing_ERP_Pro {
 
 		if ( is_admin() ) {
 			MEP_Admin::get_instance();
+			MEP_Admin_UI::get_instance();
 		}
 	}
 

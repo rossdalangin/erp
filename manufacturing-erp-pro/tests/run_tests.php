@@ -14,6 +14,7 @@ require_once MEP_PLUGIN_DIR . 'inc/class-mep-inventory.php';
 require_once MEP_PLUGIN_DIR . 'inc/class-mep-bom.php';
 require_once MEP_PLUGIN_DIR . 'inc/class-mep-mrp.php';
 require_once MEP_PLUGIN_DIR . 'inc/class-mep-reports.php';
+require_once MEP_PLUGIN_DIR . 'inc/class-mep-admin-ui.php';
 
 // Mock WP functions
 function get_post_meta($id, $key, $single = false) { return ''; }
@@ -22,6 +23,7 @@ function get_posts($args) { return []; }
 function current_time($type) { return date('Y-m-d H:i:s'); }
 function __($text, $domain) { return $text; }
 function add_action($tag, $function, $priority = 10, $accepted_args = 1) { return true; }
+function add_filter($tag, $function, $priority = 10, $accepted_args = 1) { return true; }
 function wp_next_scheduled($tag) { return false; }
 function wp_schedule_event($timestamp, $recurrence, $tag) { return true; }
 function register_rest_route($namespace, $route, $args) { return true; }
@@ -35,6 +37,7 @@ class MEP_Unit_Tests {
             'Inventory Locking' => self::test_inventory_locking(),
             'MRP Recursion' => self::test_mrp_recursion(),
             'Reporting Logic' => self::test_reporting_logic(),
+            'Admin UI Integration' => self::test_admin_ui(),
         ];
 
         $failed = false;
@@ -74,6 +77,11 @@ class MEP_Unit_Tests {
 
         $otd = MEP_Reports::calculate_real_otd();
         return $otd === 100;
+    }
+
+    private static function test_admin_ui() {
+        $ui = MEP_Admin_UI::get_instance();
+        return method_exists($ui, 'add_product_row_actions');
     }
 }
 
