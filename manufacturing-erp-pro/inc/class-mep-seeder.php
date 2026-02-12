@@ -18,42 +18,43 @@ class MEP_Seeder {
 		$wh_prod = self::create_post( 'mep_warehouse', 'Production Floor' );
 
 		// 2. Create Bins
-		$bin_main = self::create_post( 'mep_bin', 'Leather Storage (A1)', $wh_main );
-		$bin_prod = self::create_post( 'mep_bin', 'Cutting Area (P1)', $wh_prod );
+		$bin_leather = self::create_post( 'mep_bin', 'Leather Storage', $wh_main );
+		$bin_cutting = self::create_post( 'mep_bin', 'Cutting Area', $wh_prod );
+		$bin_assembly = self::create_post( 'mep_bin', 'Assembly Area', $wh_prod );
 
 		// 3. Create Suppliers
-		self::create_post( 'mep_supplier', 'Leather Supplier A' );
+		$sup_a = self::create_post( 'mep_supplier', 'Leather Supplier A' );
+		$sup_b = self::create_post( 'mep_supplier', 'Sole Supplier B' );
 
 		// 4. Create Materials
-		$leather = self::create_post( 'mep_material', 'Cowhide Leather', 0, array(
-			'_mep_sku' => 'LTH-COW-001',
+		$cow_leather = self::create_post( 'mep_material', 'Cowhide leather', 0, array(
+			'_mep_sku' => 'MAT-LTH-COW',
 			'_mep_uom' => 'm2',
-			'_mep_cost_avg' => 45.00
+			'_mep_cost_avg' => 45.00,
+			'_mep_safety_stock' => 100
+		) );
+		$pu_leather = self::create_post( 'mep_material', 'PU leather', 0, array(
+			'_mep_sku' => 'MAT-LTH-PU',
+			'_mep_uom' => 'm2',
+			'_mep_cost_avg' => 15.00
+		) );
+		$rubber_soles = self::create_post( 'mep_material', 'Rubber soles', 0, array(
+			'_mep_sku' => 'MAT-RUB-SOL',
+			'_mep_uom' => 'pcs',
+			'_mep_cost_avg' => 5.50
+		) );
+		$thread = self::create_post( 'mep_material', 'Thread', 0, array(
+			'_mep_sku' => 'MAT-THR-001',
+			'_mep_uom' => 'spool',
+			'_mep_cost_avg' => 2.00
+		) );
+		$zippers = self::create_post( 'mep_material', 'Zippers', 0, array(
+			'_mep_sku' => 'MAT-ZIP-001',
+			'_mep_uom' => 'pcs',
+			'_mep_cost_avg' => 1.20
 		) );
 
-		// 5. Create Products
-		$bag = self::create_post( 'mep_product', 'Signature Leather Handbag', 0, array(
-			'_mep_sku' => 'BAG-SIG-001'
-		) );
-
-		// 6. Create BOM
-		$bom_id = self::create_post( 'mep_bom', 'BOM for Handbag V1', $bag );
-		update_post_meta( $bom_id, '_mep_components', array(
-			array('id' => $leather, 'type' => 'material', 'qty' => 1.5, 'scrap' => 0.05)
-		) );
-
-		// 7. Create Additional Work Orders
-		$statuses = array('publish', 'in-progress', 'in-progress', 'completed', 'publish');
-		foreach ($statuses as $i => $status) {
-			wp_insert_post( array(
-				'post_type'   => 'mep_work_order',
-				'post_title'  => "Work Order #100" . ($i + 1),
-				'post_status' => $status,
-				'meta_input'  => array('_mep_is_sample_data' => 1)
-			) );
-		}
-
-		// 8. Create Equipment
+		// 5. Create Equipment
 		$eq_cutting = self::create_post( 'mep_equipment', 'Heavy Duty Laser Cutter', 0, array(
 			'_mep_daily_capacity_mins' => 480,
 			'_mep_labor_rate' => 0.75
@@ -62,71 +63,150 @@ class MEP_Seeder {
 			'_mep_daily_capacity_mins' => 480,
 			'_mep_labor_rate' => 0.50
 		) );
-
-		// 9. Create Routes
-		$route_id = self::create_post( 'mep_route', 'Standard Bag Assembly Route', $bag );
-		update_post_meta( $route_id, '_mep_steps', array(
-			array('work_center' => $eq_cutting, 'time' => 15, 'desc' => 'Cutting pattern'),
-			array('work_center' => $eq_stitching, 'time' => 45, 'desc' => 'Main stitching')
+		$eq_assembly = self::create_post( 'mep_equipment', 'Manual Assembly Bench', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 0.40
+		) );
+		$eq_qc = self::create_post( 'mep_equipment', 'QC Inspection Station', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 0.60
+		) );
+		$eq_packing = self::create_post( 'mep_equipment', 'Packing Table', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 0.30
 		) );
 
-		// 10. Create Customers
-		$cust_a = self::create_post( 'mep_customer', 'Luxury Boutiques Inc.' );
-
-		// 11. Create Forecasts
-		self::create_post( 'mep_forecast', 'Q4 Sales Forecast', $bag, array(
-			'_mep_forecast_qty' => 500,
-			'_mep_customer_id' => $cust_a
+		// 6. Create Product: Leather Handbag (3 Variants) with Nested Assemblies
+		$bag_body_asm = self::create_post( 'mep_product', 'Bag Body Assembly', 0, array(
+			'_mep_sku' => 'ASM-BAG-BODY'
+		) );
+		$strap_asm = self::create_post( 'mep_product', 'Strap Assembly', 0, array(
+			'_mep_sku' => 'ASM-STRAP'
 		) );
 
-		// 12. Create QC Checks
-		$qc_id = MEP_Quality::record_qc_result( array(
-			'object_name' => 'Leather Handbag Batch #1',
-			'object_id' => $bag,
+		// BOM for Bag Body
+		$body_bom = self::create_post( 'mep_bom', 'BOM for Bag Body', $bag_body_asm );
+		update_post_meta( $body_bom, '_mep_components', array(
+			array('id' => $cow_leather, 'type' => 'material', 'qty' => 0.8, 'scrap' => 0.05),
+			array('id' => $thread, 'type' => 'material', 'qty' => 0.05, 'scrap' => 0)
+		) );
+
+		// BOM for Strap
+		$strap_bom = self::create_post( 'mep_bom', 'BOM for Strap', $strap_asm );
+		update_post_meta( $strap_bom, '_mep_components', array(
+			array('id' => $cow_leather, 'type' => 'material', 'qty' => 0.3, 'scrap' => 0.02),
+			array('id' => $thread, 'type' => 'material', 'qty' => 0.02, 'scrap' => 0)
+		) );
+
+		$variants = array('Tan', 'Black', 'Wine');
+		foreach ($variants as $v) {
+			$bag = self::create_post( 'mep_product', "Leather Handbag - $v", 0, array(
+				'_mep_sku' => "BAG-LTH-" . strtoupper($v)
+			) );
+
+			// BOM for Bag (Nested)
+			$bom_id = self::create_post( 'mep_bom', "BOM for Handbag - $v", $bag );
+			update_post_meta( $bom_id, '_mep_components', array(
+				array('id' => $bag_body_asm, 'type' => 'product', 'qty' => 1, 'scrap' => 0),
+				array('id' => $strap_asm, 'type' => 'product', 'qty' => 2, 'scrap' => 0),
+				array('id' => $zippers, 'type' => 'material', 'qty' => 1, 'scrap' => 0)
+			) );
+
+			// Route for Bag
+			$route_id = self::create_post( 'mep_route', "Standard Route for $v Bag", $bag );
+			update_post_meta( $route_id, '_mep_steps', array(
+				array('work_center' => $eq_cutting, 'time' => 15, 'desc' => 'Cutting'),
+				array('work_center' => $eq_stitching, 'time' => 45, 'desc' => 'Stitching'),
+				array('work_center' => $eq_assembly, 'time' => 30, 'desc' => 'Assembly'),
+				array('work_center' => $eq_qc, 'time' => 10, 'desc' => 'QC'),
+				array('work_center' => $eq_packing, 'time' => 5, 'desc' => 'Packing')
+			) );
+		}
+
+		// 7. Create Product: Leather Slippers (2 Variants)
+		$sole_asm = self::create_post( 'mep_product', 'Slipper Sole Assembly', 0, array(
+			'_mep_sku' => 'ASM-SLP-SOLE'
+		) );
+		$sole_bom = self::create_post( 'mep_bom', 'BOM for Slipper Sole', $sole_asm );
+		update_post_meta( $sole_bom, '_mep_components', array(
+			array('id' => $rubber_soles, 'type' => 'material', 'qty' => 1, 'scrap' => 0)
+		) );
+
+		$s_variants = array('Standard', 'Premium');
+		foreach ($s_variants as $v) {
+			$slipper = self::create_post( 'mep_product', "Leather Slippers - $v", 0, array(
+				'_mep_sku' => "SLP-LTH-" . strtoupper($v)
+			) );
+
+			// BOM for Slipper
+			$bom_id = self::create_post( 'mep_bom', "BOM for Slippers - $v", $slipper );
+			update_post_meta( $bom_id, '_mep_components', array(
+				array('id' => ($v == 'Premium' ? $cow_leather : $pu_leather), 'type' => 'material', 'qty' => 0.4, 'scrap' => 0.03),
+				array('id' => $sole_asm, 'type' => 'product', 'qty' => 2, 'scrap' => 0),
+				array('id' => $thread, 'type' => 'material', 'qty' => 0.05, 'scrap' => 0)
+			) );
+
+			// Route for Slipper
+			$route_id = self::create_post( 'mep_route', "Slipper Route - $v", $slipper );
+			update_post_meta( $route_id, '_mep_steps', array(
+				array('work_center' => $eq_cutting, 'time' => 10, 'desc' => 'Cutting'),
+				array('work_center' => $eq_stitching, 'time' => 20, 'desc' => 'Stitching'),
+				array('work_center' => $eq_assembly, 'time' => 15, 'desc' => 'Assembly'),
+				array('work_center' => $eq_qc, 'time' => 5, 'desc' => 'QC'),
+				array('work_center' => $eq_packing, 'time' => 5, 'desc' => 'Packing')
+			) );
+		}
+
+		// 8. Create Inventory Levels
+		MEP_Inventory::record_transaction( array(
+			'material_id'  => $cow_leather,
+			'warehouse_id' => $wh_main,
+			'bin_id'       => $bin_leather,
+			'quantity'     => 500,
+			'type'         => 'RECEIVE',
+			'lot_number'   => 'LOT-COW-001'
+		) );
+		MEP_Inventory::record_transaction( array(
+			'material_id'  => $rubber_soles,
+			'warehouse_id' => $wh_main,
+			'bin_id'       => $bin_leather,
+			'quantity'     => 1000,
+			'type'         => 'RECEIVE',
+			'lot_number'   => 'LOT-RUB-001'
+		) );
+
+		// 9. Create Sample Work Orders
+		$bag_id = get_posts(array('post_type'=>'mep_product', 'title'=>'Leather Handbag - Tan', 'numberposts'=>1))[0]->ID;
+		for ($i=1; $i<=3; $i++) {
+			wp_insert_post( array(
+				'post_type'   => 'mep_work_order',
+				'post_title'  => "WO-HANDBAG-00$i",
+				'post_status' => ($i == 1 ? 'publish' : ($i == 2 ? 'in-progress' : 'completed')),
+				'post_parent' => $bag_id,
+				'meta_input'  => array(
+					'_mep_work_order_qty' => 50,
+					'_mep_due_date'       => date('Y-m-d', strtotime("+$i week")),
+					'_mep_is_sample_data' => 1
+				)
+			) );
+		}
+
+		// 10. Create QC Records
+		MEP_Quality::record_qc_result( array(
+			'object_name' => 'Handbag Batch #A1',
+			'object_id' => $bag_id,
 			'object_type' => 'product',
 			'status' => 'FAIL',
-			'defects' => 'Loose threads on handle',
+			'defects' => 'Scratched leather on front panel',
 			'trigger_rework' => 1
 		) );
 
-		// 13. Process Manufacturing Example: Slipper Sole Casting
-		$sole_material = self::create_post( 'mep_material', 'Liquid Rubber Compound', 0, array(
-			'_mep_sku' => 'MAT-RUB-001',
-			'_mep_uom' => 'kg',
-			'_mep_cost_avg' => 12.00
+		// 11. Create Customers & Forecasts
+		$cust = self::create_post( 'mep_customer', 'Luxury Craft Retailers' );
+		self::create_post( 'mep_forecast', 'Winter Collection Forecast', $bag_id, array(
+			'_mep_forecast_qty' => 200,
+			'_mep_customer_id' => $cust
 		) );
-
-		$sole_assembly = self::create_post( 'mep_product', 'Molded Slipper Sole', 0, array(
-			'_mep_sku' => 'ASM-SOL-001'
-		) );
-
-		$sole_bom = self::create_post( 'mep_bom', 'BOM for Molded Sole', $sole_assembly );
-		update_post_meta( $sole_bom, '_mep_components', array(
-			array('id' => $sole_material, 'type' => 'material', 'qty' => 0.5, 'scrap' => 0.02)
-		) );
-
-		$eq_molding = self::create_post( 'mep_equipment', 'Injection Molding Machine', 0, array(
-			'_mep_daily_capacity_mins' => 480,
-			'_mep_labor_rate' => 1.20
-		) );
-
-		$sole_route = self::create_post( 'mep_route', 'Sole Molding Route', $sole_assembly );
-		update_post_meta( $sole_route, '_mep_steps', array(
-			array('work_center' => $eq_molding, 'time' => 10, 'desc' => 'Heat and Inject'),
-			array('work_center' => $eq_molding, 'time' => 5, 'desc' => 'Cooling and Ejection')
-		) );
-
-		// 14. Create Additional Inventory Transactions
-		for ($i = 0; $i < 15; $i++) {
-			MEP_Inventory::record_transaction( array(
-				'material_id'  => $leather,
-				'warehouse_id' => ($i % 2 == 0) ? $wh_main : $wh_prod,
-				'bin_id'       => ($i % 2 == 0) ? $bin_main : $bin_prod,
-				'quantity'     => rand(10, 50),
-				'type'         => 'RECEIVE',
-				'lot_number'   => 'LOT-ABC-' . rand(100, 999)
-			) );
-		}
 	}
 
 	/**
