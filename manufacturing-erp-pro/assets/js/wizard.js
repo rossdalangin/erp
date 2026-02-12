@@ -15,17 +15,21 @@ const SetupWizard = () => {
     const runSeeder = () => {
         setStatus(__('Seeding demo data...', 'manufacturing-erp-pro'));
 
-        // Use a hidden form or a dedicated endpoint for seeding.
-        // For simplicity in this demo, we'll just set setup_complete and tell the user to use the Utilities page if they want demo data,
-        // OR we can trigger a custom action.
-
         wp.apiFetch({
-            path: '/mep/v1/settings',
-            method: 'POST',
-            data: { mep_setup_complete: '1' }
+            path: '/mep/v1/seed',
+            method: 'POST'
         }).then(() => {
-            setStatus(__('Setup complete! Redirecting...', 'manufacturing-erp-pro'));
+            return wp.apiFetch({
+                path: '/mep/v1/settings',
+                method: 'POST',
+                data: { mep_setup_complete: '1' }
+            });
+        }).then(() => {
+            setStatus(__('Setup complete with demo data! Redirecting...', 'manufacturing-erp-pro'));
             setTimeout(() => window.location.href = 'admin.php?page=mep-dashboard', 1000);
+        }).catch(err => {
+            setStatus(__('Error during seeding. Please check logs.', 'manufacturing-erp-pro'));
+            console.error(err);
         });
     };
 

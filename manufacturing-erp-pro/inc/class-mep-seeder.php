@@ -176,7 +176,14 @@ class MEP_Seeder {
 		) );
 
 		// 9. Create Sample Work Orders
-		$bag_id = get_posts(array('post_type'=>'mep_product', 'title'=>'Leather Handbag - Tan', 'numberposts'=>1))[0]->ID;
+		$bag_posts = get_posts(array('post_type'=>'mep_product', 'title'=>'Leather Handbag - Tan', 'numberposts'=>1));
+		$bag_id = ! empty( $bag_posts ) ? $bag_posts[0]->ID : 0;
+
+		if ( ! $bag_id ) {
+			// Fallback if title search failed (unlikely in fresh seed)
+			$bag_id = wp_insert_post( array( 'post_type' => 'mep_product', 'post_title' => 'Leather Handbag - Tan', 'post_status' => 'publish' ) );
+		}
+
 		for ($i=1; $i<=3; $i++) {
 			wp_insert_post( array(
 				'post_type'   => 'mep_work_order',
@@ -219,7 +226,8 @@ class MEP_Seeder {
 		$types_to_delete = array(
 			'mep_inventory_transactions',
 			'mep_audit_logs',
-			'mep_production_logs'
+			'mep_production_logs',
+			'mep_stock_reservations'
 		);
 
 		foreach ( $types_to_delete as $table ) {

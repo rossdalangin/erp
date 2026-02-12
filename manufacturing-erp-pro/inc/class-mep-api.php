@@ -190,6 +190,12 @@ class MEP_API {
 			'callback'            => array( $this, 'update_settings' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/seed', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'run_seeder' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -510,6 +516,11 @@ class MEP_API {
 		header( 'Content-Disposition: attachment; filename="erp-diagnostic.txt"' );
 		MEP_Reports::export_erp_diagnostic();
 		exit;
+	}
+
+	public function run_seeder( $request ) {
+		MEP_Seeder::seed();
+		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
 	public function update_settings( $request ) {
