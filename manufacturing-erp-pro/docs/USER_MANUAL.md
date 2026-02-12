@@ -24,6 +24,22 @@ Welcome to **Manufacturing ERP Pro**. This manual is designed to help you transf
 
 ## 2. Core Operational Modules
 
+### 2.0 Frontend Portals & Shop Floor UI
+
+Manufacturing ERP Pro provides dedicated frontend pages for shop floor operators and B2B customers, allowing them to interact with the system without needing access to the WordPress dashboard.
+
+#### 1. Shop Floor Command Center
+Accessible by default at `/erp-shop-floor/`.
+- **Production Board**: A touch-optimized Kanban board for moving Work Orders.
+- **Inventory & Bins**: A visual interface for warehouse staff to perform bin transfers via tablets.
+- **Security**: Access is restricted to logged-in users with appropriate ERP roles.
+
+#### 2. B2B Customer Portal
+Accessible by default at `/erp-customer-portal/`.
+- Customers can view their demand forecasts, historical order status, and track shipments.
+- This portal can be embedded on any WordPress page using the `[mep_customer_portal]` shortcode.
+
+
 ### 2.1 Inventory & Warehouse Management
 Manage your raw materials and finished goods with surgical precision.
 

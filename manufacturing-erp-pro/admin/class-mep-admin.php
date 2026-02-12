@@ -174,97 +174,129 @@ class MEP_Admin {
 	}
 
 	public function utilities_page() {
+		$active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
 		?>
 		<div class="wrap">
 			<h1><?php _e( 'System Utilities & Safeguards', 'manufacturing-erp-pro' ); ?></h1>
 			<?php $this->maybe_show_demo_badge(); ?>
 
-			<div class="card">
-				<h2><?php _e( 'General ERP Settings', 'manufacturing-erp-pro' ); ?></h2>
-				<form method="post">
-					<?php wp_nonce_field( 'mep_save_settings', 'mep_nonce' ); ?>
-					<p>
-						<label><?php _e( 'Inventory Valuation Method:', 'manufacturing-erp-pro' ); ?><br>
-							<select name="mep_valuation_method">
-								<option value="fifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'fifo' ); ?>>FIFO (First-In-First-Out)</option>
-								<option value="lifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'lifo' ); ?>>LIFO (Last-In-First-Out)</option>
-							</select>
-						</label>
-					</p>
-					<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Save Settings', 'manufacturing-erp-pro' ); ?>">
-				</form>
-			</div>
+			<h2 class="nav-tab-wrapper">
+				<a href="?page=mep-utilities&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e( 'General Settings', 'manufacturing-erp-pro' ); ?></a>
+				<a href="?page=mep-utilities&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Data Import', 'manufacturing-erp-pro' ); ?></a>
+				<a href="?page=mep-utilities&tab=audit" class="nav-tab <?php echo $active_tab == 'audit' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Audit Logs', 'manufacturing-erp-pro' ); ?></a>
+				<a href="?page=mep-utilities&tab=danger" class="nav-tab <?php echo $active_tab == 'danger' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Danger Zone', 'manufacturing-erp-pro' ); ?></a>
+			</h2>
 
-			<div class="card">
-				<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
-				<p><?php _e( 'Import Materials from a CSV file. Header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>
-				<form method="post">
-					<?php wp_nonce_field( 'mep_import_data', 'mep_nonce' ); ?>
-					<textarea name="mep_import_csv" style="width:100%; height:100px;" placeholder="Name,SKU,UOM,Cost"></textarea><br><br>
-					<input type="submit" name="mep_action_import" class="button button-secondary" value="<?php _e( 'Import Materials', 'manufacturing-erp-pro' ); ?>">
-				</form>
-			</div>
+			<div class="mep-tab-container" style="margin-top: 20px;">
+				<?php if ( $active_tab == 'general' ) : ?>
+					<div class="card">
+						<h2><?php _e( 'General ERP Settings', 'manufacturing-erp-pro' ); ?></h2>
+						<form method="post">
+							<?php wp_nonce_field( 'mep_save_settings', 'mep_nonce' ); ?>
+							<table class="form-table">
+								<tr>
+									<th scope="row"><?php _e( 'Inventory Valuation Method', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<select name="mep_valuation_method">
+											<option value="fifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'fifo' ); ?>>FIFO (First-In-First-Out)</option>
+											<option value="lifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'lifo' ); ?>>LIFO (Last-In-First-Out)</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><?php _e( 'MRP Auto-Run Interval', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<select name="mep_mrp_interval">
+											<option value="hourly"><?php _e( 'Hourly', 'manufacturing-erp-pro' ); ?></option>
+											<option value="twicedaily"><?php _e( 'Twice Daily', 'manufacturing-erp-pro' ); ?></option>
+											<option value="daily"><?php _e( 'Daily', 'manufacturing-erp-pro' ); ?></option>
+										</select>
+									</td>
+								</tr>
+							</table>
+							<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Save Settings', 'manufacturing-erp-pro' ); ?>">
+						</form>
+					</div>
+					<div class="card">
+						<h2><?php _e( 'Sample Data Seeder', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Populate the system with "LeatherCraft Manufacturing Co." demo data for training or testing.', 'manufacturing-erp-pro' ); ?></p>
+						<form method="post">
+							<?php wp_nonce_field( 'mep_seed_data', 'mep_nonce' ); ?>
+							<input type="submit" name="mep_action_seed" class="button button-secondary" value="<?php _e( 'Run Seeder', 'manufacturing-erp-pro' ); ?>">
+						</form>
+					</div>
 
-			<div class="card">
-				<h2><?php _e( 'System Audit Logs (Recent 20)', 'manufacturing-erp-pro' ); ?></h2>
-				<table class="wp-list-table widefat fixed striped">
-					<thead>
-						<tr>
-							<th>Date</th>
-							<th>User</th>
-							<th>Object</th>
-							<th>Action</th>
-							<th>Details</th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						global $wpdb;
-						$logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}mep_audit_logs ORDER BY created_at DESC LIMIT 20" );
-						foreach ( $logs as $log ) :
-							$user = get_userdata( $log->user_id );
-							?>
-							<tr>
-								<td><?php echo esc_html( $log->created_at ); ?></td>
-								<td><?php echo esc_html( $user ? $user->display_name : 'System' ); ?></td>
-								<td><?php echo esc_html( strtoupper( $log->object_type ) . ' #' . $log->object_id ); ?></td>
-								<td><?php echo esc_html( $log->action ); ?></td>
-								<td><small><?php echo esc_html( substr( $log->new_value, 0, 50 ) ); ?>...</small></td>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-			</div>
+				<?php elseif ( $active_tab == 'import' ) : ?>
+					<div class="card">
+						<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Import Materials from a CSV file. Expected header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>
+						<form method="post">
+							<?php wp_nonce_field( 'mep_import_data', 'mep_nonce' ); ?>
+							<textarea name="mep_import_csv" style="width:100%; height:150px; font-family: monospace;" placeholder="Cowhide,LTH-001,m2,45.00"></textarea><br><br>
+							<input type="submit" name="mep_action_import" class="button button-primary" value="<?php _e( 'Import Materials', 'manufacturing-erp-pro' ); ?>">
+						</form>
+					</div>
 
-			<div class="card">
-				<h2><?php _e( 'Sample Data Seeder', 'manufacturing-erp-pro' ); ?></h2>
-				<p><?php _e( 'Populate the system with "LeatherCraft Manufacturing Co." demo data.', 'manufacturing-erp-pro' ); ?></p>
-				<form method="post">
-					<?php wp_nonce_field( 'mep_seed_data', 'mep_nonce' ); ?>
-					<input type="submit" name="mep_action_seed" class="button button-primary" value="<?php _e( 'Run Seeder', 'manufacturing-erp-pro' ); ?>">
-				</form>
-			</div>
+				<?php elseif ( $active_tab == 'audit' ) : ?>
+					<div class="card">
+						<h2><?php _e( 'System Audit Logs (Recent 20)', 'manufacturing-erp-pro' ); ?></h2>
+						<table class="wp-list-table widefat fixed striped">
+							<thead>
+								<tr>
+									<th style="width: 150px;"><?php _e( 'Date', 'manufacturing-erp-pro' ); ?></th>
+									<th style="width: 120px;"><?php _e( 'User', 'manufacturing-erp-pro' ); ?></th>
+									<th style="width: 150px;"><?php _e( 'Object', 'manufacturing-erp-pro' ); ?></th>
+									<th style="width: 150px;"><?php _e( 'Action', 'manufacturing-erp-pro' ); ?></th>
+									<th><?php _e( 'Details', 'manufacturing-erp-pro' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+								global $wpdb;
+								$logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}mep_audit_logs ORDER BY created_at DESC LIMIT 20" );
+								foreach ( $logs as $log ) :
+									$user = get_userdata( $log->user_id );
+									?>
+									<tr>
+										<td><?php echo esc_html( $log->created_at ); ?></td>
+										<td><?php echo esc_html( $user ? $user->display_name : 'System' ); ?></td>
+										<td><?php echo esc_html( strtoupper( $log->object_type ) . ' #' . $log->object_id ); ?></td>
+										<td><code><?php echo esc_html( $log->action ); ?></code></td>
+										<td><small><?php echo esc_html( substr( $log->new_value, 0, 100 ) ); ?>...</small></td>
+									</tr>
+								<?php endforeach; ?>
+								<?php if ( empty( $logs ) ) : ?>
+									<tr><td colspan="5"><?php _e( 'No audit logs found.', 'manufacturing-erp-pro' ); ?></td></tr>
+								<?php endif; ?>
+							</tbody>
+						</table>
+					</div>
 
-			<div class="card" style="border: 1px solid #d63638;">
-				<h2 style="color: #d63638;"><?php _e( 'Danger Zone: Database Reset', 'manufacturing-erp-pro' ); ?></h2>
-				<p><?php _e( 'Wipe ERP data. This action is irreversible.', 'manufacturing-erp-pro' ); ?></p>
-				<form method="post">
-					<?php wp_nonce_field( 'mep_reset_db', 'mep_nonce' ); ?>
-					<p>
-						<label>
-							<input type="checkbox" name="mep_confirm_reset" required>
-							<?php _e( 'I understand this will delete all ERP data.', 'manufacturing-erp-pro' ); ?>
-						</label>
-					</p>
-					<p>
-						<label><?php _e( 'Type phrase to confirm:', 'manufacturing-erp-pro' ); ?> <code>RESET PRODUCTION ENVIRONMENT</code><br>
-							<input type="text" name="mep_confirm_phrase" class="regular-text" required>
-						</label>
-					</p>
-					<input type="submit" name="mep_action_reset_hard" class="button button-link-delete" value="<?php _e( 'Hard Reset (Delete All)', 'manufacturing-erp-pro' ); ?>">
-					<input type="submit" name="mep_action_reset_soft" class="button button-secondary" value="<?php _e( 'Soft Reset (Keep Master Data)', 'manufacturing-erp-pro' ); ?>">
-					<a href="<?php echo esc_url( rest_url('mep/v1/reports/diagnostic-export') ); ?>?_wpnonce=<?php echo wp_create_nonce('wp_rest'); ?>" class="button"><?php _e( 'Export ERP Database (Backup)', 'manufacturing-erp-pro' ); ?></a>
-				</form>
+				<?php elseif ( $active_tab == 'danger' ) : ?>
+					<div class="card" style="border: 2px solid #d63638;">
+						<h2 style="color: #d63638;"><?php _e( 'Danger Zone: Database Reset', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Wipe ERP data. This action is irreversible. Use with caution.', 'manufacturing-erp-pro' ); ?></p>
+						<form method="post">
+							<?php wp_nonce_field( 'mep_reset_db', 'mep_nonce' ); ?>
+							<p>
+								<label>
+									<input type="checkbox" name="mep_confirm_reset" required>
+									<strong><?php _e( 'I understand this will delete all ERP data.', 'manufacturing-erp-pro' ); ?></strong>
+								</label>
+							</p>
+							<p>
+								<label><?php _e( 'Type phrase to confirm:', 'manufacturing-erp-pro' ); ?> <code>RESET PRODUCTION ENVIRONMENT</code><br>
+									<input type="text" name="mep_confirm_phrase" class="regular-text" required placeholder="Type the phrase here">
+								</label>
+							</p>
+							<input type="submit" name="mep_action_reset_hard" class="button button-link-delete" value="<?php _e( 'Hard Reset (Delete All)', 'manufacturing-erp-pro' ); ?>">
+							<input type="submit" name="mep_action_reset_soft" class="button button-secondary" value="<?php _e( 'Soft Reset (Keep Master Data)', 'manufacturing-erp-pro' ); ?>">
+							<p style="margin-top: 20px;">
+								<a href="<?php echo esc_url( rest_url('mep/v1/reports/diagnostic-export') ); ?>?_wpnonce=<?php echo wp_create_nonce('wp_rest'); ?>" class="button"><?php _e( 'Export ERP Database (Backup)', 'manufacturing-erp-pro' ); ?></a>
+							</p>
+						</form>
+					</div>
+				<?php endif; ?>
 			</div>
 		</div>
 		<?php

@@ -59,6 +59,7 @@ class Manufacturing_ERP_Pro {
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-reports.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-importer.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-seeder.php';
+		require_once MEP_PLUGIN_DIR . 'inc/class-mep-frontend.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-api.php';
 
 		if ( is_admin() ) {
@@ -73,6 +74,7 @@ class Manufacturing_ERP_Pro {
 	private function init_hooks() {
 		register_activation_hook( __FILE__, array( 'MEP_DB', 'create_tables' ) );
 		register_activation_hook( __FILE__, array( $this, 'register_roles' ) );
+		register_activation_hook( __FILE__, array( 'MEP_Frontend', 'create_portal_pages' ) );
 
 		add_action( 'plugins_loaded', array( $this, 'init_modules' ) );
 	}
@@ -82,6 +84,7 @@ class Manufacturing_ERP_Pro {
 	 */
 	public function init_modules() {
 		MEP_CPT::get_instance();
+		MEP_Frontend::get_instance();
 		MEP_API::get_instance();
 
 		if ( is_admin() ) {

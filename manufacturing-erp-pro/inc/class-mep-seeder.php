@@ -89,7 +89,34 @@ class MEP_Seeder {
 			'trigger_rework' => 1
 		) );
 
-		// 13. Create Additional Inventory Transactions
+		// 13. Process Manufacturing Example: Slipper Sole Casting
+		$sole_material = self::create_post( 'mep_material', 'Liquid Rubber Compound', 0, array(
+			'_mep_sku' => 'MAT-RUB-001',
+			'_mep_uom' => 'kg',
+			'_mep_cost_avg' => 12.00
+		) );
+
+		$sole_assembly = self::create_post( 'mep_product', 'Molded Slipper Sole', 0, array(
+			'_mep_sku' => 'ASM-SOL-001'
+		) );
+
+		$sole_bom = self::create_post( 'mep_bom', 'BOM for Molded Sole', $sole_assembly );
+		update_post_meta( $sole_bom, '_mep_components', array(
+			array('id' => $sole_material, 'type' => 'material', 'qty' => 0.5, 'scrap' => 0.02)
+		) );
+
+		$eq_molding = self::create_post( 'mep_equipment', 'Injection Molding Machine', 0, array(
+			'_mep_daily_capacity_mins' => 480,
+			'_mep_labor_rate' => 1.20
+		) );
+
+		$sole_route = self::create_post( 'mep_route', 'Sole Molding Route', $sole_assembly );
+		update_post_meta( $sole_route, '_mep_steps', array(
+			array('work_center' => $eq_molding, 'time' => 10, 'desc' => 'Heat and Inject'),
+			array('work_center' => $eq_molding, 'time' => 5, 'desc' => 'Cooling and Ejection')
+		) );
+
+		// 14. Create Additional Inventory Transactions
 		for ($i = 0; $i < 15; $i++) {
 			MEP_Inventory::record_transaction( array(
 				'material_id'  => $leather,
