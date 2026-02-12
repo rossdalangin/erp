@@ -33,6 +33,10 @@ const QualityDashboard = () => {
                 wp.element.createElement('div', { style: { fontSize: '32px', fontWeight: 'bold', color: '#d63638' } }, data.active_ncrs)
             ),
             wp.element.createElement('div', { className: 'mep-kpi-card', style: { flex: 1, background: '#fff', padding: '20px', border: '1px solid #ccd0d4' } },
+                wp.element.createElement('h3', null, __('Active CAPAs', 'manufacturing-erp-pro')),
+                wp.element.createElement('div', { style: { fontSize: '32px', fontWeight: 'bold', color: '#f56e28' } }, data.active_capas)
+            ),
+            wp.element.createElement('div', { className: 'mep-kpi-card', style: { flex: 1, background: '#fff', padding: '20px', border: '1px solid #ccd0d4' } },
                 wp.element.createElement('h3', null, __('Total Inspections', 'manufacturing-erp-pro')),
                 wp.element.createElement('div', { style: { fontSize: '32px', fontWeight: 'bold' } }, data.total_checks)
             )

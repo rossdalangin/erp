@@ -184,6 +184,12 @@ class MEP_API {
 			'callback'            => array( $this, 'get_operators' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/settings', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'update_settings' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -213,13 +219,15 @@ class MEP_API {
 
 		foreach ( $posts as $post ) {
 			$operator = get_userdata( $post->post_author );
+			$eq_id    = get_post_meta( $post->ID, '_mep_assigned_equipment_id', true );
 			$data[] = array(
-				'id'            => $post->ID,
-				'title'         => $post->post_title,
-				'status'        => $post->post_status,
-				'qty'           => get_post_meta( $post->ID, '_mep_work_order_qty', true ),
-				'due_date'      => get_post_meta( $post->ID, '_mep_due_date', true ),
-				'operator_name' => $operator ? $operator->display_name : '',
+				'id'             => $post->ID,
+				'title'          => $post->post_title,
+				'status'         => $post->post_status,
+				'qty'            => get_post_meta( $post->ID, '_mep_work_order_qty', true ),
+				'due_date'       => get_post_meta( $post->ID, '_mep_due_date', true ),
+				'operator_name'  => $operator ? $operator->display_name : '',
+				'equipment_name' => $eq_id ? get_the_title( $eq_id ) : '',
 			);
 		}
 
@@ -502,6 +510,16 @@ class MEP_API {
 		header( 'Content-Disposition: attachment; filename="erp-diagnostic.txt"' );
 		MEP_Reports::export_erp_diagnostic();
 		exit;
+	}
+
+	public function update_settings( $request ) {
+		$params = $request->get_params();
+		foreach ( $params as $key => $val ) {
+			if ( strpos( $key, 'mep_' ) === 0 ) {
+				update_option( $key, sanitize_text_field( $val ) );
+			}
+		}
+		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
 	public function update_bom( $request ) {

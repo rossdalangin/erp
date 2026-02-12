@@ -17,6 +17,7 @@ const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
         wp.element.createElement('p', { style: { fontSize: '12px', margin: '2px 0' } }, `ID: #${wo.id} | ${__('Qty', 'manufacturing-erp-pro')}: ${wo.qty || 1}`),
         wo.due_date && wp.element.createElement('p', { style: { fontSize: '11px', color: '#d63638', fontWeight: 'bold' } }, `${__('Due', 'manufacturing-erp-pro')}: ${wo.due_date}`),
         wp.element.createElement('p', { style: { fontSize: '11px', color: '#666' } }, `${__('Operator', 'manufacturing-erp-pro')}: ${wo.operator_name || __('Unassigned', 'manufacturing-erp-pro')}`),
+        wo.equipment_name && wp.element.createElement('p', { style: { fontSize: '11px', color: '#2271b1' } }, `${__('Machine', 'manufacturing-erp-pro')}: ${wo.equipment_name}`),
         wp.element.createElement('span', { className: 'mep-badge', style: { fontSize: '10px', background: '#eee', padding: '2px 5px' } }, wo.status)
     );
 };
@@ -24,6 +25,7 @@ const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
 const KanbanBoard = () => {
     const [workOrders, setWorkOrders] = useState([]);
     const [operators, setOperators] = useState([]);
+    const [equipment, setEquipment] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -36,10 +38,12 @@ const KanbanBoard = () => {
     useEffect(() => {
         Promise.all([
             wp.apiFetch({ path: '/mep/v1/work-orders' }),
-            wp.apiFetch({ path: '/mep/v1/operators' })
-        ]).then(([woData, opData]) => {
+            wp.apiFetch({ path: '/mep/v1/operators' }),
+            wp.apiFetch({ path: '/mep/v1/equipment' })
+        ]).then(([woData, opData, eqData]) => {
                 setWorkOrders(woData);
                 setOperators(opData);
+                setEquipment(eqData);
                 setLoading(false);
             })
             .catch(err => {
@@ -67,6 +71,8 @@ const KanbanBoard = () => {
         if (nextStatus === 'in-progress') {
             const opId = prompt(__('Enter Operator ID (optional):', 'manufacturing-erp-pro'));
             if (opId) extraData.operator_id = opId;
+            const eqId = prompt(__('Enter Machine ID (optional):', 'manufacturing-erp-pro'));
+            if (eqId) extraData.equipment_id = eqId;
         }
         if (nextStatus === 'completed') {
             const scrap = prompt(__('Enter scrap quantity (if any):', 'manufacturing-erp-pro'), "0");
@@ -85,6 +91,10 @@ const KanbanBoard = () => {
                     if (extraData.operator_id) {
                         const op = operators.find(u => u.id == extraData.operator_id);
                         updated.operator_name = op ? op.name : `User #${extraData.operator_id}`;
+                    }
+                    if (extraData.equipment_id) {
+                        const eq = equipment.find(e => e.id == extraData.equipment_id);
+                        updated.equipment_name = eq ? eq.name : `Machine #${extraData.equipment_id}`;
                     }
                     return updated;
                 }

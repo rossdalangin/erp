@@ -21,7 +21,15 @@ class MEP_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menus' ) );
 		add_action( 'admin_init', array( $this, 'handle_utilities' ) );
+		add_action( 'admin_init', array( $this, 'maybe_redirect_to_wizard' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+	}
+
+	public function maybe_redirect_to_wizard() {
+		if ( ! get_option( 'mep_setup_complete' ) && isset( $_GET['page'] ) && strpos( $_GET['page'], 'mep-' ) !== false && $_GET['page'] !== 'mep-wizard' ) {
+			wp_redirect( admin_url( 'admin.php?page=mep-wizard' ) );
+			exit;
+		}
 	}
 
 	public function add_menus() {

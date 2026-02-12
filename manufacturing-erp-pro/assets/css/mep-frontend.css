@@ -1,0 +1,70 @@
+/**
+ * Manufacturing ERP Pro - Frontend Portal Styles
+ */
+
+.mep-frontend-portal {
+    background: #fff;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #3c434a;
+}
+
+.mep-frontend-portal h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #2271b1;
+    border-bottom: 2px solid #2271b1;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.mep-portal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.mep-tab-link {
+    background: #f0f0f1;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.mep-tab-link.active {
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+.mep-tab-content {
+    display: none;
+    animation: mepFadin 0.3s;
+}
+
+.mep-tab-content.active {
+    display: block;
+}
+
+@keyframes mepFadin {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Shop Floor Tablet Optimizations */
+@media (max-width: 1024px) {
+    .mep-frontend-portal {
+        padding: 20px;
+    }
+
+    .mep-wo-card {
+        margin-bottom: 15px !important;
+        padding: 20px !important;
+    }
+}

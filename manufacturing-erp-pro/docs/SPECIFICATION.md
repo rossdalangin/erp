@@ -47,7 +47,7 @@
 | `mep_supplier` | Suppliers | **Vendor CRM** | `contact`, `lead_time_avg` | Active, Probation, Blacklisted |
 | `mep_po` | Purchase Orders| **Buying Control** | `items`, `expected_date` | Draft, Sent, Received, Closed |
 | `mep_qc_check` | Quality Checks| **Inspection Gateway**| `status`, `results`, `object_id` | Pending, Pass, Fail |
-| `mep_ncr` | NCR | **Problem Solving** | `defect_type`, `resolution` | Open, Investigating, Closed |
+| `mep_ncr` | NCR | **Problem Solving** | `defect_type`, `resolution`, `capa_plan` | Open, Investigating, Closed, CAPA Pending |
 | `mep_equipment` | Equipment | **Asset Tracking** | `daily_capacity`, `labor_rate`, `maintenance_logs` | Available, Maintenance, Down |
 | `mep_route` | Routes | **Factory Map** | `steps` (JSON) | Active, Inactive |
 | `mep_forecast` | Forecasts | **Future Planning** | `product_id`, `forecast_qty`, `customer_id` | Draft, Approved |
@@ -168,8 +168,9 @@ All endpoints prefixed with `/wp-json/mep/v1`.
 | `/procurement/supplier-score/{id}` | GET | Returns Quality/OTD performance metrics. |
 | `/reports/kpis` | GET | Dashboard data (Output, Aging, Variance). |
 | `/qc/trace/{lot}` | GET | Fetch lot genealogy graph data. |
-| `/reports/quality` | GET | QC Pass Rates, Defect Pareto, Active NCRs. |
+| `/reports/quality` | GET | QC Pass Rates, Defect Pareto, Active NCRs, CAPAs. |
 | `/equipment/detailed`| GET | Detailed capacity and maintenance logs. |
+| `/settings` | POST | Update ERP settings (e.g., setup_complete, help_mode). |
 
 ## 2. Data Flow: Production Loop
 `[Forecast] -> [MRP Engine] -> [Purchase/Work Orders] -> [Inventory Issuance] -> [Shop Floor Production] -> [QC Check] -> [Finished Stock]`

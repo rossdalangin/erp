@@ -268,6 +268,7 @@ class MEP_Reports {
 			'fail_count'   => $fail,
 			'pass_rate'    => $total > 0 ? round( ( $pass / $total ) * 100, 1 ) . '%' : '100%',
 			'active_ncrs'  => (int) $ncrs->publish + (int) $ncrs->{'in-progress'},
+			'active_capas' => (int) $ncrs->{'capa-pending'},
 			'defects_log'  => array_slice( $defects, 0, 10 )
 		);
 	}

@@ -97,7 +97,8 @@ class MEP_Frontend {
 			return;
 		}
 
-		wp_enqueue_style( 'mep-frontend-style', MEP_PLUGIN_URL . 'assets/css/mep-admin.css', array(), MEP_VERSION );
+		wp_enqueue_style( 'mep-admin-style', MEP_PLUGIN_URL . 'assets/css/mep-admin.css', array(), MEP_VERSION );
+		wp_enqueue_style( 'mep-frontend-style', MEP_PLUGIN_URL . 'assets/css/mep-frontend.css', array('mep-admin-style'), MEP_VERSION );
 
 		// Enqueue the same React apps used in Admin, they are built to work with roots
 		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );

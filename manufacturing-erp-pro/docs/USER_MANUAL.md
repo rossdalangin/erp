@@ -84,6 +84,7 @@ Monitor your factory's health in real-time.
 - **QC Pass Rate:** See the percentage of inspections that passed vs. failed.
 - **Defect Pareto:** Identify the most common production issues (e.g., "Loose Stitching").
 - **Active NCRs:** Monitor Non-Conformance Reports currently being investigated.
+- **CAPA Workflow:** Promote critical NCRs to the **CAPA (Corrective and Preventive Action)** stage. This adds a dedicated tracking layer for long-term resolution and preventive measures.
 
 ### 3.2 Lot Genealogy Trace
 In the event of a customer complaint:
@@ -107,6 +108,7 @@ This is an ERP-grade system, not a toy.
 - **Roles:** Assign users to `ERP Administrator`, `Production Manager`, `Warehouse Clerk`, or `Quality Inspector`.
 - **Audit Logs:** Every status change, inventory move, and BOM update is logged. Access these in `System Utilities > Audit Logs`.
 - **Reset Safely:** To wipe transactional data while keeping your products, use the "Soft Reset." A "Hard Reset" requires the confirmation phrase: `RESET PRODUCTION ENVIRONMENT`.
+- **Help Mode:** Click the "Interactive Help Mode" button on the Dashboard. When enabled, the system displays information icons (ℹ️) and contextual tooltips across the BOM Builder, Kanban, and Warehouse views to guide new users.
 
 ---
 

@@ -64,12 +64,31 @@ class MEP_Quality {
 	 * Create a Non-Conformance Report (NCR).
 	 */
 	private static function create_ncr( $qc_id, $data ) {
-		wp_insert_post( array(
+		$ncr_id = wp_insert_post( array(
 			'post_type'   => 'mep_ncr',
 			'post_title'  => sprintf( __( 'NCR for QC #%d', 'manufacturing-erp-pro' ), $qc_id ),
 			'post_status' => 'publish',
 			'post_parent' => $qc_id,
 		) );
+
+		if ( ! is_wp_error( $ncr_id ) ) {
+			update_post_meta( $ncr_id, '_mep_ncr_type', $data['defects'] );
+		}
+	}
+
+	/**
+	 * Promote NCR to CAPA (Corrective and Preventive Action).
+	 */
+	public static function promote_to_capa( $ncr_id, $action_plan ) {
+		wp_update_post( array(
+			'ID'          => $ncr_id,
+			'post_status' => 'capa-pending'
+		) );
+
+		update_post_meta( $ncr_id, '_mep_capa_plan', $action_plan );
+		update_post_meta( $ncr_id, '_mep_capa_start_date', current_time( 'mysql' ) );
+
+		MEP_DB::log_audit( 'ncr', $ncr_id, 'PROMOTED_TO_CAPA', 'publish', 'capa-pending' );
 	}
 
 	/**

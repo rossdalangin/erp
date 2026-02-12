@@ -42,8 +42,10 @@ class MEP_Admin_UI {
 	 */
 	public function add_product_row_actions( $actions, $post ) {
 		if ( $post->post_type === 'mep_product' ) {
+			$help_mode = get_option( 'mep_help_mode', 'off' );
+			$help_suffix = $help_mode === 'on' ? ' ℹ️' : '';
 			$bom_url = admin_url( 'admin.php?page=mep-bom-builder&product_id=' . $post->ID );
-			$actions['mep_bom'] = '<a href="' . esc_url( $bom_url ) . '" style="color: #2271b1; font-weight: bold;">' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . '</a>';
+			$actions['mep_bom'] = '<a href="' . esc_url( $bom_url ) . '" style="color: #2271b1; font-weight: bold;" title="' . esc_attr__( 'Open visual BOM editor', 'manufacturing-erp-pro' ) . '">' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . $help_suffix . '</a>';
 		}
 		return $actions;
 	}

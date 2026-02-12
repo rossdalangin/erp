@@ -33,3 +33,5 @@ The plugin registers four specialized roles upon activation. These roles are des
 2. **Audit Trails**: Every administrative action and stock movement is recorded in `wp_mep_audit_logs`, capturing the User ID, Timestamp, and a JSON snapshot of the change.
 3. **API Security**: All REST API endpoints are protected via `permission_callback` functions that verify the user's ERP role and nonce.
 4. **Data Safeguards**: Destructive actions (like the Hard Reset) require a multi-step confirmation process including a typed safety phrase: `RESET PRODUCTION ENVIRONMENT`.
+5. **Onboarding Compliance**: The mandatory Setup Wizard ensures that every installation begins with a baseline configuration of Units of Measure and Warehousing, reducing manual data entry errors.
+6. **CAPA Compliance**: The system enforces a workflow where Quality Failures must be investigated (NCR) and critical systemic issues must be elevated to CAPA (Corrective and Preventive Action) status for closed-loop quality management.
