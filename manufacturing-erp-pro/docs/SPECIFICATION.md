@@ -37,21 +37,21 @@
 
 | CPT Slug | Name | Operational Workflow | Meta Fields | Status Lifecycle |
 |---|---|---|---|---|
-| `mep_material` | Materials | **Stock Tracking** | `sku`, `uom`, `cost_avg`, `safety_stock` | Active, Archived |
-| `mep_product` | Products | **Product Catalog** | `sku`, `category`, `weight` | Draft, Active, EOL |
+| `mep_material` | Materials | **Stock Tracking** | `sku`, `uom`, `cost_avg`, `safety_stock`, `lead_time`, `supplier_id` | Active, Archived |
+| `mep_product` | Products | **Product Catalog** | `sku`, `category`, `weight`, `price`, `pack_size` | Draft, Active, EOL |
 | `mep_bom` | BOM | **Product Recipe** | `components` (JSON), `version` | Draft, Active, Superseded |
-| `mep_work_order` | Work Orders | **Production Instruction** | `qty`, `start_date`, `assigned_to`, `is_rework` | Draft, Released, In Progress, Completed |
-| `mep_batch` | Batches | **Lot Management** | `batch_code`, `expiry_date` | Scheduled, Running, Finished |
+| `mep_work_order` | Work Orders | **Production Instruction** | `qty`, `due_date`, `route_id`, `batch_code` | Draft, Released, In Progress, Completed |
+| `mep_batch` | Batches | **Lot Management** | `mfg_date`, `expiry_date`, `batch_size`, `parent_wo` | Scheduled, Running, Finished |
 | `mep_warehouse` | Warehouses | **Multi-Site Control** | `location_code`, `capacity` | Active, Inactive |
-| `mep_bin` | Bins | **Micro-Location** | `bin_type`, `capacity` | Active, Full, Inactive |
-| `mep_supplier` | Suppliers | **Vendor CRM** | `contact`, `lead_time_avg` | Active, Probation, Blacklisted |
-| `mep_po` | Purchase Orders| **Buying Control** | `items`, `expected_date` | Draft, Sent, Received, Closed |
-| `mep_qc_check` | Quality Checks| **Inspection Gateway**| `status`, `results`, `object_id` | Pending, Pass, Fail |
+| `mep_bin` | Bins | **Micro-Location** | `parent_wh`, `capacity` | Active, Full, Inactive |
+| `mep_supplier` | Suppliers | **Vendor CRM** | `contact_name`, `email`, `phone`, `lead_time_avg` | Active, Probation, Blacklisted |
+| `mep_po` | Purchase Orders| **Buying Control** | `supplier_id`, `expected_date`, `total_amount` | Draft, Sent, Received, Closed |
+| `mep_qc_check` | Quality Checks| **Inspection Gateway**| `status`, `lot_number`, `qc_defects` | Pending, Pass, Fail |
 | `mep_ncr` | NCR | **Problem Solving** | `defect_type`, `resolution`, `capa_plan` | Open, Investigating, Closed, CAPA Pending |
 | `mep_equipment` | Equipment | **Asset Tracking** | `daily_capacity`, `labor_rate`, `maintenance_logs` | Available, Maintenance, Down |
 | `mep_route` | Routes | **Factory Map** | `steps` (JSON) | Active, Inactive |
 | `mep_forecast` | Forecasts | **Future Planning** | `product_id`, `forecast_qty`, `customer_id` | Draft, Approved |
-| `mep_customer` | Customers | **B2B Management** | `contact_info`, `credit_limit` | Active, Inactive |
+| `mep_customer` | Customers | **B2B Management** | `contact_name`, `email`, `credit_limit` | Active, Inactive |
 
 ---
 

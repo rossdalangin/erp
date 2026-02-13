@@ -29,9 +29,21 @@ class MEP_Admin_UI {
 		add_filter( 'manage_mep_material_posts_columns', array( $this, 'add_material_columns' ) );
 		add_action( 'manage_mep_material_posts_custom_column', array( $this, 'render_material_columns' ), 10, 2 );
 
+		// Suppliers Columns
+		add_filter( 'manage_mep_supplier_posts_columns', array( $this, 'add_supplier_columns' ) );
+		add_action( 'manage_mep_supplier_posts_custom_column', array( $this, 'render_supplier_columns' ), 10, 2 );
+
 		// Work Orders Row Actions & Columns
 		add_filter( 'manage_mep_work_order_posts_columns', array( $this, 'add_work_order_columns' ) );
 		add_action( 'manage_mep_work_order_posts_custom_column', array( $this, 'render_work_order_columns' ), 10, 2 );
+
+		// Purchase Orders Columns
+		add_filter( 'manage_mep_po_posts_columns', array( $this, 'add_po_columns' ) );
+		add_action( 'manage_mep_po_posts_custom_column', array( $this, 'render_po_columns' ), 10, 2 );
+
+		// Forecasts Columns
+		add_filter( 'manage_mep_forecast_posts_columns', array( $this, 'add_forecast_columns' ) );
+		add_action( 'manage_mep_forecast_posts_custom_column', array( $this, 'render_forecast_columns' ), 10, 2 );
 
 		// Warehouses Row Actions
 		add_filter( 'post_row_actions', array( $this, 'add_warehouse_row_actions' ), 10, 2 );
@@ -143,8 +155,10 @@ class MEP_Admin_UI {
 		$new_columns = array();
 		foreach ( $columns as $key => $val ) {
 			if ( $key === 'date' ) {
-				$new_columns['sku'] = __( 'SKU', 'manufacturing-erp-pro' );
-				$new_columns['cost'] = __( 'Roll-up Cost', 'manufacturing-erp-pro' );
+				$new_columns['sku']      = __( 'SKU', 'manufacturing-erp-pro' );
+				$new_columns['category'] = __( 'Category', 'manufacturing-erp-pro' );
+				$new_columns['price']    = __( 'Price', 'manufacturing-erp-pro' );
+				$new_columns['cost']     = __( 'Roll-up Cost', 'manufacturing-erp-pro' );
 			}
 			$new_columns[$key] = $val;
 		}
@@ -154,6 +168,13 @@ class MEP_Admin_UI {
 	public function render_product_columns( $column, $post_id ) {
 		if ( $column === 'sku' ) {
 			echo esc_html( get_post_meta( $post_id, '_mep_sku', true ) ?: '---' );
+		}
+		if ( $column === 'category' ) {
+			echo esc_html( get_post_meta( $post_id, '_mep_category', true ) ?: '---' );
+		}
+		if ( $column === 'price' ) {
+			$price = get_post_meta( $post_id, '_mep_price', true );
+			echo '<strong>$' . number_format( (float)$price, 2 ) . '</strong>';
 		}
 		if ( $column === 'cost' ) {
 			$cost = MEP_BOM::calculate_roll_up_cost( $post_id );
@@ -220,6 +241,84 @@ class MEP_Admin_UI {
 			}
 		}
 		return array_unique( $used_in );
+	}
+
+	/**
+	 * Custom Columns for Suppliers.
+	 */
+	public function add_supplier_columns( $columns ) {
+		$new_columns = array();
+		foreach ( $columns as $key => $val ) {
+			if ( $key === 'date' ) {
+				$new_columns['contact']   = __( 'Contact', 'manufacturing-erp-pro' );
+				$new_columns['lead_time'] = __( 'Avg Lead Time', 'manufacturing-erp-pro' );
+			}
+			$new_columns[$key] = $val;
+		}
+		return $new_columns;
+	}
+
+	public function render_supplier_columns( $column, $post_id ) {
+		if ( $column === 'contact' ) {
+			echo esc_html( get_post_meta( $post_id, '_mep_contact_name', true ) ?: '---' );
+		}
+		if ( $column === 'lead_time' ) {
+			echo esc_html( get_post_meta( $post_id, '_mep_lead_time_avg', true ) ) . ' ' . __( 'days', 'manufacturing-erp-pro' );
+		}
+	}
+
+	/**
+	 * Custom Columns for Purchase Orders.
+	 */
+	public function add_po_columns( $columns ) {
+		$new_columns = array();
+		foreach ( $columns as $key => $val ) {
+			if ( $key === 'date' ) {
+				$new_columns['supplier'] = __( 'Supplier', 'manufacturing-erp-pro' );
+				$new_columns['expected'] = __( 'Expected', 'manufacturing-erp-pro' );
+				$new_columns['total']    = __( 'Total', 'manufacturing-erp-pro' );
+			}
+			$new_columns[$key] = $val;
+		}
+		return $new_columns;
+	}
+
+	public function render_po_columns( $column, $post_id ) {
+		if ( $column === 'supplier' ) {
+			$supplier_id = get_post_meta( $post_id, '_mep_supplier_id', true );
+			echo esc_html( $supplier_id ? get_the_title( $supplier_id ) : '---' );
+		}
+		if ( $column === 'expected' ) {
+			echo esc_html( get_post_meta( $post_id, '_mep_expected_date', true ) ?: '---' );
+		}
+		if ( $column === 'total' ) {
+			echo '<strong>$' . number_format( (float)get_post_meta( $post_id, '_mep_total_amount', true ), 2 ) . '</strong>';
+		}
+	}
+
+	/**
+	 * Custom Columns for Forecasts.
+	 */
+	public function add_forecast_columns( $columns ) {
+		$new_columns = array();
+		foreach ( $columns as $key => $val ) {
+			if ( $key === 'date' ) {
+				$new_columns['product'] = __( 'Product', 'manufacturing-erp-pro' );
+				$new_columns['qty']     = __( 'Forecast Qty', 'manufacturing-erp-pro' );
+			}
+			$new_columns[$key] = $val;
+		}
+		return $new_columns;
+	}
+
+	public function render_forecast_columns( $column, $post_id ) {
+		if ( $column === 'product' ) {
+			$product_id = get_post_meta( $post_id, '_mep_product_id', true );
+			echo esc_html( $product_id ? get_the_title( $product_id ) : '---' );
+		}
+		if ( $column === 'qty' ) {
+			echo number_format( (float)get_post_meta( $post_id, '_mep_forecast_qty', true ), 0 );
+		}
 	}
 
 	/**

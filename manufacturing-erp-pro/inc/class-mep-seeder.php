@@ -14,24 +14,41 @@ class MEP_Seeder {
 	 */
 	public static function seed() {
 		// 1. Create Warehouses
-		$wh_main = self::create_post( 'mep_warehouse', 'Main Warehouse' );
-		$wh_prod = self::create_post( 'mep_warehouse', 'Production Floor' );
+		$wh_main = self::create_post( 'mep_warehouse', 'Main Warehouse', 0, array(
+			'_mep_location_code' => 'WH-MAIN',
+			'_mep_capacity' => 5000
+		) );
+		$wh_prod = self::create_post( 'mep_warehouse', 'Production Floor', 0, array(
+			'_mep_location_code' => 'WH-PROD',
+			'_mep_capacity' => 2000
+		) );
 
 		// 2. Create Bins
-		$bin_leather = self::create_post( 'mep_bin', 'Leather Storage', $wh_main );
-		$bin_cutting = self::create_post( 'mep_bin', 'Cutting Area', $wh_prod );
-		$bin_assembly = self::create_post( 'mep_bin', 'Assembly Area', $wh_prod );
+		$bin_leather = self::create_post( 'mep_bin', 'Leather Storage', $wh_main, array( '_mep_capacity' => 1000 ) );
+		$bin_cutting = self::create_post( 'mep_bin', 'Cutting Area', $wh_prod, array( '_mep_capacity' => 500 ) );
+		$bin_assembly = self::create_post( 'mep_bin', 'Assembly Area', $wh_prod, array( '_mep_capacity' => 500 ) );
 
 		// 3. Create Suppliers
-		$sup_a = self::create_post( 'mep_supplier', 'Leather Supplier A' );
-		$sup_b = self::create_post( 'mep_supplier', 'Sole Supplier B' );
+		$sup_a = self::create_post( 'mep_supplier', 'Leather Supplier A', 0, array(
+			'_mep_contact_name' => 'John Tanner',
+			'_mep_email' => 'john@leather-a.com',
+			'_mep_lead_time_avg' => 10
+		) );
+		$sup_b = self::create_post( 'mep_supplier', 'Sole Supplier B', 0, array(
+			'_mep_contact_name' => 'Sara Rubber',
+			'_mep_email' => 'sara@soles-b.com',
+			'_mep_lead_time_avg' => 14
+		) );
 
 		// 4. Create Materials
 		$cow_leather = self::create_post( 'mep_material', 'Cowhide leather', 0, array(
 			'_mep_sku' => 'MAT-LTH-COW',
 			'_mep_uom' => 'm2',
 			'_mep_cost_avg' => 45.00,
-			'_mep_safety_stock' => 100
+			'_mep_safety_stock' => 100,
+			'_mep_manufacturer_sku' => 'TX-COW-99',
+			'_mep_lead_time' => 7,
+			'_mep_preferred_supplier' => $sup_a
 		) );
 		wp_update_post( array( 'ID' => $cow_leather, 'post_content' => 'High-quality top-grain leather. Essential for premium handbag production.' ) );
 		$pu_leather = self::create_post( 'mep_material', 'PU leather', 0, array(
@@ -102,7 +119,10 @@ class MEP_Seeder {
 		$variants = array('Tan', 'Black', 'Wine');
 		foreach ($variants as $v) {
 			$bag = self::create_post( 'mep_product', "Leather Handbag - $v", 0, array(
-				'_mep_sku' => "BAG-LTH-" . strtoupper($v)
+				'_mep_sku' => "BAG-LTH-" . strtoupper($v),
+				'_mep_category' => 'Bags',
+				'_mep_weight' => 0.850,
+				'_mep_price' => 195.00
 			) );
 
 			// BOM for Bag (Nested)
@@ -223,7 +243,11 @@ class MEP_Seeder {
 		}
 
 		// 11. Create Customers & Forecasts
-		$cust = self::create_post( 'mep_customer', 'Luxury Craft Retailers' );
+		$cust = self::create_post( 'mep_customer', 'Luxury Craft Retailers', 0, array(
+			'_mep_contact_name' => 'Alice Boutique',
+			'_mep_email' => 'alice@luxurycraft.com',
+			'_mep_credit_limit' => 50000
+		) );
 		self::create_post( 'mep_forecast', 'Winter Collection Forecast', $bag_id, array(
 			'_mep_forecast_qty' => 200,
 			'_mep_customer_id' => $cust

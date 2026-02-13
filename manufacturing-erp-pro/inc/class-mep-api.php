@@ -234,11 +234,14 @@ class MEP_API {
 
 		foreach ( $posts as $post ) {
 			$data[] = array(
-				'id'   => $post->ID,
-				'name' => $post->post_title,
-				'sku'  => get_post_meta( $post->ID, '_mep_sku', true ),
-				'uom'  => get_post_meta( $post->ID, '_mep_uom', true ),
-				'cost' => get_post_meta( $post->ID, '_mep_cost_avg', true ),
+				'id'               => $post->ID,
+				'name'             => $post->post_title,
+				'sku'              => get_post_meta( $post->ID, '_mep_sku', true ),
+				'manufacturer_sku' => get_post_meta( $post->ID, '_mep_manufacturer_sku', true ),
+				'uom'              => get_post_meta( $post->ID, '_mep_uom', true ),
+				'cost'             => get_post_meta( $post->ID, '_mep_cost_avg', true ),
+				'lead_time'        => get_post_meta( $post->ID, '_mep_lead_time', true ),
+				'supplier_id'      => get_post_meta( $post->ID, '_mep_preferred_supplier', true ),
 			);
 		}
 
@@ -258,6 +261,7 @@ class MEP_API {
 				'status'         => $post->post_status,
 				'qty'            => get_post_meta( $post->ID, '_mep_work_order_qty', true ),
 				'due_date'       => get_post_meta( $post->ID, '_mep_due_date', true ),
+				'route_id'       => get_post_meta( $post->ID, '_mep_route_id', true ),
 				'operator_name'  => $operator ? $operator->display_name : '',
 				'equipment_name' => $eq_id ? get_the_title( $eq_id ) : '',
 			);
@@ -435,7 +439,11 @@ class MEP_API {
 		$posts = get_posts( array( 'post_type' => 'mep_warehouse', 'numberposts' => -1 ) );
 		$data = array();
 		foreach ( $posts as $post ) {
-			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+			$data[] = array(
+				'id'   => $post->ID,
+				'name' => $post->post_title,
+				'code' => get_post_meta( $post->ID, '_mep_location_code', true ),
+			);
 		}
 		return new WP_REST_Response( $data, 200 );
 	}
@@ -453,7 +461,13 @@ class MEP_API {
 		$posts = get_posts( array( 'post_type' => 'mep_supplier', 'numberposts' => -1 ) );
 		$data = array();
 		foreach ( $posts as $post ) {
-			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+			$data[] = array(
+				'id'        => $post->ID,
+				'name'      => $post->post_title,
+				'contact'   => get_post_meta( $post->ID, '_mep_contact_name', true ),
+				'email'     => get_post_meta( $post->ID, '_mep_email', true ),
+				'lead_time' => get_post_meta( $post->ID, '_mep_lead_time_avg', true ),
+			);
 		}
 		return new WP_REST_Response( $data, 200 );
 	}
@@ -546,7 +560,12 @@ class MEP_API {
 		$posts = get_posts( array( 'post_type' => 'mep_customer', 'numberposts' => -1 ) );
 		$data = array();
 		foreach ( $posts as $post ) {
-			$data[] = array( 'id' => $post->ID, 'name' => $post->post_title );
+			$data[] = array(
+				'id'      => $post->ID,
+				'name'    => $post->post_title,
+				'contact' => get_post_meta( $post->ID, '_mep_contact_name', true ),
+				'email'   => get_post_meta( $post->ID, '_mep_email', true ),
+			);
 		}
 		return new WP_REST_Response( $data, 200 );
 	}
