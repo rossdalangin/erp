@@ -28,20 +28,24 @@ class MEP_Meta_Boxes {
 		$safety = get_post_meta( $post->ID, '_mep_safety_stock', true );
 		?>
 		<p>
-			<label><?php _e( 'SKU:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" name="mep_sku" value="<?php echo esc_attr( $sku ); ?>" class="widefat">
+			<label><strong><?php _e( 'SKU (Stock Keeping Unit):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_sku" value="<?php echo esc_attr( $sku ); ?>" class="widefat" placeholder="e.g., MAT-LTH-001">
+			<small><?php _e( 'A unique identifier for this material.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<p>
-			<label><?php _e( 'UOM:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" name="mep_uom" value="<?php echo esc_attr( $uom ); ?>" class="widefat">
+			<label><strong><?php _e( 'Unit of Measure (UOM):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_uom" value="<?php echo esc_attr( $uom ); ?>" class="widefat" placeholder="e.g., m2, pcs, kg">
+			<small><?php _e( 'How you measure this material (e.g., square meters for leather).', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<p>
-			<label><?php _e( 'Average Cost ($):', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="number" step="0.01" name="mep_cost_avg" value="<?php echo esc_attr( $cost ); ?>" class="widefat">
+			<label><strong><?php _e( 'Average Unit Cost ($):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" step="0.01" name="mep_cost_avg" value="<?php echo esc_attr( $cost ); ?>" class="widefat" placeholder="45.00">
+			<small><?php _e( 'Used for real-time BOM cost roll-ups and inventory valuation.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<p>
-			<label><?php _e( 'Safety Stock:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="number" name="mep_safety_stock" value="<?php echo esc_attr( $safety ); ?>" class="widefat">
+			<label><strong><?php _e( 'Safety Stock Level:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" name="mep_safety_stock" value="<?php echo esc_attr( $safety ); ?>" class="widefat" placeholder="100">
+			<small><?php _e( 'The minimum quantity to keep on hand. MRP will flag items below this level.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<hr>
 		<h4><?php _e( 'Where Used (BOM Presence):', 'manufacturing-erp-pro' ); ?></h4>
@@ -62,10 +66,23 @@ class MEP_Meta_Boxes {
 
 	public static function render_product_meta( $post ) {
 		$sku = get_post_meta( $post->ID, '_mep_sku', true );
+		$cat = get_post_meta( $post->ID, '_mep_category', true );
+		$weight = get_post_meta( $post->ID, '_mep_weight', true );
 		?>
 		<p>
-			<label><?php _e( 'SKU:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" name="mep_sku" value="<?php echo esc_attr( $sku ); ?>" class="widefat">
+			<label><strong><?php _e( 'Product SKU:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_sku" value="<?php echo esc_attr( $sku ); ?>" class="widefat" placeholder="e.g., BAG-LTH-TAN">
+			<small><?php _e( 'Unique identifier for this finished good.', 'manufacturing-erp-pro' ); ?></small>
+		</p>
+		<p>
+			<label><strong><?php _e( 'Category:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_category" value="<?php echo esc_attr( $cat ); ?>" class="widefat" placeholder="e.g., Accessories, Footwear">
+			<small><?php _e( 'Logical grouping for reporting.', 'manufacturing-erp-pro' ); ?></small>
+		</p>
+		<p>
+			<label><strong><?php _e( 'Unit Weight (kg):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" step="0.001" name="mep_weight" value="<?php echo esc_attr( $weight ); ?>" class="widefat" placeholder="0.750">
+			<small><?php _e( 'Physical weight of one finished unit.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<?php
 	}
@@ -76,16 +93,19 @@ class MEP_Meta_Boxes {
 		$batch = get_post_meta( $post->ID, '_mep_batch_code', true );
 		?>
 		<p>
-			<label><?php _e( 'Target Quantity:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="number" name="mep_work_order_qty" value="<?php echo esc_attr( $qty ); ?>" class="widefat">
+			<label><strong><?php _e( 'Target Production Quantity:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" name="mep_work_order_qty" value="<?php echo esc_attr( $qty ); ?>" class="widefat" placeholder="50">
+			<small><?php _e( 'How many units you intend to manufacture in this job.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<p>
-			<label><?php _e( 'Due Date:', 'manufacturing-erp-pro' ); ?></label><br>
+			<label><strong><?php _e( 'Planned Due Date:', 'manufacturing-erp-pro' ); ?></strong></label><br>
 			<input type="date" name="mep_due_date" value="<?php echo esc_attr( $due ); ?>" class="widefat">
+			<small><?php _e( 'Used to calculate the On-Time Delivery (OTD) KPI.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<p>
-			<label><?php _e( 'Batch Code:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" name="mep_batch_code" value="<?php echo esc_attr( $batch ); ?>" class="widefat">
+			<label><strong><?php _e( 'Batch / Lot Code:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_batch_code" value="<?php echo esc_attr( $batch ); ?>" class="widefat" placeholder="e.g., LOT-2024-001">
+			<small><?php _e( 'Identifier for the entire production lot. Can be auto-generated during completion.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<?php
 	}
@@ -96,19 +116,23 @@ class MEP_Meta_Boxes {
 		$start = get_post_meta( $post->ID, '_mep_capa_start_date', true );
 		?>
 		<p>
-			<label><?php _e( 'Defect Type / Description:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" name="mep_ncr_type" value="<?php echo esc_attr( $type ); ?>" class="widefat">
+			<label><strong><?php _e( 'Defect Nature:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_ncr_type" value="<?php echo esc_attr( $type ); ?>" class="widefat" placeholder="e.g., Critical surface scratch">
+			<small><?php _e( 'Brief description of what went wrong during inspection.', 'manufacturing-erp-pro' ); ?></small>
 		</p>
 		<hr>
-		<h4><?php _e( 'CAPA (Corrective and Preventive Action)', 'manufacturing-erp-pro' ); ?></h4>
-		<p>
-			<label><?php _e( 'Action Plan:', 'manufacturing-erp-pro' ); ?></label><br>
-			<textarea name="mep_capa_plan" class="widefat" rows="4"><?php echo esc_textarea( $plan ); ?></textarea>
-		</p>
-		<p>
-			<label><?php _e( 'CAPA Start Date:', 'manufacturing-erp-pro' ); ?></label><br>
-			<input type="text" readonly value="<?php echo esc_attr( $start ); ?>" class="widefat">
-		</p>
+		<div style="background: #f0f6fb; padding: 15px; border-left: 4px solid #2271b1;">
+			<h4>🛡️ <?php _e( 'CAPA (Corrective and Preventive Action)', 'manufacturing-erp-pro' ); ?></h4>
+			<p><?php _e( 'Systemic issues should be promoted to CAPA to ensure the root cause is addressed and prevented in the future.', 'manufacturing-erp-pro' ); ?></p>
+			<p>
+				<label><strong><?php _e( 'Preventive Action Plan:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+				<textarea name="mep_capa_plan" class="widefat" rows="4" placeholder="<?php esc_attr_e( 'e.g., Update operator training for machine #3 and implement hourly nozzle checks.', 'manufacturing-erp-pro' ); ?>"><?php echo esc_textarea( $plan ); ?></textarea>
+			</p>
+			<p>
+				<label><strong><?php _e( 'CAPA Initiation Date:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+				<input type="text" readonly value="<?php echo esc_attr( $start ); ?>" class="widefat">
+			</p>
+		</div>
 		<p>
 			<?php if ( $post->post_status !== 'capa-pending' ) : ?>
 				<button type="submit" name="mep_promote_capa" value="1" class="button button-secondary">
@@ -127,6 +151,8 @@ class MEP_Meta_Boxes {
 			'mep_uom' => '_mep_uom',
 			'mep_cost_avg' => '_mep_cost_avg',
 			'mep_safety_stock' => '_mep_safety_stock',
+			'mep_category' => '_mep_category',
+			'mep_weight' => '_mep_weight',
 			'mep_work_order_qty' => '_mep_work_order_qty',
 			'mep_due_date' => '_mep_due_date',
 			'mep_batch_code' => '_mep_batch_code',

@@ -228,6 +228,34 @@ class MEP_Seeder {
 			'_mep_forecast_qty' => 200,
 			'_mep_customer_id' => $cust
 		) );
+
+		// 12. Subcontracting Example (Service Material)
+		$tanning_service = self::create_post( 'mep_material', 'SUBCONTRACT: Leather Tanning Service', 0, array(
+			'_mep_sku' => 'SRV-TAN-001',
+			'_mep_uom' => 'm2',
+			'_mep_cost_avg' => 12.50,
+			'_mep_is_service' => 1
+		) );
+		wp_update_post( array( 'ID' => $tanning_service, 'post_content' => 'Example of a service material used for external subcontracting operations.' ) );
+
+		$subcontractor = self::create_post( 'mep_supplier', 'Global Tanning Solutions (Subcontractor)' );
+
+		// Product that uses subcontracting
+		$raw_hide = self::create_post( 'mep_material', 'Raw Untanned Hide', 0, array(
+			'_mep_sku' => 'MAT-HIDE-RAW',
+			'_mep_uom' => 'pcs',
+			'_mep_cost_avg' => 25.00
+		) );
+
+		$tanned_hide = self::create_post( 'mep_product', 'Tanned Leather Sheet', 0, array(
+			'_mep_sku' => 'PRD-LTH-TANNED'
+		) );
+
+		$tanned_bom = self::create_post( 'mep_bom', 'BOM for Tanned Leather (Subcontracted)', $tanned_hide );
+		update_post_meta( $tanned_bom, '_mep_components', array(
+			array('id' => $raw_hide, 'type' => 'material', 'qty' => 1, 'scrap' => 0),
+			array('id' => $tanning_service, 'type' => 'material', 'qty' => 1, 'scrap' => 0)
+		) );
 	}
 
 	/**

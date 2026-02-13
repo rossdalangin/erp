@@ -51,8 +51,11 @@ const ERPSearch = () => {
         setResults(suggestions);
     }, [query]);
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     if (!isOpen) return wp.element.createElement('button', {
         className: 'button',
+        title: helpMode ? __('Command Palette: Use this to search across all ERP modules and records instantly.', 'manufacturing-erp-pro') : '',
         style: { position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999, boxShadow: '0 2px 10px rgba(0,0,0,0.2)' },
         onClick: () => setIsOpen(true)
     }, `🔍 ${__('ERP Search', 'manufacturing-erp-pro')} (Ctrl+K)`);

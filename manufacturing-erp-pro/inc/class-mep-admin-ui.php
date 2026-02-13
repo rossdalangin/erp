@@ -75,6 +75,31 @@ class MEP_Admin_UI {
 				'desc'  => __( 'Maintain your vendor list and contact details. Performance is tracked automatically in the Supplier Scorecard.', 'manufacturing-erp-pro' ),
 				'example' => __( 'Example: "Sole Supplier B", primary contact for rubber components.', 'manufacturing-erp-pro' )
 			),
+			'mep_bom' => array(
+				'title' => __( 'Bill of Materials (BOM) Versions', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'View and manage different versions of your product engineering. Use the Visual BOM Builder to edit active structures.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "BOM for Handbag V2" - Updated to use 15% less leather.', 'manufacturing-erp-pro' )
+			),
+			'mep_qc_check' => array(
+				'title' => __( 'Quality Inspection Queue', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Record results for batch inspections. Failing a check automatically triggers a Non-Conformance Report (NCR).', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: QC Check for Lot #102. Result: PASS.', 'manufacturing-erp-pro' )
+			),
+			'mep_ncr' => array(
+				'title' => __( 'NCR / CAPA Records', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Investigate production failures and systemic issues. Promote systemic defects to CAPA (Corrective and Preventive Action) status.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: NCR for damaged zippers. Action: Switch to YKK brand.', 'manufacturing-erp-pro' )
+			),
+			'mep_equipment' => array(
+				'title' => __( 'Asset & Equipment Registry', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Define factory machines and their daily capacities. The system uses this for load planning and cost roll-ups.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Industrial Stitcher #1", Capacity: 480 mins/day.', 'manufacturing-erp-pro' )
+			),
+			'mep_forecast' => array(
+				'title' => __( 'Demand Forecasting', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Enter expected sales or stock needs. The MRP engine explodes these forecasts into material requirements.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: 500 units of "Leather Bag" for the Christmas season.', 'manufacturing-erp-pro' )
+			),
 		);
 
 		if ( isset( $instructions[$screen->post_type] ) ) {

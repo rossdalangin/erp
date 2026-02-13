@@ -26,186 +26,206 @@ class MEP_API {
 		register_rest_route( 'mep/v1', '/materials', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_materials' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/work-orders', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_work_orders' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/work-orders/(?P<id>\d+)/status', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'update_work_order_status' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/work-orders/(?P<id>\d+)/print', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'print_work_order' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_bom' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_bom_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/bom/(?P<id>\d+)', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'update_bom' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_bom_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/mrp/run', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'run_mrp' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/mrp/status', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_mrp_status' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/mrp/pegging', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_pegging_data' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/inventory/transfer', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'transfer_inventory' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/inventory/receive', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'receive_inventory' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/warehouses', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_warehouses' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/warehouses/(?P<id>\d+)/bins', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_warehouse_bins' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/reports/kpis', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_kpis' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_read_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/reports/quality', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_quality_reports' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_quality_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/qc/trace/(?P<lot>[a-zA-Z0-9\-_]+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_lot_trace' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_quality_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/qc/trace/(?P<lot>[a-zA-Z0-9\-_]+)/report', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_lot_trace_report' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_quality_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/equipment/capacity', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_equipment_capacity' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/equipment', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_equipment' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/equipment/detailed', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_equipment_detailed' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/reports/inventory-csv', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_inventory_csv' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_inventory_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/reports/diagnostic-export', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_diagnostic_export' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_admin_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/customers', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_customers' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/procurement/po-from-items', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'create_po_from_items' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/suppliers', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_suppliers' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/procurement/supplier-score/(?P<id>\d+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_supplier_score' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/operators', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_operators' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/settings', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'update_settings' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_admin_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/seed', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'run_seeder' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_admin_permission' ),
 		) );
 
 		register_rest_route( 'mep/v1', '/production/release', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'release_production' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 	}
 
-	public function check_permission() {
-		return current_user_can( 'manage_options' );
+	public function check_admin_permission() {
+		return current_user_can( 'manage_options' ) || current_user_can( 'mep_manage_all' );
+	}
+
+	public function check_inventory_permission() {
+		return $this->check_admin_permission() || current_user_can( 'mep_manage_inventory' );
+	}
+
+	public function check_production_permission() {
+		return $this->check_admin_permission() || current_user_can( 'mep_manage_production' );
+	}
+
+	public function check_bom_permission() {
+		return $this->check_admin_permission() || current_user_can( 'mep_manage_bom' );
+	}
+
+	public function check_quality_permission() {
+		return $this->check_admin_permission() || current_user_can( 'mep_manage_quality' );
+	}
+
+	public function check_read_permission() {
+		return current_user_can( 'read' );
 	}
 
 	public function get_materials( $request ) {
