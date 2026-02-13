@@ -75,16 +75,21 @@ const KanbanBoard = () => {
             if (eqId) extraData.equipment_id = eqId;
         }
         if (nextStatus === 'completed') {
+            const lotId = prompt(__('Enter or Confirm Lot Number:', 'manufacturing-erp-pro'), `LOT-${id}-${new Date().getMonth()+1}${new Date().getDate()}`);
             const scrap = prompt(__('Enter scrap quantity (if any):', 'manufacturing-erp-pro'), "0");
             const labor = prompt(__('Enter total labor minutes spent:', 'manufacturing-erp-pro'), "60");
-            extraData = { ...extraData, scrap_qty: scrap, labor_mins: labor };
+            extraData = { ...extraData, lot_number: lotId, scrap_qty: scrap, labor_mins: labor };
         }
 
         wp.apiFetch({
             path: `/mep/v1/work-orders/${id}/status`,
             method: 'POST',
             data: { status: nextStatus, ...extraData }
-        }).then(() => {
+        }).then((res) => {
+            if (nextStatus === 'completed' && res.qc_id) {
+                alert(`${__('Production Complete!', 'manufacturing-erp-pro')}\n${__('Lot Assigned:', 'manufacturing-erp-pro')} ${res.lot_number}\n${__('QC Check Created:', 'manufacturing-erp-pro')} #${res.qc_id}`);
+            }
+
             setWorkOrders(workOrders.map(o => {
                 if (o.id == id) {
                     const updated = { ...o, status: nextStatus };

@@ -40,6 +40,7 @@ const WarehouseLayout = () => {
     const [warehouses, setWarehouses] = useState([]);
     const [selectedWh, setSelectedWh] = useState(null);
     const [bins, setBins] = useState([]);
+    const [reorderBasket, setReorderBasket] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -76,7 +77,9 @@ const WarehouseLayout = () => {
     };
 
     const onDrop = (e, targetBinId) => {
-        const data = JSON.parse(e.dataTransfer.getData('transferData'));
+        const dataStr = e.dataTransfer.getData('transferData');
+        if (!dataStr) return;
+        const data = JSON.parse(dataStr);
         if (data.sourceBinId === targetBinId) return;
 
         const transferQty = prompt(`Transfer quantity (Max: ${data.qty}):`, data.qty);
@@ -97,9 +100,26 @@ const WarehouseLayout = () => {
         }
     };
 
+    const onBasketDrop = (e) => {
+        const dataStr = e.dataTransfer.getData('transferData');
+        if (!dataStr) return;
+        const data = JSON.parse(dataStr);
+
+        if (!reorderBasket.find(id => id === data.materialId)) {
+            setReorderBasket([...reorderBasket, data.materialId]);
+        }
+    };
+
+    const triggerReorder = () => {
+        if (reorderBasket.length === 0) return;
+        alert(`${__('Triggering MRP checks for:', 'manufacturing-erp-pro')} ${reorderBasket.length} ${__('items. Redirecting to MRP Planning...', 'manufacturing-erp-pro')}`);
+        window.location.href = 'admin.php?page=mep-mrp-planning';
+    };
+
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-warehouse-layout' },
+    return wp.element.createElement('div', { className: 'mep-warehouse-layout', style: { display: 'flex', gap: '20px' } },
+        wp.element.createElement('div', { style: { flex: 1 } },
         wp.element.createElement('div', { className: 'mep-wh-toolbar', style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
             wp.element.createElement('div', {
                 className: 'mep-wh-selector',
@@ -119,19 +139,40 @@ const WarehouseLayout = () => {
                 onClick: () => window.location.href = wpApiSettings.root + 'mep/v1/reports/inventory-csv?_wpnonce=' + wpApiSettings.nonce
             }, 'Export Inventory CSV')
         ),
+            wp.element.createElement('div', {
+                className: 'mep-bins-grid',
+                title: helpMode ? 'Warehouse Grid: Shows bin occupancy. Drag materials between cards to perform a visual bin transfer.' : '',
+                style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }
+            },
+                bins.map(bin => wp.element.createElement(Bin, {
+                    key: bin.id,
+                    bin: bin,
+                    onDragStart,
+                    onDragOver,
+                    onDrop,
+                    helpMode
+                }))
+            )
+        ),
+        // Sidebar: Reorder Basket
         wp.element.createElement('div', {
-            className: 'mep-bins-grid',
-            title: helpMode ? 'Warehouse Grid: Shows bin occupancy. Drag materials between cards to perform a visual bin transfer.' : '',
-            style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }
+            className: 'mep-reorder-basket-sidebar',
+            onDragOver: (e) => e.preventDefault(),
+            onDrop: onBasketDrop,
+            title: helpMode ? 'Reorder Basket: Drag materials here from any bin to flag them for reordering. Example: Drag "Thread" if you notice physical stock is low.' : '',
+            style: { width: '250px', background: '#f6f7f7', border: '2px dashed #ccd0d4', padding: '20px', borderRadius: '4px' }
         },
-            bins.map(bin => wp.element.createElement(Bin, {
-                key: bin.id,
-                bin: bin,
-                onDragStart,
-                onDragOver,
-                onDrop,
-                helpMode
-            }))
+            wp.element.createElement('h3', null, '🛒 Reorder Basket'),
+            wp.element.createElement('div', { style: { minHeight: '100px', marginBottom: '20px' } },
+                reorderBasket.length > 0 ?
+                    reorderBasket.map((id, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd', fontSize: '12px' } }, `Mat #${id}`)) :
+                    wp.element.createElement('p', { style: { fontSize: '11px', color: '#999' } }, 'Drag materials here to reorder...')
+            ),
+            reorderBasket.length > 0 && wp.element.createElement('button', {
+                className: 'button button-primary',
+                style: { width: '100%' },
+                onClick: triggerReorder
+            }, 'Trigger Reorder Check')
         )
     );
 };

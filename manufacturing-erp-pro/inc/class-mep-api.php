@@ -196,6 +196,12 @@ class MEP_API {
 			'callback'            => array( $this, 'run_seeder' ),
 			'permission_callback' => array( $this, 'check_permission' ),
 		) );
+
+		register_rest_route( 'mep/v1', '/production/release', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'release_production' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	public function check_permission() {
@@ -269,21 +275,42 @@ class MEP_API {
 			update_post_meta( $id, '_mep_actual_labor_mins', (float) $params['labor_mins'] );
 		}
 
+		$qc_id = 0;
+		$lot_number = '';
+
 		// Also log to production logs table if completed
 		if ( $status === 'completed' ) {
 			global $wpdb;
+			$output_qty = (float) get_post_meta( $id, '_mep_work_order_qty', true );
 			$wpdb->insert( $wpdb->prefix . 'mep_production_logs', array(
 				'work_order_id' => $id,
-				'output_qty'    => (float) get_post_meta( $id, '_mep_work_order_qty', true ),
+				'output_qty'    => $output_qty,
 				'scrap_qty'     => (float) ( $params['scrap_qty'] ?? 0 ),
 				'labor_mins'    => (float) ( $params['labor_mins'] ?? 0 ),
 				'created_at'    => current_time( 'mysql' )
 			) );
+
+			$lot_number = $params['lot_number'] ?? sprintf( 'LOT-%d-%s', $id, date('md') );
+			update_post_meta( $id, '_mep_batch_code', $lot_number );
+
+			// Trigger automatic Quality Check post
+			$qc_id = wp_insert_post( array(
+				'post_type'   => 'mep_qc_check',
+				'post_title'  => sprintf( 'QC for Lot %s (WO #%d)', $lot_number, $id ),
+				'post_status' => 'publish',
+				'post_parent' => $id
+			) );
+			update_post_meta( $qc_id, '_mep_qc_status', 'PENDING' );
+			update_post_meta( $qc_id, '_mep_lot_number', $lot_number );
 		}
 
 		MEP_DB::log_audit( 'work_order', $id, 'STATUS_CHANGE', $old_status, $status );
 
-		return new WP_REST_Response( array( 'success' => true ), 200 );
+		return new WP_REST_Response( array(
+			'success' => true,
+			'qc_id'   => $qc_id,
+			'lot_number' => $lot_number
+		), 200 );
 	}
 
 	public function print_work_order( $request ) {
@@ -516,6 +543,32 @@ class MEP_API {
 		header( 'Content-Disposition: attachment; filename="erp-diagnostic.txt"' );
 		MEP_Reports::export_erp_diagnostic();
 		exit;
+	}
+
+	public function release_production( $request ) {
+		$product_id = $request->get_param( 'product_id' );
+		$qty = $request->get_param( 'qty' );
+		$due_date = $request->get_param( 'due_date' );
+
+		if ( ! $product_id || ! $qty ) {
+			return new WP_Error( 'invalid_data', 'Product ID and Quantity are required.', array( 'status' => 400 ) );
+		}
+
+		$wo_id = wp_insert_post( array(
+			'post_type'   => 'mep_work_order',
+			'post_title'  => sprintf( 'WO-%s-%s', get_post_meta( $product_id, '_mep_sku', true ), date( 'mdHis' ) ),
+			'post_parent' => $product_id,
+			'post_status' => 'publish',
+		) );
+
+		if ( ! is_wp_error( $wo_id ) ) {
+			update_post_meta( $wo_id, '_mep_work_order_qty', (float) $qty );
+			update_post_meta( $wo_id, '_mep_due_date', sanitize_text_field( $due_date ) );
+			MEP_DB::log_audit( 'work_order', $wo_id, 'RELEASE_FROM_BOM', '', array( 'product_id' => $product_id, 'qty' => $qty ) );
+			return new WP_REST_Response( array( 'success' => true, 'wo_id' => $wo_id ), 200 );
+		}
+
+		return new WP_Error( 'create_failed', 'Failed to create work order.', array( 'status' => 500 ) );
 	}
 
 	public function run_seeder( $request ) {

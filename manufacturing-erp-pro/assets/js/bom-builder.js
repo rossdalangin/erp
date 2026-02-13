@@ -172,9 +172,23 @@ const BOMBuilder = ({ productId }) => {
                 create_new_version: newVersion
             }
         }).then(() => {
-            alert('BOM Saved Successfully!');
+            alert(__('BOM Saved Successfully!', 'manufacturing-erp-pro'));
             setNewVersion(false);
             wp.apiFetch({ path: `/mep/v1/bom/${productId}` }).then(setBom);
+        });
+    };
+
+    const releaseWorkOrder = () => {
+        const qty = prompt(__('Enter quantity to produce:', 'manufacturing-erp-pro'), '100');
+        if (!qty) return;
+        const dueDate = prompt(__('Enter due date (YYYY-MM-DD):', 'manufacturing-erp-pro'), new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]);
+
+        wp.apiFetch({
+            path: '/mep/v1/production/release',
+            method: 'POST',
+            data: { product_id: productId, qty: parseFloat(qty), due_date: dueDate }
+        }).then(res => {
+            alert(`${__('Work Order Released:', 'manufacturing-erp-pro')} #${res.wo_id}`);
         });
     };
 
@@ -231,17 +245,26 @@ const BOMBuilder = ({ productId }) => {
                     bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :
                     wp.element.createElement('p', { className: 'empty-msg' }, __('Drag materials or operations here to start building...', 'manufacturing-erp-pro'))
             ),
-            wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px' } },
-                wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, __('Save BOM Structure', 'manufacturing-erp-pro')),
-                wp.element.createElement('label', null,
-                    wp.element.createElement('input', {
-                        type: 'checkbox',
+            wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px', background: '#f9f9f9', padding: '15px', border: '1px solid #eee' } },
+                wp.element.createElement('div', { style: { flex: 1, display: 'flex', gap: '10px', alignItems: 'center' } },
+                    wp.element.createElement('button', { className: 'button button-primary', onClick: saveBom }, __('Save BOM Structure', 'manufacturing-erp-pro')),
+                    wp.element.createElement('label', null,
+                        wp.element.createElement('input', {
+                            type: 'checkbox',
                         checked: newVersion,
-                        onChange: (e) => setNewVersion(e.target.checked)
-                    }),
-                    ` ${__('Save as New Version', 'manufacturing-erp-pro')}`
+                            onChange: (e) => setNewVersion(e.target.checked)
+                        }),
+                        ` ${__('Save as New Version', 'manufacturing-erp-pro')}`
+                    ),
+                    wp.element.createElement('span', { style: { color: '#666', marginLeft: '10px' } }, `${__('Current Version', 'manufacturing-erp-pro')}: ${bom.version || 1}`)
                 ),
-                wp.element.createElement('span', { style: { color: '#666' } }, `${__('Current Version', 'manufacturing-erp-pro')}: ${bom.version || 1}`)
+                wp.element.createElement('div', { className: 'mep-quick-release' },
+                    wp.element.createElement('button', {
+                        className: 'button button-secondary',
+                        title: helpMode ? __('Quick Release: Immediately launch a Work Order for this product using the current BOM.', 'manufacturing-erp-pro') : '',
+                        onClick: releaseWorkOrder
+                    }, `🚀 ${__('Release Work Order', 'manufacturing-erp-pro')}`)
+                )
             )
         )
     );

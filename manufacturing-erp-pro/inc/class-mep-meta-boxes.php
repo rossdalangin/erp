@@ -43,6 +43,20 @@ class MEP_Meta_Boxes {
 			<label><?php _e( 'Safety Stock:', 'manufacturing-erp-pro' ); ?></label><br>
 			<input type="number" name="mep_safety_stock" value="<?php echo esc_attr( $safety ); ?>" class="widefat">
 		</p>
+		<hr>
+		<h4><?php _e( 'Where Used (BOM Presence):', 'manufacturing-erp-pro' ); ?></h4>
+		<?php
+			$used_in = MEP_Admin_UI::get_instance()->get_where_material_is_used( $post->ID );
+			if ( empty( $used_in ) ) {
+				echo '<p><em>' . __( 'Not used in any active Bill of Materials.', 'manufacturing-erp-pro' ) . '</em></p>';
+			} else {
+				echo '<ul style="list-style:disc; margin-left:20px;">';
+				foreach ( $used_in as $product_id ) {
+					echo '<li><a href="' . get_edit_post_link( $product_id ) . '">' . get_the_title( $product_id ) . '</a></li>';
+				}
+				echo '</ul>';
+			}
+		?>
 		<?php
 	}
 

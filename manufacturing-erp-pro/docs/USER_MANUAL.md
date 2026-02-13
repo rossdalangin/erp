@@ -109,10 +109,27 @@ This is an ERP-grade system, not a toy.
 - **Audit Logs:** Every status change, inventory move, and BOM update is logged. Access these in `System Utilities > Audit Logs`.
 - **Reset Safely:** To wipe transactional data while keeping your products, use the "Soft Reset." A "Hard Reset" requires the confirmation phrase: `RESET PRODUCTION ENVIRONMENT`.
 - **Help Mode:** Click the "Interactive Help Mode" button on the Dashboard. When enabled, the system displays information icons (ℹ️) and contextual tooltips across the BOM Builder, Kanban, and Warehouse views to guide new users.
+- **ERP Search (Command Palette):** Press `Ctrl+K` at any time to open the global search. Quickly jump between modules, search for SKUs, or trace Lots without multiple clicks.
 
 ---
 
-## 6. Quick Start Examples
+## 6. Pro UX Workflows
+
+### 6.1 Engineering to Production (The One-Click Release)
+Inside the **Visual BOM Builder**, after you have finalized your product structure and cost roll-up, you don't need to navigate away. Use the **🚀 Release Work Order** button in the footer to immediately launch a production job.
+
+### 6.2 Visual Replenishment
+In the **Visual Warehouse** view, you can drag any material from a bin into the **🛒 Reorder Basket** sidebar. Once you have flagged all needed items, one click will take you to the MRP Planning page to finalize the procurement.
+
+### 6.3 Automated QC Loop
+When you drag a Work Order to "Completed" on the Production Board, the system automatically:
+1. Generates a Lot ID.
+2. Creates a PENDING Quality Check.
+3. Provides a direct link to the QC record for immediate inspection.
+
+---
+
+## 7. Quick Start Examples
 
 ### Scenario A: Producing a New Leather Bag
 1.  **Define Materials:** Go to `ERP Pro > Materials`. Add "Tan Cowhide" and "Heavy Duty Zip".
@@ -130,7 +147,7 @@ This is an ERP-grade system, not a toy.
 
 ---
 
-## 7. Troubleshooting FAQ
+## 8. Troubleshooting FAQ
 
 **Q: Why is my BOM cost roll-up incorrect?**
 A: Ensure every material in the BOM has an "Avg Cost" defined in its master record.

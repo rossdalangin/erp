@@ -146,6 +146,7 @@ class MEP_Admin_UI {
 				$new_columns['sku'] = __( 'SKU', 'manufacturing-erp-pro' );
 				$new_columns['stock'] = __( 'On Hand', 'manufacturing-erp-pro' );
 				$new_columns['safety'] = __( 'Safety Stock', 'manufacturing-erp-pro' );
+			$new_columns['where_used'] = __( 'Where Used', 'manufacturing-erp-pro' );
 			}
 			$new_columns[$key] = $val;
 		}
@@ -165,6 +166,35 @@ class MEP_Admin_UI {
 		if ( $column === 'safety' ) {
 			echo number_format( (float) get_post_meta( $post_id, '_mep_safety_stock', true ), 2 );
 		}
+		if ( $column === 'where_used' ) {
+			$used_in = $this->get_where_material_is_used( $post_id );
+			if ( empty( $used_in ) ) {
+				echo '<small style="color: #999;">' . __( 'Not in any BOM', 'manufacturing-erp-pro' ) . '</small>';
+			} else {
+				$links = array();
+				foreach ( $used_in as $product_id ) {
+					$links[] = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $product_id ), get_the_title( $product_id ) );
+				}
+				echo implode( ', ', $links );
+			}
+		}
+	}
+
+	public function get_where_material_is_used( $material_id ) {
+		$used_in = array();
+		$boms = get_posts( array( 'post_type' => 'mep_bom', 'numberposts' => -1, 'post_status' => 'any' ) );
+		foreach ( $boms as $bom ) {
+			$components = get_post_meta( $bom->ID, '_mep_components', true );
+			if ( is_array( $components ) ) {
+				foreach ( $components as $comp ) {
+					if ( isset( $comp['id'] ) && $comp['id'] == $material_id && isset( $comp['type'] ) && $comp['type'] === 'material' ) {
+						$used_in[] = $bom->post_parent;
+						break;
+					}
+				}
+			}
+		}
+		return array_unique( $used_in );
 	}
 
 	/**

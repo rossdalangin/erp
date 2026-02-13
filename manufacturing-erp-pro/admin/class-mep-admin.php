@@ -452,6 +452,7 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-quality-dashboard', MEP_PLUGIN_URL . 'assets/js/quality-dashboard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
 		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n' ), MEP_VERSION, true );
 
 		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )
