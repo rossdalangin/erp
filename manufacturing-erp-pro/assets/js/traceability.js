@@ -32,6 +32,7 @@ const Traceability = () => {
                 setLoading(false);
             })
             .catch(err => {
+                alert(__('Lot trace failed. Verify the Lot ID exists and you have permissions.', 'manufacturing-erp-pro'));
                 console.error(err);
                 setLoading(false);
             });

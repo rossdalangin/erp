@@ -105,6 +105,9 @@ const KanbanBoard = () => {
                 }
                 return o;
             }));
+        }).catch(err => {
+            alert(__('Failed to update Work Order status. Please check your permissions.', 'manufacturing-erp-pro'));
+            console.error(err);
         });
     };
 

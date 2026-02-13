@@ -69,9 +69,12 @@ const POReceiving = () => {
                     type: 'RECEIVE'
                 }
             }).then(() => {
-                alert('Goods Received Successfully!');
+                alert(__('Goods Received Successfully!', 'manufacturing-erp-pro'));
                 // Refresh bins
                 wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins);
+            }).catch(err => {
+                alert(__('Failed to receive goods. Please check permissions.', 'manufacturing-erp-pro'));
+                console.error(err);
             });
         }
     };

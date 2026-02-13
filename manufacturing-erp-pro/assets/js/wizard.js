@@ -26,20 +26,24 @@ const SetupWizard = () => {
             });
         }).then(() => {
             setStatus(__('Setup complete with demo data! Redirecting...', 'manufacturing-erp-pro'));
-            setTimeout(() => window.location.href = 'admin.php?page=mep-dashboard', 1000);
+            setTimeout(() => { window.location.href = 'admin.php?page=mep-dashboard'; }, 1000);
         }).catch(err => {
-            setStatus(__('Error during seeding. Please check logs.', 'manufacturing-erp-pro'));
+            setStatus(__('Error during seeding. Please check your permissions and try again.', 'manufacturing-erp-pro'));
             console.error(err);
         });
     };
 
     const completeSetup = () => {
+        setStatus(__('Finalizing setup...', 'manufacturing-erp-pro'));
         wp.apiFetch({
             path: '/mep/v1/settings',
             method: 'POST',
             data: { mep_setup_complete: '1' }
         }).then(() => {
             setStep(3);
+        }).catch(err => {
+            setStatus(__('Failed to save settings. Please ensure you are an administrator.', 'manufacturing-erp-pro'));
+            console.error(err);
         });
     };
 

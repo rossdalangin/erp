@@ -25,9 +25,10 @@ class MEP_Reports {
 
 		// 2. Inventory Value
 		$inventory_value = 0;
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 		foreach ( $materials as $mat ) {
-			$stock = MEP_Inventory::get_stock_level( $mat->ID );
+			$stock = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			$cost  = (float) get_post_meta( $mat->ID, '_mep_cost_avg', true );
 			$inventory_value += ( $stock * $cost );
 		}
@@ -71,9 +72,10 @@ class MEP_Reports {
 			'90+ days'   => 0
 		);
 
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 		foreach ( $materials as $mat ) {
-			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			$on_hand = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			if ( $on_hand <= 0 ) continue;
 
 			$receipts = $wpdb->get_results( $wpdb->prepare(
@@ -111,10 +113,11 @@ class MEP_Reports {
 	 * Count materials below safety stock.
 	 */
 	public static function get_at_risk_count() {
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 		$at_risk_count = 0;
 		foreach ( $materials as $mat ) {
-			$stock = MEP_Inventory::get_stock_level( $mat->ID );
+			$stock = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			$safety = (float) get_post_meta( $mat->ID, '_mep_safety_stock', true );
 			if ( $safety > 0 && $stock < $safety ) {
 				$at_risk_count++;
@@ -166,11 +169,12 @@ class MEP_Reports {
 	public static function get_fifo_valuation() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 		$total_value = 0;
 
 		foreach ( $materials as $mat ) {
-			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			$on_hand = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			if ( $on_hand <= 0 ) continue;
 
 			// FIFO logic: we assume the oldest items were sold first.
@@ -279,11 +283,12 @@ class MEP_Reports {
 	public static function get_lifo_valuation() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 		$total_value = 0;
 
 		foreach ( $materials as $mat ) {
-			$on_hand = MEP_Inventory::get_stock_level( $mat->ID );
+			$on_hand = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			if ( $on_hand <= 0 ) continue;
 
 			// LIFO logic: we assume the newest items were sold first.
@@ -325,13 +330,14 @@ class MEP_Reports {
 	 * Generate Inventory CSV data and send to output.
 	 */
 	public static function export_inventory_csv() {
+		$stock_levels = MEP_Inventory::get_all_stock_levels();
 		$materials = get_posts( array( 'post_type' => 'mep_material', 'numberposts' => -1 ) );
 
 		$fp = fopen( 'php://output', 'w' );
 		fputcsv( $fp, array( 'SKU', 'Name', 'UOM', 'Stock Level', 'Avg Cost', 'Total Value' ) );
 
 		foreach ( $materials as $mat ) {
-			$stock = MEP_Inventory::get_stock_level( $mat->ID );
+			$stock = isset( $stock_levels[ $mat->ID ] ) ? $stock_levels[ $mat->ID ] : 0;
 			$cost  = (float) get_post_meta( $mat->ID, '_mep_cost_avg', true );
 
 			fputcsv( $fp, array(
@@ -349,8 +355,10 @@ class MEP_Reports {
 
 	/**
 	 * Export all custom ERP tables as a single diagnostic text file.
+	 *
+	 * @param string $target 'browser' or 'string' or 'file_path'
 	 */
-	public static function export_erp_diagnostic() {
+	public static function export_erp_diagnostic( $target = 'browser' ) {
 		global $wpdb;
 		$tables = array(
 			'mep_inventory_transactions',
@@ -359,19 +367,36 @@ class MEP_Reports {
 			'mep_stock_reservations'
 		);
 
+		$output = '';
+		if ( $target === 'browser' ) {
+			$fp = fopen( 'php://output', 'w' );
+		} elseif ( $target === 'string' ) {
+			$fp = fopen( 'php://temp', 'r+' );
+		} else {
+			$fp = fopen( $target, 'w' );
+		}
+
 		foreach ( $tables as $table ) {
-			echo "--- TABLE: $table ---\n";
+			fwrite( $fp, "--- TABLE: $table ---\n" );
 			$rows = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}$table", ARRAY_A );
 			if ( ! empty( $rows ) ) {
-				$fp = fopen( 'php://output', 'w' );
 				fputcsv( $fp, array_keys( $rows[0] ) );
 				foreach ( $rows as $row ) {
 					fputcsv( $fp, $row );
 				}
 			} else {
-				echo "No data.\n";
+				fwrite( $fp, "No data.\n" );
 			}
-			echo "\n\n";
+			fwrite( $fp, "\n\n" );
 		}
+
+		if ( $target === 'string' ) {
+			rewind( $fp );
+			$output = stream_get_contents( $fp );
+			fclose( $fp );
+			return $output;
+		}
+
+		fclose( $fp );
 	}
 }

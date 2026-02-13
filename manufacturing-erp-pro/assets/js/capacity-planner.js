@@ -15,7 +15,10 @@ const CapacityPlanner = () => {
                 setEquipment(res);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch((err) => {
+                setLoading(false);
+                console.error(err);
+            });
     }, []);
 
     if (loading) return wp.element.createElement('p', null, __('Loading Capacity Data...', 'manufacturing-erp-pro'));

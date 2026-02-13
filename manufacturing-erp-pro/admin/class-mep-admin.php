@@ -449,30 +449,45 @@ class MEP_Admin {
 	}
 
 	public function enqueue_assets( $hook ) {
-		// Only enqueue on ERP pages
-		if ( strpos( $hook, 'mep-' ) === false && strpos( $hook, 'edit.php?post_type=mep_' ) === false ) {
+		global $typenow;
+
+		// Only enqueue on ERP pages or CPT pages
+		$is_mep_cpt = ( $typenow && strpos( $typenow, 'mep_' ) === 0 );
+		$is_mep_page = ( strpos( $hook, 'mep-' ) !== false || strpos( $hook, 'erp-pro' ) !== false );
+
+		if ( ! $is_mep_cpt && ! $is_mep_page ) {
 			return;
 		}
 
 		wp_enqueue_style( 'mep-admin-style', MEP_PLUGIN_URL . 'assets/css/mep-admin.css', array(), MEP_VERSION );
 
 		// Scaffolding for React components
-		wp_enqueue_script( 'mep-bom-builder', MEP_PLUGIN_URL . 'assets/js/bom-builder.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-quality-dashboard', MEP_PLUGIN_URL . 'assets/js/quality-dashboard.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ), MEP_VERSION, true );
-		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n' ), MEP_VERSION, true );
+		$deps = array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'wp-api' );
 
-		wp_localize_script( 'mep-bom-builder', 'mepSettings', array(
+		wp_enqueue_script( 'mep-bom-builder', MEP_PLUGIN_URL . 'assets/js/bom-builder.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-quality-dashboard', MEP_PLUGIN_URL . 'assets/js/quality-dashboard.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', $deps, MEP_VERSION, true );
+		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n', 'wp-api' ), MEP_VERSION, true );
+
+		// Localize help mode to a common script handle that all others depend on
+		// Or just localize to all handles. For safety, we'll localize to 'mep-dashboard' and 'mep-bom-builder' etc.
+		$settings = array(
 			'helpMode' => get_option( 'mep_help_mode', 'off' )
-		) );
+		);
+
+		$scripts = array( 'mep-bom-builder', 'mep-kanban-board', 'mep-warehouse-layout', 'mep-dashboard', 'mep-wizard', 'mep-traceability', 'mep-mrp-suggestions', 'mep-pegging-view', 'mep-supplier-scorecard', 'mep-po-receiving', 'mep-quality-dashboard', 'mep-capacity-planner', 'mep-erp-search' );
+
+		foreach ( $scripts as $handle ) {
+			wp_localize_script( $handle, 'mepSettings', $settings );
+		}
 	}
 }

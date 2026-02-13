@@ -289,6 +289,15 @@ class MEP_Seeder {
 	public static function reset( $hard = true ) {
 		global $wpdb;
 
+		// Perform automatic backup before reset
+		$upload_dir = wp_upload_dir();
+		$mep_dir = $upload_dir['basedir'] . '/mep_backups';
+		if ( ! file_exists( $mep_dir ) ) {
+			wp_mkdir_p( $mep_dir );
+		}
+		$filename = $mep_dir . '/backup_before_reset_' . date( 'Y-m-d_H-i-s' ) . '.txt';
+		MEP_Reports::export_erp_diagnostic( $filename );
+
 		$types_to_delete = array(
 			'mep_inventory_transactions',
 			'mep_audit_logs',

@@ -10,8 +10,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 class MEP_Meta_Boxes {
 
 	public static function init() {
+		add_action( 'init', array( __CLASS__, 'register_rest_meta' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( __CLASS__, 'save_meta_boxes' ) );
+	}
+
+	public static function register_rest_meta() {
+		$numeric_fields = array(
+			'_mep_cost_avg', '_mep_safety_stock', '_mep_weight', '_mep_work_order_qty',
+			'_mep_lead_time_avg', '_mep_credit_limit', '_mep_capacity', '_mep_supplier_id',
+			'_mep_total_amount', '_mep_batch_size', '_mep_product_id', '_mep_forecast_qty',
+			'_mep_customer_id', '_mep_daily_capacity_mins', '_mep_labor_rate',
+			'_mep_lead_time', '_mep_price', '_mep_pack_size', '_mep_preferred_supplier',
+			'_mep_route_id', '_mep_assigned_equipment_id', '_mep_actual_scrap',
+			'_mep_actual_labor_mins'
+		);
+
+		$array_fields = array(
+			'_mep_components', '_mep_steps', '_mep_maintenance_logs'
+		);
+
+		$all_fields = array(
+			'_mep_sku', '_mep_uom', '_mep_cost_avg', '_mep_safety_stock', '_mep_category',
+			'_mep_weight', '_mep_work_order_qty', '_mep_due_date', '_mep_batch_code',
+			'_mep_ncr_type', '_mep_capa_plan', '_mep_contact_name', '_mep_email',
+			'_mep_phone', '_mep_lead_time_avg', '_mep_credit_limit', '_mep_location_code',
+			'_mep_capacity', '_mep_supplier_id', '_mep_expected_date', '_mep_total_amount',
+			'_mep_mfg_date', '_mep_expiry_date', '_mep_batch_size', '_mep_product_id',
+			'_mep_forecast_qty', '_mep_customer_id', '_mep_daily_capacity_mins',
+			'_mep_labor_rate', '_mep_qc_status', '_mep_lot_number', '_mep_qc_defects',
+			'_mep_manufacturer_sku', '_mep_lead_time', '_mep_price', '_mep_pack_size',
+			'_mep_preferred_supplier', '_mep_route_id', '_mep_assigned_equipment_id',
+			'_mep_actual_scrap', '_mep_actual_labor_mins', '_mep_start_date',
+			'_mep_components', '_mep_steps', '_mep_maintenance_logs', '_mep_version'
+		);
+
+		foreach ( $all_fields as $meta_key ) {
+			$type = 'string';
+			if ( in_array( $meta_key, $numeric_fields ) ) {
+				$type = 'number';
+			} elseif ( in_array( $meta_key, $array_fields ) ) {
+				$type = 'array';
+			}
+
+			register_post_meta( '', $meta_key, array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => $type,
+			) );
+		}
 	}
 
 	public static function add_meta_boxes() {
@@ -207,10 +254,15 @@ class MEP_Meta_Boxes {
 
 	public static function render_warehouse_meta( $post ) {
 		$code = get_post_meta( $post->ID, '_mep_location_code', true );
+		$capacity = get_post_meta( $post->ID, '_mep_capacity', true );
 		?>
 		<p>
 			<label><strong><?php _e( 'Location Code:', 'manufacturing-erp-pro' ); ?></strong></label><br>
 			<input type="text" name="mep_location_code" value="<?php echo esc_attr( $code ); ?>" class="widefat" placeholder="e.g., WH-01">
+		</p>
+		<p>
+			<label><strong><?php _e( 'Total Storage Capacity (Units):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" name="mep_capacity" value="<?php echo esc_attr( $capacity ); ?>" class="widefat">
 		</p>
 		<?php
 	}

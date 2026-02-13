@@ -189,6 +189,9 @@ const BOMBuilder = ({ productId }) => {
             data: { product_id: productId, qty: parseFloat(qty), due_date: dueDate }
         }).then(res => {
             alert(`${__('Work Order Released:', 'manufacturing-erp-pro')} #${res.wo_id}`);
+        }).catch(err => {
+            alert(__('Failed to release Work Order.', 'manufacturing-erp-pro'));
+            console.error(err);
         });
     };
 

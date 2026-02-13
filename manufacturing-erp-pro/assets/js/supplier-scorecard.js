@@ -49,6 +49,9 @@ const SupplierScorecard = () => {
                 }));
                 setSuppliers(enriched);
                 setLoading(false);
+            }).catch(err => {
+                setLoading(false);
+                console.error(err);
             });
     }, []);
 

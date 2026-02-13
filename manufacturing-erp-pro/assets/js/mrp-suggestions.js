@@ -3,6 +3,7 @@
  */
 
 const { useState, useEffect } = wp.element;
+const { __, sprintf } = wp.i18n;
 
 const SuggestionItem = ({ item, onDragStart }) => {
     return wp.element.createElement('div', {
@@ -82,8 +83,11 @@ const MRPSuggestions = () => {
             method: 'POST',
             data: { items: basket }
         }).then(data => {
-            alert(`Successfully created ${data.po_ids.length} Purchase Orders!`);
+            alert(sprintf(__('Successfully created %d Purchase Orders!', 'manufacturing-erp-pro'), data.po_ids.length));
             setBasket([]);
+        }).catch(err => {
+            alert(__('Failed to create Purchase Orders.', 'manufacturing-erp-pro'));
+            console.error(err);
         });
     };
 

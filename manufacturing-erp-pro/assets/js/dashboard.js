@@ -27,6 +27,9 @@ const Dashboard = () => {
             setKpis(kpiData);
             setCapacity(capData);
             setLoading(false);
+        }).catch(err => {
+            setLoading(false);
+            console.error(err);
         });
     }, []);
 

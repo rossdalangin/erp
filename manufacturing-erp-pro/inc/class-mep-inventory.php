@@ -115,6 +115,23 @@ class MEP_Inventory {
 	}
 
 	/**
+	 * Get stock levels for all materials in a single query.
+	 *
+	 * @return array Material ID as key, quantity as value.
+	 */
+	public static function get_all_stock_levels() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mep_inventory_transactions';
+		$results = $wpdb->get_results( "SELECT material_id, SUM(quantity) as qty FROM $table_name GROUP BY material_id" );
+
+		$levels = array();
+		foreach ( $results as $row ) {
+			$levels[ (int) $row->material_id ] = (float) $row->qty;
+		}
+		return $levels;
+	}
+
+	/**
 	 * Transfer stock between bins atomically.
 	 */
 	public static function transfer( $data ) {

@@ -56,6 +56,24 @@ class MEP_CPT {
 			) );
 		}
 
+		// Register Work Order statuses
+		$wo_statuses = array(
+			'released'    => _x( 'Released', 'post' ),
+			'in-progress' => _x( 'In Progress', 'post' ),
+			'completed'   => _x( 'Completed', 'post' ),
+		);
+
+		foreach ( $wo_statuses as $status => $label ) {
+			register_post_status( $status, array(
+				'label'                     => $label,
+				'public'                    => true,
+				'exclude_from_search'       => false,
+				'show_in_admin_all_list'    => true,
+				'show_in_admin_status_list' => true,
+				'label_count'               => _n_noop( $label . ' <span class="count">(%s)</span>', $label . ' <span class="count">(%s)</span>' ),
+			) );
+		}
+
 		// Register CAPA status for NCR
 		register_post_status( 'capa-pending', array(
 			'label'                     => _x( 'CAPA Pending', 'post' ),

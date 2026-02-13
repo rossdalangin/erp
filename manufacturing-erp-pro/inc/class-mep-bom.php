@@ -17,6 +17,11 @@ class MEP_BOM {
 	 * @return array
 	 */
 	public static function get_bom_tree( $product_id, $depth = 0 ) {
+		static $tree_cache = array();
+		if ( $depth === 0 && isset( $tree_cache[ $product_id ] ) ) {
+			return $tree_cache[ $product_id ];
+		}
+
 		if ( $depth > 10 ) return array(); // Prevent infinite loops
 
 		$bom_posts = get_posts( array(
@@ -48,6 +53,10 @@ class MEP_BOM {
 			}
 		}
 
+		if ( $depth === 0 ) {
+			$tree_cache[ $product_id ] = $components;
+		}
+
 		return $components;
 	}
 
@@ -58,6 +67,11 @@ class MEP_BOM {
 	 * @return float
 	 */
 	public static function calculate_roll_up_cost( $product_id ) {
+		static $cache = array();
+		if ( isset( $cache[ $product_id ] ) ) {
+			return $cache[ $product_id ];
+		}
+
 		$components = static::get_bom_tree( $product_id );
 		$total_cost = 0;
 
@@ -83,6 +97,7 @@ class MEP_BOM {
 		// Add Routing Costs
 		$total_cost += static::get_routing_costs( $product_id );
 
+		$cache[ $product_id ] = $total_cost;
 		return $total_cost;
 	}
 

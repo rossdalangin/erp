@@ -96,6 +96,9 @@ const WarehouseLayout = () => {
             }).then(() => {
                 // Reload bins
                 wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins);
+            }).catch(err => {
+                alert(__('Inventory transfer failed. Check stock levels and permissions.', 'manufacturing-erp-pro'));
+                console.error(err);
             });
         }
     };
