@@ -54,8 +54,12 @@ const SupplierScorecard = () => {
 
     if (loading) return wp.element.createElement('p', null, 'Calculating vendor performance metrics...');
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-scorecard-container' },
-        wp.element.createElement('h2', null, 'Supplier Performance Scorecards'),
+        wp.element.createElement('h2', {
+            title: helpMode ? 'Scorecard: Aggregates Quality (QC results) and OTD (Lead time compliance) to give each vendor a 0-100 score. Example: A score of 95 indicates a highly reliable partner.' : ''
+        }, 'Supplier Performance Scorecards'),
         suppliers.length > 0 ?
             suppliers.map(s => wp.element.createElement(ScoreCard, { key: s.id, supplier: s })) :
             wp.element.createElement('p', null, 'No suppliers found.')

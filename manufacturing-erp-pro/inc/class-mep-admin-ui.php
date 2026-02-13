@@ -35,6 +35,56 @@ class MEP_Admin_UI {
 
 		// Warehouses Row Actions
 		add_filter( 'post_row_actions', array( $this, 'add_warehouse_row_actions' ), 10, 2 );
+
+		// Global List Table Headers
+		add_action( 'restrict_manage_posts', array( $this, 'add_list_table_instructions' ) );
+	}
+
+	/**
+	 * Add instructional text to the top of standard WordPress list tables.
+	 */
+	public function add_list_table_instructions() {
+		$screen = get_current_screen();
+		if ( ! $screen || strpos( $screen->post_type, 'mep_' ) === false ) {
+			return;
+		}
+
+		$instructions = array(
+			'mep_material' => array(
+				'title' => __( 'Materials Inventory', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Define your raw materials and components here. Set average costs and safety stock levels to enable accurate MRP and costing.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Cowhide Leather", SKU: MAT-LTH-001, UOM: m2, Avg Cost: $45.', 'manufacturing-erp-pro' )
+			),
+			'mep_product' => array(
+				'title' => __( 'Finished Products', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Manage your sellable products and assemblies. Use the "Visual BOM Builder" in the row actions to define how each product is manufactured.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Leather Handbag", SKU: BAG-001. A product can contain other assemblies as components.', 'manufacturing-erp-pro' )
+			),
+			'mep_work_order' => array(
+				'title' => __( 'Production Work Orders', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Track active manufacturing jobs. Use the "Production Board" for a visual Kanban view of these orders.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: WO-1001 for 50 units of "Leather Handbag".', 'manufacturing-erp-pro' )
+			),
+			'mep_po' => array(
+				'title' => __( 'Purchase Orders', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Manage procurement from suppliers. Use the "Receive Shipments" tool to bring these items into inventory visually.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: PO-501 to "Leather Supplier A" for 200m2 of Cowhide.', 'manufacturing-erp-pro' )
+			),
+			'mep_supplier' => array(
+				'title' => __( 'Supplier Management', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Maintain your vendor list and contact details. Performance is tracked automatically in the Supplier Scorecard.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Sole Supplier B", primary contact for rubber components.', 'manufacturing-erp-pro' )
+			),
+		);
+
+		if ( isset( $instructions[$screen->post_type] ) ) {
+			$info = $instructions[$screen->post_type];
+			echo '<div class="mep-list-table-help" style="background: #fff; border-left: 4px solid #2271b1; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+					<strong style="display: block; margin-bottom: 4px;">' . esc_html( $info['title'] ) . '</strong>
+					<p style="margin: 0; font-size: 13px;">' . esc_html( $info['desc'] ) . '</p>
+					<p style="margin: 5px 0 0 0; font-size: 12px; color: #666;"><em>' . esc_html( $info['example'] ) . '</em></p>
+				  </div>';
+		}
 	}
 
 	/**

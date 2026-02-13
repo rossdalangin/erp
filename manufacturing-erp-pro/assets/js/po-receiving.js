@@ -78,9 +78,14 @@ const POReceiving = () => {
 
     if (loading) return wp.element.createElement('p', null, 'Loading PO Receiving Workspace...');
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-receiving-layout', style: { display: 'flex', gap: '30px' } },
         // Left: PO List & Items
-        wp.element.createElement('div', { style: { width: '300px' } },
+        wp.element.createElement('div', {
+            style: { width: '300px' },
+            title: helpMode ? 'PO List: Select an open Purchase Order to view its lines. Example: Select PO #401 to receive leather from Supplier A.' : ''
+        },
             wp.element.createElement('h3', null, 'Open Purchase Orders'),
             pos.map(po => wp.element.createElement('div', {
                 key: po.id,
@@ -102,7 +107,10 @@ const POReceiving = () => {
                     warehouses.map(wh => wp.element.createElement('option', { key: wh.id, value: wh.id }, wh.name))
                 )
             ),
-            wp.element.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' } },
+            wp.element.createElement('div', {
+                style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
+                title: helpMode ? 'Receiving Zones: Drag items from the left into these bins to record goods receipt. Example: Drag leather into "Leather Storage".' : ''
+            },
                 bins.map(bin => wp.element.createElement('div', {
                     key: bin.id,
                     onDragOver: onDragOver,

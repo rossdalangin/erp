@@ -12,7 +12,7 @@ const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop, helpMode }) => 
         className: 'mep-bin-card',
         onDragOver: onDragOver,
         onDrop: (e) => onDrop(e, bin.id),
-        title: helpMode ? `Bin (${bin.name}): Shows current material levels. Drag materials out of this bin to transfer them elsewhere.` : '',
+        title: helpMode ? `Bin (${bin.name}): Shows current material levels. Drag materials out of this bin to transfer them elsewhere. Example: Drag 'Cowhide' to the 'Production Floor' to issue material.` : '',
         style: { border: `2px solid ${borderColor}`, padding: '15px', minWidth: '180px', background: bgColor, borderRadius: '4px' }
     },
         wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' } },
@@ -115,6 +115,7 @@ const WarehouseLayout = () => {
             ),
             wp.element.createElement('button', {
                 className: 'button button-secondary',
+                title: helpMode ? 'Export CSV: Generates a CSV report of all items in inventory across all warehouses.' : '',
                 onClick: () => window.location.href = wpApiSettings.root + 'mep/v1/reports/inventory-csv?_wpnonce=' + wpApiSettings.nonce
             }, 'Export Inventory CSV')
         ),

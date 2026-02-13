@@ -42,7 +42,7 @@ const Traceability = () => {
     return wp.element.createElement('div', { className: 'mep-traceability-view' },
         wp.element.createElement('div', {
             className: 'mep-trace-search',
-            title: helpMode ? 'Lot Search: Enter a lot number to see its entire production history.' : '',
+            title: helpMode ? 'Lot Search: Enter a lot number to see its entire production history. Example: Enter "LOT-COW-001" to trace raw cowhide.' : '',
             style: { marginBottom: '30px', display: 'flex', gap: '10px' }
         },
             wp.element.createElement('input', {
@@ -59,7 +59,7 @@ const Traceability = () => {
 
         trace && wp.element.createElement('div', {
             className: 'mep-trace-results',
-            title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot.' : ''
+            title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot. The graph displays receipt, transfer, and consumption nodes.' : ''
         },
             wp.element.createElement('h3', null, `Genealogy Graph for Lot: ${trace.lot}`),
             wp.element.createElement('div', {

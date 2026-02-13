@@ -33,6 +33,7 @@ class MEP_Seeder {
 			'_mep_cost_avg' => 45.00,
 			'_mep_safety_stock' => 100
 		) );
+		wp_update_post( array( 'ID' => $cow_leather, 'post_content' => 'High-quality top-grain leather. Essential for premium handbag production.' ) );
 		$pu_leather = self::create_post( 'mep_material', 'PU leather', 0, array(
 			'_mep_sku' => 'MAT-LTH-PU',
 			'_mep_uom' => 'm2',
@@ -175,7 +176,7 @@ class MEP_Seeder {
 			'lot_number'   => 'LOT-RUB-001'
 		) );
 
-		// 9. Create Sample Work Orders
+		// 9. Create Sample Work Orders (Instructional)
 		$bag_posts = get_posts(array('post_type'=>'mep_product', 'title'=>'Leather Handbag - Tan', 'numberposts'=>1));
 		$bag_id = ! empty( $bag_posts ) ? $bag_posts[0]->ID : 0;
 
@@ -184,29 +185,42 @@ class MEP_Seeder {
 			$bag_id = wp_insert_post( array( 'post_type' => 'mep_product', 'post_title' => 'Leather Handbag - Tan', 'post_status' => 'publish' ) );
 		}
 
-		for ($i=1; $i<=3; $i++) {
+		$wo_scenarios = array(
+			array('title' => 'INSTRUCTION: Draft Work Order', 'status' => 'publish', 'desc' => 'This order is in the backlog. Drag it to "In Progress" on the Kanban board to start.'),
+			array('title' => 'EXAMPLE: Active Production', 'status' => 'in-progress', 'desc' => 'This order is currently being worked on by an operator.'),
+			array('title' => 'TRAINING: Completed Job', 'status' => 'completed', 'desc' => 'This job is finished. Notice how actual labor and scrap were recorded.'),
+		);
+
+		foreach ($wo_scenarios as $i => $scene) {
 			wp_insert_post( array(
 				'post_type'   => 'mep_work_order',
-				'post_title'  => "WO-HANDBAG-00$i",
-				'post_status' => ($i == 1 ? 'publish' : ($i == 2 ? 'in-progress' : 'completed')),
+				'post_title'  => $scene['title'],
+				'post_content' => $scene['desc'],
+				'post_status' => $scene['status'],
 				'post_parent' => $bag_id,
 				'meta_input'  => array(
-					'_mep_work_order_qty' => 50,
-					'_mep_due_date'       => date('Y-m-d', strtotime("+$i week")),
+					'_mep_work_order_qty' => 25,
+					'_mep_due_date'       => date('Y-m-d', strtotime("+" . ($i+1) . " week")),
 					'_mep_is_sample_data' => 1
 				)
 			) );
 		}
 
-		// 10. Create QC Records
-		MEP_Quality::record_qc_result( array(
-			'object_name' => 'Handbag Batch #A1',
+		// 10. Create QC Records (Instructional)
+		$qc_id = MEP_Quality::record_qc_result( array(
+			'object_name' => 'INSTRUCTIONAL QC: Failed Inspection',
 			'object_id' => $bag_id,
 			'object_type' => 'product',
 			'status' => 'FAIL',
-			'defects' => 'Scratched leather on front panel',
+			'defects' => 'Example defect: Scratched leather on front panel',
 			'trigger_rework' => 1
 		) );
+
+		// Promote a sample NCR to CAPA
+		$ncr_posts = get_posts( array( 'post_type' => 'mep_ncr', 'numberposts' => 1, 'orderby' => 'ID', 'order' => 'DESC' ) );
+		if ( ! empty( $ncr_posts ) ) {
+			MEP_Quality::promote_to_capa( $ncr_posts[0]->ID, 'EXAMPLE CAPA PLAN: Investigate supplier storage conditions and implement better protective wrapping for finished goods.' );
+		}
 
 		// 11. Create Customers & Forecasts
 		$cust = self::create_post( 'mep_customer', 'Luxury Craft Retailers' );

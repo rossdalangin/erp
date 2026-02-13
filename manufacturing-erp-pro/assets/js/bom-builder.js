@@ -187,7 +187,7 @@ const BOMBuilder = ({ productId }) => {
         // Left Sidebar: Material & Operation Library
         wp.element.createElement('div', {
             className: 'mep-material-library',
-            title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure.' : '',
+            title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure. Example: Drag "Cowhide Leather" then "Stitching" to define the first assembly step.' : '',
             style: { width: '250px', border: '1px solid #ccc', padding: '10px' }
         },
             wp.element.createElement('h3', null, __('Materials', 'manufacturing-erp-pro')),
@@ -222,7 +222,7 @@ const BOMBuilder = ({ productId }) => {
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
-                title: helpMode ? __('Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence.', 'manufacturing-erp-pro') : '',
+                title: helpMode ? __('Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence. Example: Set 1.2m2 for leather and 15 mins for cutting.', 'manufacturing-erp-pro') : '',
                 onDragOver: onDragOver,
                 onDrop: onDrop,
                 style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }

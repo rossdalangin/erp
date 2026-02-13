@@ -46,7 +46,7 @@ const Dashboard = () => {
         ),
         wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' } },
             wp.element.createElement('div', {
-                title: helpMode ? 'Capacity Planner: Monitor machine load. Red bars indicate resources that are over-capacity.' : '',
+                title: helpMode ? 'Capacity Planner: Monitor machine load. Red bars indicate resources that are over-capacity. Example: A laser cutter at 120% load needs overtime or another machine.' : '',
                 style: { padding: '20px', background: '#fff', border: '1px solid #ccc' }
             },
                 wp.element.createElement('h3', null, 'Resource Capacity (Load vs. Capacity)'),
@@ -60,7 +60,10 @@ const Dashboard = () => {
                     )
                 )) : wp.element.createElement('p', null, 'No equipment data available.')
             ),
-            wp.element.createElement('div', { style: { padding: '20px', background: '#fff', border: '1px solid #ccc' } },
+            wp.element.createElement('div', {
+                title: helpMode ? 'Cost Variance: Compares the estimated BOM cost with the actual costs recorded on the shop floor. Positive variance (Red) means the item cost more than expected.' : '',
+                style: { padding: '20px', background: '#fff', border: '1px solid #ccc' }
+            },
                 wp.element.createElement('h3', null, 'Cost Variance (Est vs Actual)'),
                 kpis.cost_variance && kpis.cost_variance.length > 0 ?
                     wp.element.createElement('table', { style: { width: '100%', fontSize: '12px', borderCollapse: 'collapse' } },
@@ -84,7 +87,10 @@ const Dashboard = () => {
                         )
                     ) : wp.element.createElement('p', null, 'No production history yet for cost variance analysis.'),
 
-                wp.element.createElement('h3', { style: { marginTop: '30px' } }, 'Inventory Aging (Units by Receipt Age)'),
+                wp.element.createElement('h3', {
+                    style: { marginTop: '30px' },
+                    title: helpMode ? 'Inventory Aging: Shows the age of your current stock based on receipt dates. Older stock (90+ days) may be at risk of obsolescence.' : ''
+                }, 'Inventory Aging (Units by Receipt Age)'),
                 kpis.inventory_aging ?
                     wp.element.createElement('div', { style: { display: 'flex', gap: '5px', height: '100px', alignItems: 'flex-end', paddingTop: '20px' } },
                         Object.keys(kpis.inventory_aging).map(bucket => {

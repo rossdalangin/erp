@@ -20,9 +20,12 @@ const CapacityPlanner = () => {
 
     if (loading) return wp.element.createElement('p', null, __('Loading Capacity Data...', 'manufacturing-erp-pro'));
 
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
+
     return wp.element.createElement('div', { className: 'mep-capacity-planner' },
         equipment.map(item => wp.element.createElement('div', {
             key: item.id,
+            title: helpMode ? 'Machine View: Compares available time with production demand. Maintenance logs help track machine health.' : '',
             style: { background: '#fff', padding: '20px', border: '1px solid #ccd0d4', marginBottom: '20px' }
         },
             wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px' } },
@@ -32,7 +35,9 @@ const CapacityPlanner = () => {
 
             wp.element.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '20px' } },
                 // Left side: Schedule/Load (simplified placeholder)
-                wp.element.createElement('div', null,
+                wp.element.createElement('div', {
+                    title: helpMode ? 'Load: Sum of all active Work Orders assigned to this machine. If any day is too tall, the machine is overloaded. Example: 480 mins capacity vs 600 mins load.' : ''
+                },
                     wp.element.createElement('h3', null, __('Operational Load', 'manufacturing-erp-pro')),
                     wp.element.createElement('p', { style: { color: '#666' } }, __('Machine schedule for the current week:', 'manufacturing-erp-pro')),
                     wp.element.createElement('div', { style: { display: 'flex', gap: '5px' } },

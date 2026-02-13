@@ -9,7 +9,7 @@ const WorkOrderCard = ({ wo, onDragStart, helpMode }) => {
     return wp.element.createElement('div', {
         className: 'mep-wo-card',
         draggable: true,
-        title: helpMode ? __('Work Order: Drag this card to a new column to update the manufacturing status of this order.', 'manufacturing-erp-pro') : '',
+        title: helpMode ? __('Work Order: Drag this card to a new column to update the manufacturing status of this order. Example: Drag to "In Progress" when the machinist starts cutting.', 'manufacturing-erp-pro') : '',
         onDragStart: (e) => onDragStart(e, wo.id),
         style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px', cursor: 'grab' }
     },
@@ -116,7 +116,7 @@ const KanbanBoard = () => {
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
             className: 'mep-kanban-column',
-            title: helpMode ? `Column (${col.label}): Drop Work Orders here to set them to ${col.label} status.` : '',
+            title: helpMode ? `Column (${col.label}): Drop Work Orders here to set them to ${col.label} status. Example: Drop here to mark as ${col.label}.` : '',
             onDragOver: onDragOver,
             onDrop: (e) => onDrop(e, col.id),
             style: { flex: 1, background: '#f0f0f1', padding: '15px', minHeight: '500px', border: '2px dashed transparent' }

@@ -112,7 +112,25 @@ This is an ERP-grade system, not a toy.
 
 ---
 
-## 6. Troubleshooting FAQ
+## 6. Quick Start Examples
+
+### Scenario A: Producing a New Leather Bag
+1.  **Define Materials:** Go to `ERP Pro > Materials`. Add "Tan Cowhide" and "Heavy Duty Zip".
+2.  **Define Product:** Go to `ERP Pro > Products`. Add "Classic Tan Handbag".
+3.  **Build BOM:** Click "Visual BOM Builder" on the handbag row. Drag the Zip and Cowhide into the tree. Set Cowhide quantity to `1.2` and Zip to `1`.
+4.  **Receive Stock:** Go to `ERP Pro > Receive Shipments`. Drag leather from a draft PO into "Main Warehouse".
+5.  **Release Production:** Go to `ERP Pro > Work Orders`. Create a new order for 10 units.
+6.  **Execute:** Go to `ERP Pro > Production Board`. Drag the order to "In Progress".
+
+### Scenario B: Handling a Quality Failure
+1.  **Inspect:** On the Shop Floor Portal, mark a Work Order as "Completed".
+2.  **Log QC:** The system prompts for inspection. Select "FAIL" and enter "Scratch on leather".
+3.  **Investigate:** Go to `ERP Pro > Quality Dashboard`. Click on the new NCR.
+4.  **Action Plan:** If it's a systemic issue, click "Promote to CAPA" and enter a preventive plan (e.g., "Add protective sheets between stacked bags").
+
+---
+
+## 7. Troubleshooting FAQ
 
 **Q: Why is my BOM cost roll-up incorrect?**
 A: Ensure every material in the BOM has an "Avg Cost" defined in its master record.

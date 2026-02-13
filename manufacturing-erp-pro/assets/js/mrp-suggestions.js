@@ -110,7 +110,7 @@ const MRPSuggestions = () => {
         wp.element.createElement('div', {
             className: 'mep-suggestions-list',
             style: { flex: 1 },
-            title: helpMode ? 'Suggestions: These are items the MRP engine thinks you should buy based on demand.' : ''
+            title: helpMode ? 'Suggestions: These are items the MRP engine thinks you should buy based on demand. Example: If leather is below safety stock, it will appear here.' : ''
         },
             wp.element.createElement('h2', null, 'MRP Suggestions'),
             suggestions.length > 0 ?
@@ -122,7 +122,7 @@ const MRPSuggestions = () => {
             onDragOver: onDragOver,
             onDrop: onDrop,
             style: { flex: 1, background: '#f6f7f7', border: '2px dashed #ccc', padding: '20px', minHeight: '400px' },
-            title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation.' : ''
+            title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation. Example: Drag all "Thread" suggestions to create one bulk order.' : ''
         },
             wp.element.createElement('h2', null, 'Draft PO Basket'),
             basket.map((item, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd' } },

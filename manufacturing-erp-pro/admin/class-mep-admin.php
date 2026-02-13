@@ -96,54 +96,90 @@ class MEP_Admin {
 	public function supplier_scorecard_page() {
 		echo '<div class="wrap"><h1>' . __( 'Vendor Performance Analysis', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Supplier Scoring Logic:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Evaluate your vendors based on real-world data. The system tracks Quality (percentage of received items that pass QC) and OTD (On-Time Delivery based on PO expected dates).', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: A supplier with a 100% Quality score but 40% OTD may be a bottleneck for your production schedule.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-supplier-scorecard-root"></div></div>';
 	}
 
 	public function po_receiving_page() {
 		echo '<div class="wrap"><h1>' . __( 'Visual Goods Receipt Workspace', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Receiving Instructions:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Close the loop on your procurement. Drag items from open Purchase Orders into their target Warehouse bins to record the receipt and update inventory levels.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: Drag "500m Leather" from PO #401 into "Bin A1". The system will automatically log the transaction and update your stock on hand.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-po-receiving-root"></div></div>';
 	}
 
 	public function quality_dashboard_page() {
 		echo '<div class="wrap"><h1>' . __( 'Quality & Compliance Analytics', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Quality Control Overview:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Monitor your inspection pass rates and defect distribution. If an inspection fails, the system automatically generates an NCR (Non-Conformance Report). Critical systemic issues should be promoted to CAPA status for resolution.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: A high fail rate for "Stitching" may indicate a machine calibration issue or training requirement.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-quality-dashboard-root"></div></div>';
 	}
 
 	public function traceability_page() {
 		echo '<div class="wrap"><h1>' . __( 'Lot & Batch Traceability', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Traceability Instructions:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Enter a Lot or Batch ID to visualize the complete genealogy of a product. You can trace back to the specific supplier shipment for raw materials used in any finished good.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: Enter "LOT-COW-001" to see which Work Orders consumed this specific batch of leather.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-traceability-root"></div></div>';
 	}
 
 	public function capacity_page() {
 		echo '<div class="wrap"><h1>' . __( 'Resource Capacity & Maintenance', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Capacity Planning Logic:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Avoid bottlenecks by monitoring machine load vs. daily capacity. This view aggregates the total time required for all pending Work Orders assigned to each piece of equipment.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: If your "Laser Cutter" has a load of 600 mins but only 480 mins of daily capacity, you are over-scheduled for that resource.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-capacity-root"></div></div>';
 	}
 
 	public function mrp_planning_page() {
 		echo '<div class="wrap"><h1>' . __( 'MRP Planning & Procurement', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'MRP Engine Logic:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'The Material Requirements Planning engine explodes your demand forecasts and compares them with current inventory and open orders. It generates "Purchase Suggestions" to ensure you have the right materials at the right time.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: If you forecast 100 bags and have 20 in stock, MRP will suggest buying leather for the remaining 80, factoring in your safety stock levels.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-mrp-suggestions-root"></div></div>';
 	}
 
 	public function pegging_page() {
 		echo '<div class="wrap"><h1>' . __( 'Demand Pegging Visualization', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'What is Pegging?', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Pegging shows you the link between raw material requirements and the original demand source (e.g., a specific forecast or customer order). It explains "Why" the system is asking you to buy a material.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: View the pegging tree for "Zippers" to see which upcoming Work Orders are driving the requirement.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-pegging-root"></div></div>';
 	}
 
 	public function inventory_page() {
 		echo '<div class="wrap"><h1>' . __( 'Warehouse & Inventory Management', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'How to manage your Warehouse:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Use this visual layout to track stock levels by bin. To move stock, simply drag a material card from its current bin and drop it into a new one. Bins highlighted in Yellow or Red indicate high occupancy.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: Drag "Cowhide Leather" from "Main Warehouse" to "Cutting Area" when starting a new batch.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-warehouse-root"></div></div>';
 	}
 
 	public function production_page() {
 		echo '<div class="wrap"><h1>' . __( 'Production Planning & Kanban', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Production Workflow:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Manage the lifecycle of your Work Orders. Drag cards to "In Progress" to assign an operator and start production. Move them to "Completed" to record actual scrap and labor time.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: Release a Work Order for 50 Handbags. Once stitching begins, drag it to In Progress and select the assigned Machine.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
 		echo '<div id="mep-kanban-root"></div></div>';
 	}
 
@@ -151,10 +187,17 @@ class MEP_Admin {
 		$product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 		echo '<div class="wrap"><h1>' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
+
 		if ( ! $product_id ) {
-			echo '<p>' . __( 'Please select a product from the Products list to edit its BOM.', 'manufacturing-erp-pro' ) . '</p>';
+			echo '<div class="notice notice-warning"><p>' . __( 'Please select a product from the Products list (ERP Pro > Products) to edit its Bill of Materials.', 'manufacturing-erp-pro' ) . '</p></div>';
 			return;
 		}
+
+		echo '<div class="mep-page-header" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px;">
+				<p><strong>' . __( 'Engineering Instructions:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Drag materials or labor operations from the left library into the central canvas. You can nest assemblies (e.g., adding a "Strap Assembly" product into a "Handbag" BOM) to create multi-level structures. The cost roll-up updates in real-time.', 'manufacturing-erp-pro' ) . '</p>
+				<p style="font-size: 12px; color: #666;"><em>' . __( 'Example: To build a Leather Bag, drag 1.2m2 of Leather, 1 Zip, and a "Stitching" operation. Set the scrap factor for leather to 5% to account for cutting waste.', 'manufacturing-erp-pro' ) . '</em></p>
+			  </div>';
+
 		echo '<div id="mep-bom-builder-root" data-product-id="' . esc_attr( $product_id ) . '"></div></div>';
 	}
 
@@ -162,15 +205,41 @@ class MEP_Admin {
 		$help_mode = get_option( 'mep_help_mode', 'off' );
 		echo '<div class="wrap"><h1>' . __( 'Manufacturing ERP Pro Dashboard', 'manufacturing-erp-pro' ) . '</h1>';
 		$this->maybe_show_demo_badge();
-		echo '<div class="mep-help-toggle-container" style="background: #fff; padding: 10px; border: 1px solid #ccc; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-				<strong>' . __( 'Interactive Help Mode:', 'manufacturing-erp-pro' ) . '</strong>
-				<form method="post" style="display:inline;">
-					<input type="hidden" name="mep_action_toggle_help" value="1">
-					' . wp_nonce_field( 'mep_toggle_help', 'mep_nonce', true, false ) . '
-					<button type="submit" class="button ' . ( $help_mode === 'on' ? 'button-primary' : '' ) . '">' . ( $help_mode === 'on' ? 'ON' : 'OFF' ) . '</button>
-				</form>
-				<small>' . __( 'When ON, hover over elements to see guided instructions.', 'manufacturing-erp-pro' ) . '</small>
+
+		echo '<div class="mep-help-toggle-container" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; border-radius: 4px;">
+				<div style="flex: 1;">
+					<strong>' . __( 'Interactive Help Mode:', 'manufacturing-erp-pro' ) . '</strong>
+					<form method="post" style="display:inline; margin-left: 10px;">
+						<input type="hidden" name="mep_action_toggle_help" value="1">
+						' . wp_nonce_field( 'mep_toggle_help', 'mep_nonce', true, false ) . '
+						<button type="submit" class="button ' . ( $help_mode === 'on' ? 'button-primary' : '' ) . '">' . ( $help_mode === 'on' ? 'ON' : 'OFF' ) . '</button>
+					</form>
+					<p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">' . __( 'Toggle this ON to see detailed instructions and examples directly on ERP components.', 'manufacturing-erp-pro' ) . '</p>
+				</div>
+				<div style="background: #f0f0f1; padding: 10px; border-radius: 4px; font-size: 12px; max-width: 300px;">
+					<strong>' . __( 'Quick Start Tip:', 'manufacturing-erp-pro' ) . '</strong> ' . __( 'Start by adding Materials, then create a Product and use the Visual BOM Builder to define how it is made.', 'manufacturing-erp-pro' ) . '
+				</div>
 			  </div>';
+
+		echo '<div class="mep-dashboard-intro" style="margin-bottom: 20px; background: #fff; padding: 20px; border: 1px solid #ccd0d4;">
+				<h2>' . __( 'Welcome to your Factory Command Center', 'manufacturing-erp-pro' ) . '</h2>
+				<p>' . __( 'This dashboard provides a real-time overview of your production health, inventory value, and quality metrics.', 'manufacturing-erp-pro' ) . '</p>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+					<div>
+						<strong>' . __( 'Step 1: Inventory', 'manufacturing-erp-pro' ) . '</strong>
+						<p style="font-size: 12px;">' . __( 'Add raw materials and receive stock to establish your inventory baseline.', 'manufacturing-erp-pro' ) . '</p>
+					</div>
+					<div>
+						<strong>' . __( 'Step 2: Engineering', 'manufacturing-erp-pro' ) . '</strong>
+						<p style="font-size: 12px;">' . __( 'Build multi-level BOMs and define production routes for your finished goods.', 'manufacturing-erp-pro' ) . '</p>
+					</div>
+					<div>
+						<strong>' . __( 'Step 3: Execution', 'manufacturing-erp-pro' ) . '</strong>
+						<p style="font-size: 12px;">' . __( 'Run MRP to generate suggestions, release Work Orders, and track them on the Kanban board.', 'manufacturing-erp-pro' ) . '</p>
+					</div>
+				</div>
+			  </div>';
+
 		echo '<div id="mep-dashboard-root"></div></div>';
 	}
 
