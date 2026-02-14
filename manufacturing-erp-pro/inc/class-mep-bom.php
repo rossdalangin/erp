@@ -43,6 +43,9 @@ class MEP_BOM {
 		}
 
 		foreach ( $components as &$component ) {
+			// Ensure name is always fresh
+			$component['name'] = get_the_title( $component['id'] );
+
 			if ( $component['type'] === 'product' ) {
 				$component['sub_bom'] = static::get_bom_tree( $component['id'], $depth + 1 );
 			}

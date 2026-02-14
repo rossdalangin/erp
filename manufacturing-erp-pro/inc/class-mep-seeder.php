@@ -117,6 +117,7 @@ class MEP_Seeder {
 		) );
 
 		$variants = array('Tan', 'Black', 'Wine');
+		$tan_bag_id = 0;
 		foreach ($variants as $v) {
 			$bag = self::create_post( 'mep_product', "Leather Handbag - $v", 0, array(
 				'_mep_sku' => "BAG-LTH-" . strtoupper($v),
@@ -124,6 +125,10 @@ class MEP_Seeder {
 				'_mep_weight' => 0.850,
 				'_mep_price' => 195.00
 			) );
+
+			if ( $v === 'Tan' ) {
+				$tan_bag_id = $bag;
+			}
 
 			// BOM for Bag (Nested)
 			$bom_id = self::create_post( 'mep_bom', "BOM for Handbag - $v", $bag );
@@ -197,12 +202,10 @@ class MEP_Seeder {
 		) );
 
 		// 9. Create Sample Work Orders (Instructional)
-		$bag_posts = get_posts(array('post_type'=>'mep_product', 'title'=>'Leather Handbag - Tan', 'numberposts'=>1));
-		$bag_id = ! empty( $bag_posts ) ? $bag_posts[0]->ID : 0;
+		$bag_id = $tan_bag_id;
 
 		if ( ! $bag_id ) {
-			// Fallback if title search failed (unlikely in fresh seed)
-			$bag_id = wp_insert_post( array( 'post_type' => 'mep_product', 'post_title' => 'Leather Handbag - Tan', 'post_status' => 'publish' ) );
+			$bag_id = self::create_post( 'mep_product', 'Leather Handbag - Tan' );
 		}
 
 		$wo_scenarios = array(

@@ -91,25 +91,41 @@ class Manufacturing_ERP_Pro {
 		MEP_Frontend::get_instance();
 		MEP_API::get_instance();
 
+		// Ensure roles are available for API checks
+		if ( ! get_role( 'mep_administrator' ) ) {
+			$this->register_roles();
+		}
+
 		if ( is_admin() ) {
-			// Ensure roles are available for API checks
-			if ( ! get_role( 'mep_administrator' ) ) {
-				$this->register_roles();
-			}
 			MEP_Admin::get_instance();
 			MEP_Admin_UI::get_instance();
 		}
 	}
 
 	/**
-	 * Register custom ERP roles.
+	 * Register custom ERP roles and capabilities.
 	 */
 	public function register_roles() {
-		add_role( 'mep_administrator', __( 'ERP Administrator', 'manufacturing-erp-pro' ), array(
+		$caps = array(
+			'mep_manage_inventory'  => true,
+			'mep_manage_production' => true,
+			'mep_manage_bom'        => true,
+			'mep_manage_quality'    => true,
+			'mep_manage_all'        => true,
+		);
+
+		// Grant to standard admin
+		$admin_role = get_role( 'administrator' );
+		if ( $admin_role ) {
+			foreach ( $caps as $cap => $val ) {
+				$admin_role->add_cap( $cap );
+			}
+		}
+
+		add_role( 'mep_administrator', __( 'ERP Administrator', 'manufacturing-erp-pro' ), array_merge( array(
 			'read' => true,
 			'manage_options' => true,
-			'mep_manage_all' => true
-		) );
+		), $caps ) );
 
 		add_role( 'mep_production_manager', __( 'ERP Production Manager', 'manufacturing-erp-pro' ), array(
 			'read' => true,
