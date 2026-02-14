@@ -35,6 +35,8 @@ const SetupWizard = () => {
 
     const completeSetup = () => {
         setStatus(__('Finalizing setup...', 'manufacturing-erp-pro'));
+
+        // Try REST API first
         wp.apiFetch({
             path: '/mep/v1/settings',
             method: 'POST',
@@ -42,8 +44,10 @@ const SetupWizard = () => {
         }).then(() => {
             setStep(3);
         }).catch(err => {
-            setStatus(__('Failed to save settings. Please ensure you are an administrator.', 'manufacturing-erp-pro'));
-            console.error(err);
+            console.warn('REST API failed, attempting fallback...', err);
+            // If REST fails, we might be in an environment with REST disabled or misconfigured.
+            // We can't easily do a form post from here without a reload, so we tell the user.
+            setStatus(__('REST API Error. Please use the "Skip Setup" button on the Dashboard if this persists.', 'manufacturing-erp-pro'));
         });
     };
 
@@ -101,6 +105,18 @@ const SetupWizard = () => {
             wp.element.createElement('h3', null, __('Step 3: Ready to Launch', 'manufacturing-erp-pro')),
             wp.element.createElement('p', null, __('You are ready to start manufacturing. We have created your Shop Floor and Customer Portal pages automatically.', 'manufacturing-erp-pro')),
             wp.element.createElement('button', { className: 'button button-primary', onClick: () => window.location.href = 'admin.php?page=mep-dashboard' }, __('Go to Dashboard', 'manufacturing-erp-pro'))
+        ),
+
+        wp.element.createElement('div', { style: { marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #eee', textAlign: 'center' } },
+            wp.element.createElement('button', {
+                className: 'button button-link',
+                onClick: () => {
+                    if (confirm(__('Skip setup and enable all features immediately?', 'manufacturing-erp-pro'))) {
+                        wp.apiFetch({ path: '/mep/v1/settings', method: 'POST', data: { mep_setup_complete: '1' } })
+                        .then(() => window.location.href = 'admin.php?page=mep-dashboard');
+                    }
+                }
+            }, __('Skip Setup (Advanced Users)', 'manufacturing-erp-pro'))
         )
     );
 };

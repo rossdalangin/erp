@@ -26,7 +26,19 @@ class MEP_Admin {
 	}
 
 	public function maybe_redirect_to_wizard() {
-		if ( ! get_option( 'mep_setup_complete' ) && isset( $_GET['page'] ) && strpos( $_GET['page'], 'mep-' ) !== false && $_GET['page'] !== 'mep-wizard' ) {
+		$setup_complete = get_option( 'mep_setup_complete' );
+
+		// If setup is complete, never redirect.
+		if ( $setup_complete ) {
+			return;
+		}
+
+		$current_page = isset( $_GET['page'] ) ? $_GET['page'] : '';
+
+		// Only redirect if we are trying to access an ERP Pro page (mep-*)
+		// but not the wizard itself.
+		// We ALSO allow the dashboard to be accessed to prevent locked-out states.
+		if ( strpos( $current_page, 'mep-' ) === 0 && $current_page !== 'mep-wizard' && $current_page !== 'mep-dashboard' ) {
 			wp_redirect( admin_url( 'admin.php?page=mep-wizard' ) );
 			exit;
 		}
@@ -239,16 +251,32 @@ class MEP_Admin {
 						<a href="' . admin_url( 'customize.php?autofocus[section]=mep_branding' ) . '" class="button button-secondary">' . __( '🎨 Branding Customizer', 'manufacturing-erp-pro' ) . '</a>
 					</div>
 
-					<h4>' . __( '⚙️ System Controls', 'manufacturing-erp-pro' ) . '</h4>
-					<div style="display: flex; gap: 10px; flex-wrap: wrap; background: #fff8e1; padding: 15px; border-radius: 4px; border: 1px solid #ffe082;">
-						<form method="post" style="display:inline;" onsubmit="return confirm(\'' . esc_js(__('Are you sure you want to seed sample data? This will add LeatherCraft Co. records.', 'manufacturing-erp-pro')) . '\');">
-							' . wp_nonce_field( 'mep_seed_data', 'mep_nonce', true, false ) . '
-							<button type="submit" name="mep_action_seed" class="button button-primary" style="background: #ffa000; border-color: #ff8f00;">🚀 ' . __( 'Add Sample Data', 'manufacturing-erp-pro' ) . '</button>
-						</form>
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+						<div style="background: #fff8e1; padding: 20px; border-radius: 4px; border: 1px solid #ffe082;">
+							<h4>' . __( '🚀 Initialize Demo', 'manufacturing-erp-pro' ) . '</h4>
+							<p>' . __( 'Populate the system with LeatherCraft Co. sample data for testing.', 'manufacturing-erp-pro' ) . '</p>
+							<form method="post" onsubmit="return confirm(\'' . esc_js(__('Are you sure you want to seed sample data?', 'manufacturing-erp-pro')) . '\');">
+								' . wp_nonce_field( 'mep_seed_data', 'mep_nonce', true, false ) . '
+								<button type="submit" name="mep_action_seed" class="button button-primary" style="background: #ffa000; border-color: #ff8f00;">' . __( 'Add Sample Data', 'manufacturing-erp-pro' ) . '</button>
+							</form>
+						</div>
 
-						<a href="' . admin_url( 'admin.php?page=mep-utilities&tab=onboarding' ) . '" class="button button-link-delete" style="color: #d32f2f;">🔥 ' . __( 'Reset Database...', 'manufacturing-erp-pro' ) . '</a>
+						<div style="background: #fdf2f2; padding: 20px; border-radius: 4px; border: 1px solid #f8d7da;">
+							<h4>' . __( '⚠️ Danger Zone', 'manufacturing-erp-pro' ) . '</h4>
+							<p>' . __( 'Wipe all manufacturing records. This action is irreversible.', 'manufacturing-erp-pro' ) . '</p>
+							<form method="post" onsubmit="return prompt(\'' . esc_js(__('Type RESET to confirm database wipe:', 'manufacturing-erp-pro')) . '\') === \'RESET\';">
+								' . wp_nonce_field( 'mep_reset_db_quick', 'mep_nonce', true, false ) . '
+								<button type="submit" name="mep_action_reset_hard_quick" class="button button-link-delete" style="color: #d32f2f;">' . __( 'Reset Database (Delete All)', 'manufacturing-erp-pro' ) . '</button>
+							</form>
+						</div>
+					</div>
 
+					<div style="margin-top: 20px;">
 						<a href="' . admin_url( 'admin.php?page=mep-wizard' ) . '" class="button">' . __( '🪄 Run Setup Wizard', 'manufacturing-erp-pro' ) . '</a>
+						<form method="post" style="display:inline; margin-left:10px;">
+							' . wp_nonce_field( 'mep_skip_wizard', 'mep_nonce', true, false ) . '
+							<button type="submit" name="mep_action_skip_wizard" class="button button-secondary">' . __( 'Skip Setup & Enable Features', 'manufacturing-erp-pro' ) . '</button>
+						</form>
 					</div>
 				</div>
 
@@ -485,8 +513,24 @@ class MEP_Admin {
 
 		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_seed_data' ) && isset( $_POST['mep_action_seed'] ) ) {
 			MEP_Seeder::seed();
+			update_option( 'mep_setup_complete', '1' ); // Seeding also completes setup
 			add_action( 'admin_notices', function() {
-				echo '<div class="updated"><p>' . __( 'Sample data seeded successfully!', 'manufacturing-erp-pro' ) . '</p></div>';
+				echo '<div class="updated"><p>' . __( 'Sample data seeded successfully! Setup marked as complete.', 'manufacturing-erp-pro' ) . '</p></div>';
+			} );
+		}
+
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_skip_wizard' ) && isset( $_POST['mep_action_skip_wizard'] ) ) {
+			update_option( 'mep_setup_complete', '1' );
+			add_action( 'admin_notices', function() {
+				echo '<div class="updated"><p>' . __( 'Setup skipped. All ERP functionalities are now enabled.', 'manufacturing-erp-pro' ) . '</p></div>';
+			} );
+		}
+
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_reset_db_quick' ) && isset( $_POST['mep_action_reset_hard_quick'] ) ) {
+			MEP_Seeder::reset( true ); // Hard reset
+			update_option( 'mep_setup_complete', '' ); // Reset setup status
+			add_action( 'admin_notices', function() {
+				echo '<div class="updated"><p>' . __( 'Database completely wiped and system reset.', 'manufacturing-erp-pro' ) . '</p></div>';
 			} );
 		}
 

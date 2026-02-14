@@ -234,7 +234,7 @@ const BOMBuilder = ({ productId }) => {
                     title: helpMode ? __('Cost Roll-up: This value is calculated in real-time by aggregating the costs of all materials and labor operations in the tree below.', 'manufacturing-erp-pro') : ''
                 },
                     wp.element.createElement('strong', null, __('Estimated Roll-up Cost: ', 'manufacturing-erp-pro')),
-                    wp.element.createElement('span', { className: 'price', style: { color: '#2271b1', fontSize: '1.2em' } }, `$${bom.total_cost}`)
+                    wp.element.createElement('span', { className: 'price', style: { color: '#2271b1', fontSize: '1.2em' } }, `$${bom ? bom.total_cost : '0.00'}`)
                 )
             ),
             wp.element.createElement('div', {
