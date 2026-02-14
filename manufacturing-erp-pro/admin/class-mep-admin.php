@@ -231,12 +231,24 @@ class MEP_Admin {
 
 				<div class="mep-quick-actions" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
 					<h4>' . __( '⚡ Quick Launch Pad', 'manufacturing-erp-pro' ) . '</h4>
-					<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+					<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
 						<a href="' . admin_url( 'admin.php?page=mep-bom-builder' ) . '" class="button">' . __( '🛠️ Build BOM', 'manufacturing-erp-pro' ) . '</a>
 						<a href="' . admin_url( 'admin.php?page=mep-production' ) . '" class="button">' . __( '📋 Production Board', 'manufacturing-erp-pro' ) . '</a>
 						<a href="' . admin_url( 'admin.php?page=mep-inventory' ) . '" class="button">' . __( '📦 Visual Warehouse', 'manufacturing-erp-pro' ) . '</a>
 						<a href="' . admin_url( 'admin.php?page=mep-mrp-planning' ) . '" class="button button-primary">' . __( '🧠 Run MRP Engine', 'manufacturing-erp-pro' ) . '</a>
 						<a href="' . admin_url( 'customize.php?autofocus[section]=mep_branding' ) . '" class="button button-secondary">' . __( '🎨 Branding Customizer', 'manufacturing-erp-pro' ) . '</a>
+					</div>
+
+					<h4>' . __( '⚙️ System Controls', 'manufacturing-erp-pro' ) . '</h4>
+					<div style="display: flex; gap: 10px; flex-wrap: wrap; background: #fff8e1; padding: 15px; border-radius: 4px; border: 1px solid #ffe082;">
+						<form method="post" style="display:inline;" onsubmit="return confirm(\'' . esc_js(__('Are you sure you want to seed sample data? This will add LeatherCraft Co. records.', 'manufacturing-erp-pro')) . '\');">
+							' . wp_nonce_field( 'mep_seed_data', 'mep_nonce', true, false ) . '
+							<button type="submit" name="mep_action_seed" class="button button-primary" style="background: #ffa000; border-color: #ff8f00;">🚀 ' . __( 'Add Sample Data', 'manufacturing-erp-pro' ) . '</button>
+						</form>
+
+						<a href="' . admin_url( 'admin.php?page=mep-utilities&tab=onboarding' ) . '" class="button button-link-delete" style="color: #d32f2f;">🔥 ' . __( 'Reset Database...', 'manufacturing-erp-pro' ) . '</a>
+
+						<a href="' . admin_url( 'admin.php?page=mep-wizard' ) . '" class="button">' . __( '🪄 Run Setup Wizard', 'manufacturing-erp-pro' ) . '</a>
 					</div>
 				</div>
 
@@ -310,6 +322,29 @@ class MEP_Admin {
 									</td>
 								</tr>
 							</table>
+
+							<h3><?php _e( 'Default ERP Values', 'manufacturing-erp-pro' ); ?></h3>
+							<table class="form-table">
+								<tr>
+									<th scope="row"><?php _e( 'Primary Currency', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<input type="text" name="mep_currency" value="<?php echo esc_attr( get_option( 'mep_currency', 'USD' ) ); ?>" class="regular-text">
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><?php _e( 'Default Weight Unit', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<input type="text" name="mep_weight_unit" value="<?php echo esc_attr( get_option( 'mep_weight_unit', 'kg' ) ); ?>" class="regular-text">
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><?php _e( 'Standard Labor Rate ($/min)', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<input type="number" step="0.01" name="mep_default_labor_rate" value="<?php echo esc_attr( get_option( 'mep_default_labor_rate', '0.50' ) ); ?>" class="regular-text">
+									</td>
+								</tr>
+							</table>
+
 							<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Update System Settings', 'manufacturing-erp-pro' ); ?>">
 						</form>
 					</div>
@@ -349,6 +384,7 @@ class MEP_Admin {
 							<div style="display: flex; gap: 10px;">
 								<input type="submit" name="mep_action_reset_hard" class="button button-link-delete" value="<?php _e( 'Hard Reset (Delete All)', 'manufacturing-erp-pro' ); ?>">
 								<input type="submit" name="mep_action_reset_soft" class="button button-secondary" value="<?php _e( 'Soft Reset (Keep Master Data)', 'manufacturing-erp-pro' ); ?>">
+								<input type="submit" name="mep_action_recreate_tables" class="button" value="<?php _e( 'Recreate DB Tables', 'manufacturing-erp-pro' ); ?>">
 							</div>
 							<p style="margin-top: 20px;">
 								<a href="<?php echo esc_url( rest_url('mep/v1/reports/diagnostic-export') ); ?>?_wpnonce=<?php echo wp_create_nonce('wp_rest'); ?>" class="button"><?php _e( '📦 Export ERP Backup (CSV/TXT)', 'manufacturing-erp-pro' ); ?></a>
@@ -422,6 +458,10 @@ class MEP_Admin {
 		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_save_settings' ) && isset( $_POST['mep_action_save_settings'] ) ) {
 			update_option( 'mep_valuation_method', sanitize_text_field( $_POST['mep_valuation_method'] ) );
 			update_option( 'mep_mrp_interval', sanitize_text_field( $_POST['mep_mrp_interval'] ) );
+			update_option( 'mep_currency', sanitize_text_field( $_POST['mep_currency'] ) );
+			update_option( 'mep_weight_unit', sanitize_text_field( $_POST['mep_weight_unit'] ) );
+			update_option( 'mep_default_labor_rate', sanitize_text_field( $_POST['mep_default_labor_rate'] ) );
+
 			add_action( 'admin_notices', function() {
 				echo '<div class="updated"><p>' . __( 'Settings saved.', 'manufacturing-erp-pro' ) . '</p></div>';
 			} );
@@ -439,6 +479,13 @@ class MEP_Admin {
 			$count = MEP_Importer::import_materials( $csv );
 			add_action( 'admin_notices', function() use ( $count ) {
 				echo '<div class="updated"><p>' . sprintf( __( '%d materials imported successfully!', 'manufacturing-erp-pro' ), $count ) . '</p></div>';
+			} );
+		}
+
+		if ( isset( $_POST['mep_action_recreate_tables'] ) ) {
+			MEP_DB::create_tables();
+			add_action( 'admin_notices', function() {
+				echo '<div class="updated"><p>' . __( 'Database tables recreated/updated.', 'manufacturing-erp-pro' ) . '</p></div>';
 			} );
 		}
 
@@ -490,8 +537,10 @@ class MEP_Admin {
 		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', $deps, MEP_VERSION, true );
 		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n', 'wp-api' ), MEP_VERSION, true );
 
-		// Localize help mode and branding to a common script handle
+		// Localize help mode and branding
 		$settings = array(
+			'root'        => esc_url_raw( rest_url() ),
+			'nonce'       => wp_create_nonce( 'wp_rest' ),
 			'helpMode'    => get_option( 'mep_help_mode', 'off' ),
 			'accentColor' => get_theme_mod( 'mep_accent_color', '#2271b1' ),
 			'companyName' => get_theme_mod( 'mep_company_legal_name', 'LeatherCraft Manufacturing Co.' ),
@@ -501,6 +550,10 @@ class MEP_Admin {
 
 		foreach ( $scripts as $handle ) {
 			wp_localize_script( $handle, 'mepSettings', $settings );
+			wp_localize_script( $handle, 'wpApiSettings', array(
+				'root' => esc_url_raw( rest_url() ),
+				'nonce' => wp_create_nonce( 'wp_rest' )
+			) );
 		}
 	}
 }

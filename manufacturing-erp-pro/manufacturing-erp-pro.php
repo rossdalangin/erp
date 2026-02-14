@@ -92,6 +92,10 @@ class Manufacturing_ERP_Pro {
 		MEP_API::get_instance();
 
 		if ( is_admin() ) {
+			// Ensure roles are available for API checks
+			if ( ! get_role( 'mep_administrator' ) ) {
+				$this->register_roles();
+			}
 			MEP_Admin::get_instance();
 			MEP_Admin_UI::get_instance();
 		}

@@ -44,7 +44,7 @@ class MEP_Meta_Boxes {
 			'_mep_actual_scrap', '_mep_actual_labor_mins', '_mep_start_date',
 			'_mep_components', '_mep_steps', '_mep_maintenance_logs', '_mep_version',
 			'_mep_moq', '_mep_std_pkg', '_mep_sales_tax', '_mep_default_wh',
-			'_mep_payment_terms', '_mep_carrier'
+			'_mep_payment_terms', '_mep_carrier', '_mep_is_sample_data'
 		);
 
 		foreach ( $all_fields as $meta_key ) {

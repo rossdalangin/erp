@@ -112,6 +112,31 @@ class MEP_Admin_UI {
 				'desc'  => __( 'Enter expected sales or stock needs. The MRP engine explodes these forecasts into material requirements.', 'manufacturing-erp-pro' ),
 				'example' => __( 'Example: 500 units of "Leather Bag" for the Christmas season.', 'manufacturing-erp-pro' )
 			),
+			'mep_batch' => array(
+				'title' => __( 'Production Batches', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Track specific lots of manufactured goods. Useful for expiration tracking and quality genealogy.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: Batch #2024-05-A for Handbags.', 'manufacturing-erp-pro' )
+			),
+			'mep_warehouse' => array(
+				'title' => __( 'Factory Warehouses', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Define the physical buildings or zones in your facility.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Main Warehouse", "Remote Storage".', 'manufacturing-erp-pro' )
+			),
+			'mep_bin' => array(
+				'title' => __( 'Inventory Bins', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'The specific shelves or floor areas within a warehouse. Visual Warehouse uses these for mapping.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Bin A-01", "Cold Storage Zone 2".', 'manufacturing-erp-pro' )
+			),
+			'mep_route' => array(
+				'title' => __( 'Production Routes', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'The sequence of operations required to build a product.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: Cutting -> Stitching -> Assembly -> QC.', 'manufacturing-erp-pro' )
+			),
+			'mep_customer' => array(
+				'title' => __( 'B2B Customers', 'manufacturing-erp-pro' ),
+				'desc'  => __( 'Maintain your client list for demand planning and sales tracking.', 'manufacturing-erp-pro' ),
+				'example' => __( 'Example: "Luxury Leather Retailers Inc."', 'manufacturing-erp-pro' )
+			),
 		);
 
 		if ( isset( $instructions[$screen->post_type] ) ) {

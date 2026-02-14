@@ -108,9 +108,20 @@ class MEP_Frontend {
 		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', array( 'wp-element', 'wp-api-fetch' ), MEP_VERSION, true );
 
 		// Inject helpMode and other settings
-		wp_localize_script( 'mep-kanban-board', 'mepSettings', array(
+		$settings = array(
+			'root'     => esc_url_raw( rest_url() ),
+			'nonce'    => wp_create_nonce( 'wp_rest' ),
 			'helpMode' => get_option( 'mep_help_mode', 'off' )
-		) );
+		);
+		wp_localize_script( 'mep-kanban-board', 'mepSettings', $settings );
+		wp_localize_script( 'mep-warehouse-layout', 'mepSettings', $settings );
+
+		$wp_api_settings = array(
+			'root' => esc_url_raw( rest_url() ),
+			'nonce' => wp_create_nonce( 'wp_rest' )
+		);
+		wp_localize_script( 'mep-kanban-board', 'wpApiSettings', $wp_api_settings );
+		wp_localize_script( 'mep-warehouse-layout', 'wpApiSettings', $wp_api_settings );
 	}
 
 	/**
