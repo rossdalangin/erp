@@ -27,18 +27,19 @@ class MEP_Admin {
 
 	public function maybe_redirect_to_wizard() {
 		$setup_complete = get_option( 'mep_setup_complete' );
-
-		// If setup is complete, never redirect.
 		if ( $setup_complete ) {
 			return;
 		}
 
 		$current_page = isset( $_GET['page'] ) ? $_GET['page'] : '';
 
-		// Only redirect if we are trying to access an ERP Pro page (mep-*)
-		// but not the wizard itself.
-		// We ALSO allow the dashboard to be accessed to prevent locked-out states.
-		if ( strpos( $current_page, 'mep-' ) === 0 && $current_page !== 'mep-wizard' && $current_page !== 'mep-dashboard' ) {
+		// Allow access to wizard and dashboard at all times
+		if ( $current_page === 'mep-wizard' || $current_page === 'mep-dashboard' ) {
+			return;
+		}
+
+		// Only redirect if we are on an MEP-specific page
+		if ( strpos( $current_page, 'mep-' ) === 0 || ( isset( $_GET['post_type'] ) && strpos( $_GET['post_type'], 'mep_' ) === 0 ) ) {
 			wp_redirect( admin_url( 'admin.php?page=mep-wizard' ) );
 			exit;
 		}
@@ -67,35 +68,35 @@ class MEP_Admin {
 		);
 
 		// --- INVENTORY MODULE ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', 'mep-sep-1', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Master Materials', 'manufacturing-erp-pro' ), __( 'Master Materials', 'manufacturing-erp-pro' ), 'mep_manage_inventory', 'edit.php?post_type=mep_material' );
 		add_submenu_page( 'mep-dashboard', __( 'Visual Warehouse', 'manufacturing-erp-pro' ), __( 'Visual Warehouse', 'manufacturing-erp-pro' ), 'mep_manage_inventory', 'mep-inventory', array( $this, 'inventory_page' ) );
 
 		// --- ENGINEERING MODULE ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', 'mep-sep-2', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Finished Products', 'manufacturing-erp-pro' ), __( 'Finished Products', 'manufacturing-erp-pro' ), 'mep_manage_bom', 'edit.php?post_type=mep_product' );
 		add_submenu_page( 'mep-dashboard', __( 'BOM Canvas Builder', 'manufacturing-erp-pro' ), __( 'BOM Canvas Builder', 'manufacturing-erp-pro' ), 'mep_manage_bom', 'mep-bom-builder', array( $this, 'bom_builder_page' ) );
 
 		// --- PRODUCTION MODULE ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', 'mep-sep-3', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Production Board', 'manufacturing-erp-pro' ), __( 'Production Board', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-production', array( $this, 'production_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Resource Capacity', 'manufacturing-erp-pro' ), __( 'Resource Capacity', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-capacity', array( $this, 'capacity_page' ) );
 
 		// --- QUALITY MODULE ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', 'mep-sep-4', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Quality Inspections', 'manufacturing-erp-pro' ), __( 'Quality Inspections', 'manufacturing-erp-pro' ), 'mep_manage_quality', 'edit.php?post_type=mep_qc_check' );
 		add_submenu_page( 'mep-dashboard', __( 'Compliance Dashboard', 'manufacturing-erp-pro' ), __( 'Compliance Dashboard', 'manufacturing-erp-pro' ), 'mep_manage_quality', 'mep-quality-dashboard', array( $this, 'quality_dashboard_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Batch Traceability', 'manufacturing-erp-pro' ), __( 'Batch Traceability', 'manufacturing-erp-pro' ), 'mep_manage_quality', 'mep-traceability', array( $this, 'traceability_page' ) );
 
 		// --- SUPPLY CHAIN & MRP ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'read', 'mep-sep-5', '' );
 		add_submenu_page( 'mep-dashboard', __( 'Supplier Center', 'manufacturing-erp-pro' ), __( 'Supplier Center', 'manufacturing-erp-pro' ), 'mep_manage_production', 'edit.php?post_type=mep_supplier' );
 		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'mep_manage_production', 'edit.php?post_type=mep_po' );
 		add_submenu_page( 'mep-dashboard', __( 'Receipt Workspace', 'manufacturing-erp-pro' ), __( 'Receipt Workspace', 'manufacturing-erp-pro' ), 'mep_manage_inventory', 'mep-po-receiving', array( $this, 'po_receiving_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'MRP Planning Engine', 'manufacturing-erp-pro' ), __( 'MRP Planning Engine', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-mrp-planning', array( $this, 'mrp_planning_page' ) );
 
 		// --- SETTINGS ---
-		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', '#', '' );
+		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', 'mep-sep-6', '' );
 		add_submenu_page( 'mep-dashboard', __( 'System Utilities', 'manufacturing-erp-pro' ), __( 'System Utilities', 'manufacturing-erp-pro' ), 'manage_options', 'mep-utilities', array( $this, 'utilities_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'Setup Wizard', 'manufacturing-erp-pro' ), __( 'Setup Wizard', 'manufacturing-erp-pro' ), 'manage_options', 'mep-wizard', array( $this, 'wizard_page' ) );
 	}
@@ -314,135 +315,118 @@ class MEP_Admin {
 			<?php $this->maybe_show_demo_badge(); ?>
 
 			<h2 class="nav-tab-wrapper">
-				<a href="?page=mep-utilities&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e( 'System Settings', 'manufacturing-erp-pro' ); ?></a>
-				<a href="?page=mep-utilities&tab=onboarding" class="nav-tab <?php echo $active_tab == 'onboarding' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Onboarding & Safeguards', 'manufacturing-erp-pro' ); ?></a>
+				<a href="?page=mep-utilities&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Global Settings', 'manufacturing-erp-pro' ); ?></a>
+				<a href="?page=mep-utilities&tab=onboarding" class="nav-tab <?php echo $active_tab == 'onboarding' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Onboarding & Reset', 'manufacturing-erp-pro' ); ?></a>
 				<a href="?page=mep-utilities&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Data Import', 'manufacturing-erp-pro' ); ?></a>
 				<a href="?page=mep-utilities&tab=audit" class="nav-tab <?php echo $active_tab == 'audit' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Audit Logs', 'manufacturing-erp-pro' ); ?></a>
 			</h2>
 
 			<div class="mep-tab-container" style="margin-top: 20px;">
 				<?php if ( $active_tab == 'general' ) : ?>
-					<div class="card">
-						<h2><?php _e( 'Core Configuration', 'manufacturing-erp-pro' ); ?></h2>
-						<p><?php _e( 'Adjust global behaviors for inventory and automated planning.', 'manufacturing-erp-pro' ); ?></p>
+					<div class="card" style="max-width: 800px;">
+						<h2><?php _e( 'General ERP Settings', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Configure your factory defaults and system behavior.', 'manufacturing-erp-pro' ); ?></p>
 						<form method="post">
 							<?php wp_nonce_field( 'mep_save_settings', 'mep_nonce' ); ?>
 							<table class="form-table">
 								<tr>
-									<th scope="row"><?php _e( 'Valuation Method', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'Inventory Valuation', 'manufacturing-erp-pro' ); ?></th>
 									<td>
-										<select name="mep_valuation_method">
+										<select name="mep_valuation_method" class="regular-text">
 											<option value="fifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'fifo' ); ?>>FIFO (First-In-First-Out)</option>
 											<option value="lifo" <?php selected( get_option( 'mep_valuation_method', 'fifo' ), 'lifo' ); ?>>LIFO (Last-In-First-Out)</option>
 										</select>
-										<p class="description"><?php _e( 'Determines how material costs are calculated for reporting. FIFO assumes oldest stock is used first.', 'manufacturing-erp-pro' ); ?></p>
+										<p class="description"><?php _e( 'FIFO assumes oldest stock is consumed first.', 'manufacturing-erp-pro' ); ?></p>
 									</td>
 								</tr>
 								<tr>
-									<th scope="row"><?php _e( 'MRP Recalculation', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'MRP Interval', 'manufacturing-erp-pro' ); ?></th>
 									<td>
-										<select name="mep_mrp_interval">
+										<select name="mep_mrp_interval" class="regular-text">
 											<option value="hourly" <?php selected( get_option( 'mep_mrp_interval', 'daily' ), 'hourly' ); ?>><?php _e( 'Hourly', 'manufacturing-erp-pro' ); ?></option>
-											<option value="twicedaily" <?php selected( get_option( 'mep_mrp_interval', 'daily' ), 'twicedaily' ); ?>><?php _e( 'Twice Daily', 'manufacturing-erp-pro' ); ?></option>
 											<option value="daily" <?php selected( get_option( 'mep_mrp_interval', 'daily' ), 'daily' ); ?>><?php _e( 'Daily', 'manufacturing-erp-pro' ); ?></option>
 										</select>
-										<p class="description"><?php _e( 'How often the system should explode BOMs and generate procurement suggestions automatically.', 'manufacturing-erp-pro' ); ?></p>
 									</td>
 								</tr>
-							</table>
-
-							<h3><?php _e( 'Default ERP Values', 'manufacturing-erp-pro' ); ?></h3>
-							<table class="form-table">
 								<tr>
-									<th scope="row"><?php _e( 'Primary Currency', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'Base Currency', 'manufacturing-erp-pro' ); ?></th>
 									<td>
 										<input type="text" name="mep_currency" value="<?php echo esc_attr( get_option( 'mep_currency', 'USD' ) ); ?>" class="regular-text">
 									</td>
 								</tr>
 								<tr>
-									<th scope="row"><?php _e( 'Default Weight Unit', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'Weight Unit', 'manufacturing-erp-pro' ); ?></th>
 									<td>
 										<input type="text" name="mep_weight_unit" value="<?php echo esc_attr( get_option( 'mep_weight_unit', 'kg' ) ); ?>" class="regular-text">
 									</td>
 								</tr>
 								<tr>
-									<th scope="row"><?php _e( 'Standard Labor Rate ($/min)', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'Std Labor Rate ($/min)', 'manufacturing-erp-pro' ); ?></th>
 									<td>
 										<input type="number" step="0.01" name="mep_default_labor_rate" value="<?php echo esc_attr( get_option( 'mep_default_labor_rate', '0.50' ) ); ?>" class="regular-text">
 									</td>
 								</tr>
 								<tr>
-									<th scope="row"><?php _e( 'Default Production Warehouse', 'manufacturing-erp-pro' ); ?></th>
+									<th scope="row"><?php _e( 'Interactive Help Mode', 'manufacturing-erp-pro' ); ?></th>
 									<td>
-										<?php
-										$warehouses = get_posts( array( 'post_type' => 'mep_warehouse', 'numberposts' => -1 ) );
-										$current_wh = get_option( 'mep_default_warehouse', '' );
-										?>
-										<select name="mep_default_warehouse">
-											<option value=""><?php _e( '-- Select --', 'manufacturing-erp-pro' ); ?></option>
-											<?php foreach ( $warehouses as $wh ) : ?>
-												<option value="<?php echo $wh->ID; ?>" <?php selected( $current_wh, $wh->ID ); ?>><?php echo $wh->post_title; ?></option>
-											<?php endforeach; ?>
+										<select name="mep_help_mode" class="regular-text">
+											<option value="on" <?php selected( get_option( 'mep_help_mode', 'off' ), 'on' ); ?>><?php _e( 'Enabled (Show tooltips)', 'manufacturing-erp-pro' ); ?></option>
+											<option value="off" <?php selected( get_option( 'mep_help_mode', 'off' ), 'off' ); ?>><?php _e( 'Disabled', 'manufacturing-erp-pro' ); ?></option>
 										</select>
 									</td>
 								</tr>
 							</table>
-
-							<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Update System Settings', 'manufacturing-erp-pro' ); ?>">
+							<p class="submit">
+								<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Save Global Settings', 'manufacturing-erp-pro' ); ?>">
+							</p>
 						</form>
 					</div>
 
 				<?php elseif ( $active_tab == 'onboarding' ) : ?>
-					<div class="card" style="border-left: 4px solid #dba617;">
-						<h2><?php _e( 'Sample Data Seeder (Demo Mode)', 'manufacturing-erp-pro' ); ?></h2>
-						<p><?php _e( 'Populate the system with "LeatherCraft Manufacturing Co." demo data. This is perfect for training staff or exploring features without manual entry.', 'manufacturing-erp-pro' ); ?></p>
-						<p><strong><?php _e( 'Included Samples:', 'manufacturing-erp-pro' ); ?></strong> <?php _e( 'Materials (Leather, Soles), Nested BOMs (Bags, Straps), 5 Machines, and instructional Work Orders.', 'manufacturing-erp-pro' ); ?></p>
-						<form method="post">
+					<div class="card" style="max-width: 800px; border-left: 4px solid #dba617;">
+						<h2><?php _e( 'Sample Data Seeder', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Populate your system with realistic manufacturing data from LeatherCraft Co. to see how modules connect.', 'manufacturing-erp-pro' ); ?></p>
+						<form method="post" onsubmit="return confirm('<?php _e( 'This will add sample records to your database. Continue?', 'manufacturing-erp-pro' ); ?>');">
 							<?php wp_nonce_field( 'mep_seed_data', 'mep_nonce' ); ?>
-							<input type="submit" name="mep_action_seed" class="button button-secondary" value="<?php _e( '🚀 Seed Demo Environment', 'manufacturing-erp-pro' ); ?>">
+							<button type="submit" name="mep_action_seed" class="button button-secondary">🚀 <?php _e( 'Add Sample Data', 'manufacturing-erp-pro' ); ?></button>
 						</form>
 					</div>
 
-					<div class="card" style="border-left: 4px solid #d63638; margin-top: 30px;">
-						<h2 style="color: #d63638;"><?php _e( 'System Safeguards: Database Reset', 'manufacturing-erp-pro' ); ?></h2>
-						<p><?php _e( 'Wipe ERP data to start fresh. This action is irreversible. Use with extreme caution.', 'manufacturing-erp-pro' ); ?></p>
-
-						<div style="background: #fcf2f2; padding: 15px; border: 1px solid #d63638; border-radius: 4px; margin-bottom: 20px;">
-							<strong><?php _e( 'Warning:', 'manufacturing-erp-pro' ); ?></strong> <?php _e( 'Performing a Hard Reset will delete ALL Materials, Products, BOMs, and Transactions.', 'manufacturing-erp-pro' ); ?>
-						</div>
+					<div class="card" style="max-width: 800px; border-left: 4px solid #d63638; margin-top: 30px;">
+						<h2 style="color: #d63638;"><?php _e( 'System Reset (Danger Zone)', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Wipe all manufacturing records to start fresh. This action cannot be undone.', 'manufacturing-erp-pro' ); ?></p>
 
 						<form method="post">
 							<?php wp_nonce_field( 'mep_reset_db', 'mep_nonce' ); ?>
 							<p>
 								<label>
 									<input type="checkbox" name="mep_confirm_reset" required>
-									<strong><?php _e( 'I understand this will delete all ERP data.', 'manufacturing-erp-pro' ); ?></strong>
+									<strong><?php _e( 'I confirm that I want to delete ALL manufacturing data.', 'manufacturing-erp-pro' ); ?></strong>
 								</label>
 							</p>
 							<p>
-								<label><?php _e( 'Type phrase to confirm:', 'manufacturing-erp-pro' ); ?> <code>RESET PRODUCTION ENVIRONMENT</code><br>
-									<input type="text" name="mep_confirm_phrase" class="regular-text" required placeholder="Type the phrase here">
+								<label><?php _e( 'Type "RESET" to confirm:', 'manufacturing-erp-pro' ); ?><br>
+									<input type="text" name="mep_confirm_phrase_simple" class="regular-text" required placeholder="RESET">
 								</label>
 							</p>
 							<div style="display: flex; gap: 10px;">
 								<input type="submit" name="mep_action_reset_hard" class="button button-link-delete" value="<?php _e( 'Hard Reset (Delete All)', 'manufacturing-erp-pro' ); ?>">
 								<input type="submit" name="mep_action_reset_soft" class="button button-secondary" value="<?php _e( 'Soft Reset (Keep Master Data)', 'manufacturing-erp-pro' ); ?>">
-								<input type="submit" name="mep_action_recreate_tables" class="button" value="<?php _e( 'Recreate DB Tables', 'manufacturing-erp-pro' ); ?>">
+								<input type="submit" name="mep_action_recreate_tables" class="button" value="<?php _e( 'Recreate Tables Only', 'manufacturing-erp-pro' ); ?>">
 							</div>
-							<p style="margin-top: 20px;">
-								<a href="<?php echo esc_url( rest_url('mep/v1/reports/diagnostic-export') ); ?>?_wpnonce=<?php echo wp_create_nonce('wp_rest'); ?>" class="button"><?php _e( '📦 Export ERP Backup (CSV/TXT)', 'manufacturing-erp-pro' ); ?></a>
-							</p>
 						</form>
 					</div>
 
 				<?php elseif ( $active_tab == 'import' ) : ?>
-					<div class="card">
-						<h2><?php _e( 'Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
-						<p><?php _e( 'Import Materials from a CSV file. Expected header: Name,SKU,UOM,Cost', 'manufacturing-erp-pro' ); ?></p>
+					<div class="card" style="max-width: 800px;">
+						<h2><?php _e( 'CSV Master Data Importer', 'manufacturing-erp-pro' ); ?></h2>
+						<p><?php _e( 'Quickly upload your materials. Format: Name, SKU, UOM, Unit Cost', 'manufacturing-erp-pro' ); ?></p>
 						<form method="post">
 							<?php wp_nonce_field( 'mep_import_data', 'mep_nonce' ); ?>
-							<textarea name="mep_import_csv" style="width:100%; height:150px; font-family: monospace;" placeholder="Cowhide,LTH-001,m2,45.00"></textarea><br><br>
-							<input type="submit" name="mep_action_import" class="button button-primary" value="<?php _e( 'Import Materials', 'manufacturing-erp-pro' ); ?>">
+							<textarea name="mep_import_csv" style="width:100%; height:150px; font-family: monospace;" placeholder="Cowhide Leather,MAT-001,m2,45.00"></textarea>
+							<p class="submit">
+								<input type="submit" name="mep_action_import" class="button button-primary" value="<?php _e( 'Import Materials', 'manufacturing-erp-pro' ); ?>">
+							</p>
 						</form>
 					</div>
 
@@ -488,6 +472,10 @@ class MEP_Admin {
 	}
 
 	public function handle_utilities() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		if ( ! isset( $_POST['mep_nonce'] ) ) {
 			return;
 		}
@@ -504,10 +492,10 @@ class MEP_Admin {
 			update_option( 'mep_currency', sanitize_text_field( $_POST['mep_currency'] ) );
 			update_option( 'mep_weight_unit', sanitize_text_field( $_POST['mep_weight_unit'] ) );
 			update_option( 'mep_default_labor_rate', sanitize_text_field( $_POST['mep_default_labor_rate'] ) );
-			update_option( 'mep_default_warehouse', sanitize_text_field( $_POST['mep_default_warehouse'] ) );
+			update_option( 'mep_help_mode', sanitize_text_field( $_POST['mep_help_mode'] ) );
 
 			add_action( 'admin_notices', function() {
-				echo '<div class="updated"><p>' . __( 'Settings saved.', 'manufacturing-erp-pro' ) . '</p></div>';
+				echo '<div class="updated"><p>' . __( 'Global Settings saved.', 'manufacturing-erp-pro' ) . '</p></div>';
 			} );
 		}
 
@@ -542,17 +530,17 @@ class MEP_Admin {
 			} );
 		}
 
-		if ( isset( $_POST['mep_action_recreate_tables'] ) ) {
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_reset_db' ) && isset( $_POST['mep_action_recreate_tables'] ) ) {
 			MEP_DB::create_tables();
 			add_action( 'admin_notices', function() {
 				echo '<div class="updated"><p>' . __( 'Database tables recreated/updated.', 'manufacturing-erp-pro' ) . '</p></div>';
 			} );
 		}
 
-		if ( isset( $_POST['mep_action_reset_hard'] ) || isset( $_POST['mep_action_reset_soft'] ) ) {
-			if ( $_POST['mep_confirm_phrase'] !== 'RESET PRODUCTION ENVIRONMENT' ) {
+		if ( wp_verify_nonce( $_POST['mep_nonce'], 'mep_reset_db' ) && ( isset( $_POST['mep_action_reset_hard'] ) || isset( $_POST['mep_action_reset_soft'] ) ) ) {
+			if ( $_POST['mep_confirm_phrase_simple'] !== 'RESET' ) {
 				add_action( 'admin_notices', function() {
-					echo '<div class="error"><p>' . __( 'Invalid confirmation phrase.', 'manufacturing-erp-pro' ) . '</p></div>';
+					echo '<div class="error"><p>' . __( 'Confirmation phrase must be RESET.', 'manufacturing-erp-pro' ) . '</p></div>';
 				} );
 				return;
 			}

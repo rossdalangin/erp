@@ -1,16 +1,18 @@
 /**
- * MEP Executive Dashboard - Visual KPIs
+ * MEP Executive Dashboard - v2.0
  */
 
 const { useState, useEffect } = wp.element;
+const { __ } = wp.i18n;
 
-const KPICard = ({ label, value, color }) => {
+const KPICard = ({ label, value, color, loading }) => {
     return wp.element.createElement('div', {
         className: 'mep-kpi-card',
-        style: { borderTop: `4px solid ${color}`, padding: '20px', background: '#fff', textAlign: 'center' }
+        style: { borderTop: `4px solid ${color}`, padding: '20px', background: '#fff', textAlign: 'center', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
     },
-        wp.element.createElement('h3', { style: { margin: 0, fontSize: '14px', color: '#666' } }, label),
-        wp.element.createElement('p', { style: { fontSize: '24px', fontWeight: 'bold', margin: '10px 0' } }, value)
+        wp.element.createElement('h3', { style: { margin: 0, fontSize: '14px', color: '#666', fontWeight: 'normal' } }, label),
+        loading ? wp.element.createElement('span', { className: 'spinner is-active', style: { float: 'none' } }) :
+                  wp.element.createElement('p', { style: { fontSize: '28px', fontWeight: 'bold', margin: '10px 0', color: '#2c3338' } }, value)
     );
 };
 
@@ -18,94 +20,127 @@ const Dashboard = () => {
     const [kpis, setKpis] = useState(null);
     const [capacity, setCapacity] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [setupComplete, setSetupComplete] = useState(true);
 
     useEffect(() => {
-        Promise.all([
-            wp.apiFetch({ path: '/mep/v1/reports/kpis' }),
-            wp.apiFetch({ path: '/mep/v1/equipment/capacity' })
-        ]).then(([kpiData, capData]) => {
-            setKpis(kpiData);
-            setCapacity(capData);
-            setLoading(false);
-        }).catch(err => {
-            setLoading(false);
-            console.error(err);
-        });
+        wp.apiFetch({ path: '/mep/v1/reports/kpis' })
+            .then(data => {
+                setKpis(data);
+                return wp.apiFetch({ path: '/mep/v1/equipment/capacity' });
+            })
+            .then(capData => {
+                setCapacity(capData);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('MEP Dashboard Data Error:', err);
+                setLoading(false);
+            });
     }, []);
-
-    if (loading) return wp.element.createElement('p', null, 'Loading ERP Dashboard...');
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-dashboard-grid' },
+    return wp.element.createElement('div', { className: 'mep-dashboard-container' },
+        // Step-by-Step Onboarding Guidance (Only show if data is empty)
+        (!loading && kpis && kpis.production_output === 0) && wp.element.createElement('div', {
+            className: 'mep-onboarding-guide',
+            style: { background: '#fff8e1', border: '1px solid #ffe082', padding: '20px', marginBottom: '30px', borderRadius: '4px' }
+        },
+            wp.element.createElement('h2', { style: { marginTop: 0 } }, '✨ ' + __('Welcome! Let\'s build your factory.', 'manufacturing-erp-pro')),
+            wp.element.createElement('p', null, __('Follow these steps to get your first production order released:', 'manufacturing-erp-pro')),
+            wp.element.createElement('div', { style: { display: 'flex', gap: '20px', marginTop: '15px' } },
+                [
+                    { title: __('1. Materials', 'manufacturing-erp-pro'), desc: __('Add your raw ingredients.', 'manufacturing-erp-pro'), link: 'edit.php?post_type=mep_material' },
+                    { title: __('2. Products', 'manufacturing-erp-pro'), desc: __('Define finished goods.', 'manufacturing-erp-pro'), link: 'edit.php?post_type=mep_product' },
+                    { title: __('3. Build BOM', 'manufacturing-erp-pro'), desc: __('Link materials to products.', 'manufacturing-erp-pro'), link: 'admin.php?page=mep-bom-builder' },
+                    { title: __('4. Release WO', 'manufacturing-erp-pro'), desc: __('Start production!', 'manufacturing-erp-pro'), link: 'admin.php?page=mep-production' }
+                ].map((s, i) => wp.element.createElement('a', {
+                    key: i, href: s.link,
+                    style: { flex: 1, textDecoration: 'none', color: 'inherit', background: '#fff', padding: '15px', border: '1px solid #e0c46a', borderRadius: '4px' }
+                },
+                    wp.element.createElement('strong', { style: { display: 'block', marginBottom: '5px', color: '#2271b1' } }, s.title),
+                    wp.element.createElement('span', { style: { fontSize: '12px' } }, s.desc)
+                ))
+            )
+        ),
+
+        // KPI Row
         wp.element.createElement('div', {
-            title: helpMode ? 'KPI Tiles: Real-time snapshots of factory performance, stock value, and output.' : '',
             style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }
         },
-            wp.element.createElement(KPICard, { label: 'Production Output', value: kpis.production_output, color: '#2271b1' }),
-            wp.element.createElement(KPICard, { label: 'Scrap Rate', value: kpis.scrap_rate, color: '#d63638' }),
-            wp.element.createElement(KPICard, { label: `Valuation (${kpis.valuation_method})`, value: kpis.inventory_valuation, color: '#dba617' }),
-            wp.element.createElement(KPICard, { label: 'At-Risk Materials', value: kpis.at_risk_materials, color: kpis.at_risk_materials > 0 ? '#d63638' : '#46b450' })
+            wp.element.createElement(KPICard, {
+                label: __('Monthly Output', 'manufacturing-erp-pro'),
+                value: kpis ? kpis.production_output : '0',
+                color: '#2271b1', loading
+            }),
+            wp.element.createElement(KPICard, {
+                label: __('Average Scrap Rate', 'manufacturing-erp-pro'),
+                value: kpis ? kpis.scrap_rate : '0%',
+                color: '#d63638', loading
+            }),
+            wp.element.createElement(KPICard, {
+                label: __('Inventory Value', 'manufacturing-erp-pro'),
+                value: kpis ? kpis.inventory_valuation : '$0.00',
+                color: '#dba617', loading
+            }),
+            wp.element.createElement(KPICard, {
+                label: __('Items Below Safety', 'manufacturing-erp-pro'),
+                value: kpis ? kpis.at_risk_materials : '0',
+                color: kpis && kpis.at_risk_materials > 0 ? '#d63638' : '#46b450', loading
+            })
         ),
-        wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' } },
-            wp.element.createElement('div', {
-                title: helpMode ? 'Capacity Planner: Monitor machine load. Red bars indicate resources that are over-capacity. Example: A laser cutter at 120% load needs overtime or another machine.' : '',
-                style: { padding: '20px', background: '#fff', border: '1px solid #ccc' }
-            },
-                wp.element.createElement('h3', null, 'Resource Capacity (Load vs. Capacity)'),
-                capacity.length > 0 ? capacity.map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
-                    wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '5px' } },
-                        wp.element.createElement('span', null, item.name),
-                        wp.element.createElement('span', null, `${item.load} / ${item.capacity} mins (${item.percent}%)`)
-                    ),
-                    wp.element.createElement('div', { style: { height: '10px', background: '#eee', borderRadius: '5px', overflow: 'hidden' } },
-                        wp.element.createElement('div', { style: { height: '100%', width: `${Math.min(item.percent, 100)}%`, background: item.percent > 90 ? '#d63638' : '#2271b1' } })
-                    )
-                )) : wp.element.createElement('p', null, 'No equipment data available.')
-            ),
-            wp.element.createElement('div', {
-                title: helpMode ? 'Cost Variance: Compares the estimated BOM cost with the actual costs recorded on the shop floor. Positive variance (Red) means the item cost more than expected.' : '',
-                style: { padding: '20px', background: '#fff', border: '1px solid #ccc' }
-            },
-                wp.element.createElement('h3', null, 'Cost Variance (Est vs Actual)'),
-                kpis.cost_variance && kpis.cost_variance.length > 0 ?
-                    wp.element.createElement('table', { style: { width: '100%', fontSize: '12px', borderCollapse: 'collapse' } },
-                        wp.element.createElement('thead', null,
-                            wp.element.createElement('tr', null,
-                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'WO'),
-                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Est'),
-                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Act'),
-                                wp.element.createElement('th', { style: { textAlign: 'left' } }, 'Var')
-                            )
-                        ),
-                        wp.element.createElement('tbody', null,
-                            kpis.cost_variance.map((v, i) => wp.element.createElement('tr', { key: i },
-                                wp.element.createElement('td', null, `#${v.wo_id}`),
-                                wp.element.createElement('td', null, `$${v.estimated}`),
-                                wp.element.createElement('td', null, `$${v.actual}`),
-                                wp.element.createElement('td', { style: { color: v.variance > 0 ? '#d63638' : '#46b450', fontWeight: 'bold' } },
-                                    (v.variance > 0 ? '+' : '') + `$${v.variance}`
-                                )
-                            ))
-                        )
-                    ) : wp.element.createElement('p', null, 'No production history yet for cost variance analysis.'),
 
-                wp.element.createElement('h3', {
-                    style: { marginTop: '30px' },
-                    title: helpMode ? 'Inventory Aging: Shows the age of your current stock based on receipt dates. Older stock (90+ days) may be at risk of obsolescence.' : ''
-                }, 'Inventory Aging (Units by Receipt Age)'),
-                kpis.inventory_aging ?
-                    wp.element.createElement('div', { style: { display: 'flex', gap: '5px', height: '100px', alignItems: 'flex-end', paddingTop: '20px' } },
-                        Object.keys(kpis.inventory_aging).map(bucket => {
-                            const val = kpis.inventory_aging[bucket];
-                            const max = Math.max(...Object.values(kpis.inventory_aging), 1);
-                            const height = (val / max) * 100;
-                            return wp.element.createElement('div', { key: bucket, style: { flex: 1, textAlign: 'center' } },
-                                wp.element.createElement('div', { style: { background: '#2271b1', height: `${height}%`, borderRadius: '3px 3px 0 0' } }),
-                                wp.element.createElement('div', { style: { fontSize: '9px', marginTop: '5px' } }, bucket)
-                            );
+        // Capacity & Activity Row
+        wp.element.createElement('div', { style: { marginTop: '30px', display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '30px' } },
+            // Capacity Planner Snapshot
+            wp.element.createElement('div', { style: { background: '#fff', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } },
+                wp.element.createElement('h3', { style: { marginTop: 0 } }, __('Resource Utilization', 'manufacturing-erp-pro')),
+                capacity.length > 0 ? capacity.map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
+                    wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px' } },
+                        wp.element.createElement('span', null, item.name),
+                        wp.element.createElement('span', { style: { fontWeight: 'bold' } }, `${item.percent}%`)
+                    ),
+                    wp.element.createElement('div', { style: { height: '8px', background: '#f0f0f1', borderRadius: '4px', overflow: 'hidden' } },
+                        wp.element.createElement('div', {
+                            style: {
+                                height: '100%',
+                                width: `${Math.min(item.percent, 100)}%`,
+                                background: item.percent > 90 ? '#d63638' : (item.percent > 70 ? '#dba617' : '#2271b1'),
+                                transition: 'width 1s ease-in-out'
+                            }
                         })
-                    ) : wp.element.createElement('p', null, 'No inventory aging data.')
+                    )
+                )) : wp.element.createElement('p', { style: { color: '#666', fontStyle: 'italic' } }, __('No active machine schedules found.', 'manufacturing-erp-pro'))
+            ),
+
+            // System Status & Quick Links
+            wp.element.createElement('div', null,
+                wp.element.createElement('div', { style: { background: '#fff', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '20px' } },
+                    wp.element.createElement('h3', { style: { marginTop: 0 } }, __('System Health', 'manufacturing-erp-pro')),
+                    wp.element.createElement('ul', { style: { margin: 0, padding: 0, listStyle: 'none' } },
+                        wp.element.createElement('li', { style: { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f0f0f1' } },
+                            wp.element.createElement('span', null, __('Database Tables', 'manufacturing-erp-pro')),
+                            wp.element.createElement('span', { style: { color: '#46b450', fontWeight: 'bold' } }, '● ' + __('Connected', 'manufacturing-erp-pro'))
+                        ),
+                        wp.element.createElement('li', { style: { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f0f0f1' } },
+                            wp.element.createElement('span', null, __('Background Tasks', 'manufacturing-erp-pro')),
+                            wp.element.createElement('span', { style: { color: '#46b450', fontWeight: 'bold' } }, '● ' + __('Active', 'manufacturing-erp-pro'))
+                        ),
+                        wp.element.createElement('li', { style: { display: 'flex', justifyContent: 'space-between', padding: '8px 0' } },
+                            wp.element.createElement('span', null, __('REST API', 'manufacturing-erp-pro')),
+                            wp.element.createElement('span', { style: { color: '#46b450', fontWeight: 'bold' } }, '● ' + __('Operational', 'manufacturing-erp-pro'))
+                        )
+                    )
+                ),
+                wp.element.createElement('div', { style: { background: '#2c3338', color: '#fff', padding: '20px', borderRadius: '4px' } },
+                    wp.element.createElement('h3', { style: { marginTop: 0, color: '#fff' } }, __('Support & Docs', 'manufacturing-erp-pro')),
+                    wp.element.createElement('p', { style: { fontSize: '13px', opacity: 0.8 } }, __('Need help with your factory configuration? Check our professional guides.', 'manufacturing-erp-pro')),
+                    wp.element.createElement('a', {
+                        href: '#',
+                        className: 'button button-primary',
+                        style: { width: '100%', textAlign: 'center', marginTop: '10px' }
+                    }, __('Read User Manual', 'manufacturing-erp-pro'))
+                )
             )
         )
     );

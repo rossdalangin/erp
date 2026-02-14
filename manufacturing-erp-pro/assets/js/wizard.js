@@ -1,5 +1,5 @@
 /**
- * MEP Setup Wizard
+ * MEP Setup Wizard - v2.0
  */
 
 const { useState } = wp.element;
@@ -7,116 +7,133 @@ const { __ } = wp.i18n;
 
 const SetupWizard = () => {
     const [step, setStep] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [status, setStatus] = useState('');
 
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
 
-    const runSeeder = () => {
-        setStatus(__('Seeding demo data...', 'manufacturing-erp-pro'));
+    const finishSetup = (withSeeding = false) => {
+        setLoading(true);
+        setError(null);
+        setStatus(withSeeding ? __('Planting factory seeds...', 'manufacturing-erp-pro') : __('Initializing factory...', 'manufacturing-erp-pro'));
 
-        wp.apiFetch({
-            path: '/mep/v1/seed',
-            method: 'POST'
-        }).then(() => {
-            return wp.apiFetch({
-                path: '/mep/v1/settings',
-                method: 'POST',
-                data: { mep_setup_complete: '1' }
-            });
-        }).then(() => {
-            setStatus(__('Setup complete with demo data! Redirecting...', 'manufacturing-erp-pro'));
-            setTimeout(() => { window.location.href = 'admin.php?page=mep-dashboard'; }, 1000);
-        }).catch(err => {
-            setStatus(__('Error during seeding. Please check your permissions and try again.', 'manufacturing-erp-pro'));
-            console.error(err);
-        });
-    };
+        const tasks = [];
+        if (withSeeding) {
+            tasks.push(wp.apiFetch({ path: '/mep/v1/seed', method: 'POST' }));
+        }
 
-    const completeSetup = () => {
-        setStatus(__('Finalizing setup...', 'manufacturing-erp-pro'));
-
-        // Try REST API first
-        wp.apiFetch({
+        // Finalize setting
+        tasks.push(wp.apiFetch({
             path: '/mep/v1/settings',
             method: 'POST',
-            data: { mep_setup_complete: '1' }
-        }).then(() => {
-            setStep(3);
-        }).catch(err => {
-            console.warn('REST API failed, attempting fallback...', err);
-            // If REST fails, we might be in an environment with REST disabled or misconfigured.
-            // We can't easily do a form post from here without a reload, so we tell the user.
-            setStatus(__('REST API Error. Please use the "Skip Setup" button on the Dashboard if this persists.', 'manufacturing-erp-pro'));
-        });
+            data: { mep_setup_complete: '1', mep_help_mode: 'on' }
+        }));
+
+        Promise.all(tasks)
+            .then(() => {
+                setStatus(__('Success! Launching your ERP...', 'manufacturing-erp-pro'));
+                setTimeout(() => {
+                    window.location.href = 'admin.php?page=mep-dashboard';
+                }, 1500);
+            })
+            .catch(err => {
+                setLoading(false);
+                setError(err.message || __('Critical error during setup. Please try "Skip Setup" if this persists.', 'manufacturing-erp-pro'));
+                console.error('MEP Wizard Error:', err);
+            });
     };
 
-    return wp.element.createElement('div', { className: 'mep-wizard-container', style: { maxWidth: '800px', margin: '40px auto', background: '#fff', padding: '40px', border: '1px solid #ccd0d4', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } },
-        wp.element.createElement('div', { className: 'mep-wizard-header', style: { textAlign: 'center', marginBottom: '40px' } },
-            wp.element.createElement('h2', null, __('Welcome to Manufacturing ERP Pro', 'manufacturing-erp-pro')),
-            wp.element.createElement('p', null, __('Let\'s get your factory up and running in minutes.', 'manufacturing-erp-pro'))
-        ),
-
-        wp.element.createElement('div', { className: 'mep-wizard-steps', style: { display: 'flex', justifyContent: 'space-between', marginBottom: '40px' } },
-            [1, 2, 3].map(s => wp.element.createElement('div', {
-                key: s,
-                style: {
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    background: step >= s ? '#2271b1' : '#eee',
-                    color: step >= s ? '#fff' : '#666',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold'
-                }
-            }, s))
-        ),
-
-        step === 1 && wp.element.createElement('div', { className: 'mep-wizard-step' },
-            wp.element.createElement('h3', null, __('Step 1: Company Profile', 'manufacturing-erp-pro')),
-            wp.element.createElement('p', null, __('Enter your primary manufacturing focus.', 'manufacturing-erp-pro')),
-            wp.element.createElement('select', { className: 'widefat', style: { marginBottom: '20px' } },
-                wp.element.createElement('option', null, __('Discrete Manufacturing (Bags, Furniture, Electronics)', 'manufacturing-erp-pro')),
-                wp.element.createElement('option', null, __('Process Manufacturing (Chemicals, Food, Liquids)', 'manufacturing-erp-pro'))
+    return wp.element.createElement('div', {
+        className: 'mep-wizard-overlay',
+        style: {
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+            background: '#f0f0f1', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px', boxSizing: 'border-box'
+        }
+    },
+        wp.element.createElement('div', {
+            className: 'mep-wizard-card',
+            style: {
+                background: '#fff', padding: '40px', maxWidth: '600px', width: '100%',
+                borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                textAlign: 'center'
+            }
+        },
+            wp.element.createElement('header', { style: { marginBottom: '30px' } },
+                wp.element.createElement('h1', { style: { margin: '0 0 10px 0', fontSize: '28px', color: '#2271b1' } }, __('Manufacturing ERP Pro', 'manufacturing-erp-pro')),
+                wp.element.createElement('p', { style: { color: '#666', fontSize: '16px' } }, __('Factory Setup & Onboarding', 'manufacturing-erp-pro'))
             ),
-            wp.element.createElement('button', { className: 'button button-primary', onClick: nextStep }, __('Next', 'manufacturing-erp-pro'))
-        ),
 
-        step === 2 && wp.element.createElement('div', { className: 'mep-wizard-step' },
-            wp.element.createElement('h3', null, __('Step 2: Experience Mode', 'manufacturing-erp-pro')),
-            wp.element.createElement('p', null, __('How would you like to start?', 'manufacturing-erp-pro')),
-            wp.element.createElement('div', { style: { display: 'flex', gap: '20px' } },
-                wp.element.createElement('div', { style: { flex: 1, padding: '20px', border: '2px solid #eee', cursor: 'pointer' }, onClick: completeSetup },
-                    wp.element.createElement('h4', null, __('Clean Slate', 'manufacturing-erp-pro')),
-                    wp.element.createElement('p', null, __('I will enter my own materials and products.', 'manufacturing-erp-pro'))
-                ),
-                wp.element.createElement('div', { style: { flex: 1, padding: '20px', border: '2px solid #2271b1', cursor: 'pointer' }, onClick: runSeeder },
-                    wp.element.createElement('h4', null, __('Demo Mode', 'manufacturing-erp-pro')),
-                    wp.element.createElement('p', null, __('Load LeatherCraft Co. sample data to explore.', 'manufacturing-erp-pro'))
+            error && wp.element.createElement('div', {
+                style: { background: '#fcf2f2', border: '1px solid #d63638', padding: '15px', color: '#d63638', borderRadius: '4px', marginBottom: '20px' }
+            }, error),
+
+            status && wp.element.createElement('div', {
+                style: { background: '#f0f6fb', border: '1px solid #2271b1', padding: '15px', color: '#2271b1', borderRadius: '4px', marginBottom: '20px', fontWeight: 'bold' }
+            },
+                wp.element.createElement('span', { className: 'spinner is-active', style: { float: 'none', margin: '0 10px 0 0' } }),
+                status
+            ),
+
+            !loading && step === 1 && wp.element.createElement('div', null,
+                wp.element.createElement('h2', null, __('Step 1: Your Production Model', 'manufacturing-erp-pro')),
+                wp.element.createElement('p', null, __('What kind of manufacturing facility do you run?', 'manufacturing-erp-pro')),
+                wp.element.createElement('div', { style: { display: 'flex', gap: '15px', marginTop: '20px' } },
+                    wp.element.createElement('button', {
+                        className: 'button button-large',
+                        style: { flex: 1, height: '100px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
+                        onClick: nextStep
+                    },
+                        wp.element.createElement('span', { style: { fontSize: '24px', marginBottom: '5px' } }, '👜'),
+                        __('Discrete (Goods)', 'manufacturing-erp-pro')
+                    ),
+                    wp.element.createElement('button', {
+                        className: 'button button-large',
+                        style: { flex: 1, height: '100px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
+                        onClick: nextStep
+                    },
+                        wp.element.createElement('span', { style: { fontSize: '24px', marginBottom: '5px' } }, '⚗️'),
+                        __('Process (Liquids/Mix)', 'manufacturing-erp-pro')
+                    )
                 )
             ),
-            wp.element.createElement('p', { style: { color: '#d63638', marginTop: '10px' } }, status),
-            wp.element.createElement('button', { className: 'button', onClick: prevStep, style: { marginTop: '20px' } }, __('Back', 'manufacturing-erp-pro'))
-        ),
 
-        step === 3 && wp.element.createElement('div', { className: 'mep-wizard-step' },
-            wp.element.createElement('h3', null, __('Step 3: Ready to Launch', 'manufacturing-erp-pro')),
-            wp.element.createElement('p', null, __('You are ready to start manufacturing. We have created your Shop Floor and Customer Portal pages automatically.', 'manufacturing-erp-pro')),
-            wp.element.createElement('button', { className: 'button button-primary', onClick: () => window.location.href = 'admin.php?page=mep-dashboard' }, __('Go to Dashboard', 'manufacturing-erp-pro'))
-        ),
+            !loading && step === 2 && wp.element.createElement('div', null,
+                wp.element.createElement('h2', null, __('Step 2: Initialize Factory Data', 'manufacturing-erp-pro')),
+                wp.element.createElement('p', null, __('Choose how you would like to start using the system.', 'manufacturing-erp-pro')),
 
-        wp.element.createElement('div', { style: { marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #eee', textAlign: 'center' } },
-            wp.element.createElement('button', {
-                className: 'button button-link',
-                onClick: () => {
-                    if (confirm(__('Skip setup and enable all features immediately?', 'manufacturing-erp-pro'))) {
-                        wp.apiFetch({ path: '/mep/v1/settings', method: 'POST', data: { mep_setup_complete: '1' } })
-                        .then(() => window.location.href = 'admin.php?page=mep-dashboard');
+                wp.element.createElement('div', {
+                    onClick: () => finishSetup(true),
+                    style: { background: '#f6f7f7', border: '2px solid #2271b1', padding: '20px', borderRadius: '6px', cursor: 'pointer', marginBottom: '15px', textAlign: 'left' }
+                },
+                    wp.element.createElement('h4', { style: { margin: '0 0 5px 0', color: '#2271b1' } }, '🚀 ' + __('Demo Mode (Recommended)', 'manufacturing-erp-pro')),
+                    wp.element.createElement('p', { style: { margin: 0, fontSize: '13px' } }, __('Instantly load LeatherCraft Co. sample data: Materials, BOMs, Work Orders, and Warehouses.', 'manufacturing-erp-pro'))
+                ),
+
+                wp.element.createElement('div', {
+                    onClick: () => finishSetup(false),
+                    style: { background: '#fff', border: '1px solid #ccc', padding: '20px', borderRadius: '6px', cursor: 'pointer', textAlign: 'left' }
+                },
+                    wp.element.createElement('h4', { style: { margin: '0 0 5px 0' } }, '🏢 ' + __('Clean Slate', 'manufacturing-erp-pro')),
+                    wp.element.createElement('p', { style: { margin: 0, fontSize: '13px' } }, __('Start with an empty system and enter your own master data manually.', 'manufacturing-erp-pro'))
+                ),
+
+                wp.element.createElement('button', { className: 'button', style: { marginTop: '20px' }, onClick: prevStep }, __('Back', 'manufacturing-erp-pro'))
+            ),
+
+            !loading && wp.element.createElement('div', { style: { marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' } },
+                wp.element.createElement('button', {
+                    className: 'button button-link',
+                    style: { color: '#999' },
+                    onClick: () => {
+                        if (confirm(__('Skip setup and enable all ERP features immediately?', 'manufacturing-erp-pro'))) {
+                            finishSetup(false);
+                        }
                     }
-                }
-            }, __('Skip Setup (Advanced Users)', 'manufacturing-erp-pro'))
+                }, __('Skip wizard and enable features', 'manufacturing-erp-pro'))
+            )
         )
     );
 };
