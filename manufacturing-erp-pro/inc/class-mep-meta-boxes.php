@@ -23,7 +23,7 @@ class MEP_Meta_Boxes {
 			'_mep_customer_id', '_mep_daily_capacity_mins', '_mep_labor_rate',
 			'_mep_lead_time', '_mep_price', '_mep_pack_size', '_mep_preferred_supplier',
 			'_mep_route_id', '_mep_assigned_equipment_id', '_mep_actual_scrap',
-			'_mep_actual_labor_mins'
+			'_mep_actual_labor_mins', '_mep_moq', '_mep_sales_tax', '_mep_default_wh'
 		);
 
 		$array_fields = array(
@@ -42,7 +42,9 @@ class MEP_Meta_Boxes {
 			'_mep_manufacturer_sku', '_mep_lead_time', '_mep_price', '_mep_pack_size',
 			'_mep_preferred_supplier', '_mep_route_id', '_mep_assigned_equipment_id',
 			'_mep_actual_scrap', '_mep_actual_labor_mins', '_mep_start_date',
-			'_mep_components', '_mep_steps', '_mep_maintenance_logs', '_mep_version'
+			'_mep_components', '_mep_steps', '_mep_maintenance_logs', '_mep_version',
+			'_mep_moq', '_mep_std_pkg', '_mep_sales_tax', '_mep_default_wh',
+			'_mep_payment_terms', '_mep_carrier'
 		);
 
 		foreach ( $all_fields as $meta_key ) {
@@ -124,6 +126,14 @@ class MEP_Meta_Boxes {
 			<label><strong><?php _e( 'Lead Time (Days):', 'manufacturing-erp-pro' ); ?></strong></label><br>
 			<input type="number" name="mep_lead_time" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_lead_time', true ) ); ?>" class="widefat" placeholder="14">
 		</p>
+		<p>
+			<label><strong><?php _e( 'Minimum Order Quantity (MOQ):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" name="mep_moq" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_moq', true ) ); ?>" class="widefat" placeholder="500">
+		</p>
+		<p>
+			<label><strong><?php _e( 'Standard Packaging:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_std_pkg" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_std_pkg', true ) ); ?>" class="widefat" placeholder="e.g., Roll of 50m">
+		</p>
 		<hr>
 		<h4><?php _e( 'Where Used (BOM Presence):', 'manufacturing-erp-pro' ); ?></h4>
 		<?php
@@ -169,6 +179,20 @@ class MEP_Meta_Boxes {
 			<label><strong><?php _e( 'Pack Size:', 'manufacturing-erp-pro' ); ?></strong></label><br>
 			<input type="number" name="mep_pack_size" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_pack_size', true ) ?: 1 ); ?>" class="widefat">
 			<small><?php _e( 'Units per shipping carton.', 'manufacturing-erp-pro' ); ?></small>
+		</p>
+		<p>
+			<label><strong><?php _e( 'Sales Tax Rate (%):', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="number" step="0.01" name="mep_sales_tax" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_sales_tax', true ) ); ?>" class="widefat">
+		</p>
+		<p>
+			<label><strong><?php _e( 'Default Shipping Warehouse:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<?php $warehouses = get_posts( array( 'post_type' => 'mep_warehouse', 'numberposts' => -1 ) ); ?>
+			<select name="mep_default_wh" class="widefat">
+				<option value=""><?php _e( '-- Select --', 'manufacturing-erp-pro' ); ?></option>
+				<?php foreach ( $warehouses as $wh ) : ?>
+					<option value="<?php echo $wh->ID; ?>" <?php selected( get_post_meta( $post->ID, '_mep_default_wh', true ), $wh->ID ); ?>><?php echo $wh->post_title; ?></option>
+				<?php endforeach; ?>
+			</select>
 		</p>
 		<?php
 	}
@@ -310,6 +334,14 @@ class MEP_Meta_Boxes {
 		<p>
 			<label><strong><?php _e( 'Total Amount ($):', 'manufacturing-erp-pro' ); ?></strong></label><br>
 			<input type="number" step="0.01" name="mep_total_amount" value="<?php echo esc_attr( $total ); ?>" class="widefat">
+		</p>
+		<p>
+			<label><strong><?php _e( 'Payment Terms:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_payment_terms" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_payment_terms', true ) ); ?>" class="widefat" placeholder="e.g., Net 30">
+		</p>
+		<p>
+			<label><strong><?php _e( 'Preferred Carrier:', 'manufacturing-erp-pro' ); ?></strong></label><br>
+			<input type="text" name="mep_carrier" value="<?php echo esc_attr( get_post_meta( $post->ID, '_mep_carrier', true ) ); ?>" class="widefat" placeholder="e.g., DHL, FedEx">
 		</p>
 		<?php
 	}
@@ -518,6 +550,12 @@ class MEP_Meta_Boxes {
 			'mep_pack_size' => '_mep_pack_size',
 			'mep_preferred_supplier' => '_mep_preferred_supplier',
 			'mep_route_id' => '_mep_route_id',
+			'mep_moq' => '_mep_moq',
+			'mep_std_pkg' => '_mep_std_pkg',
+			'mep_sales_tax' => '_mep_sales_tax',
+			'mep_default_wh' => '_mep_default_wh',
+			'mep_payment_terms' => '_mep_payment_terms',
+			'mep_carrier' => '_mep_carrier',
 		);
 
 		foreach ( $fields as $key => $meta ) {

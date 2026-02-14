@@ -60,6 +60,7 @@ class Manufacturing_ERP_Pro {
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-importer.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-seeder.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-meta-boxes.php';
+		require_once MEP_PLUGIN_DIR . 'inc/class-mep-customizer.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-frontend.php';
 		require_once MEP_PLUGIN_DIR . 'inc/class-mep-api.php';
 
@@ -86,6 +87,7 @@ class Manufacturing_ERP_Pro {
 	public function init_modules() {
 		MEP_CPT::get_instance();
 		MEP_Meta_Boxes::init();
+		MEP_Customizer::init();
 		MEP_Frontend::get_instance();
 		MEP_API::get_instance();
 

@@ -10,8 +10,8 @@
     <title>Work Order #<?php echo esc_html( $data['id'] ); ?> - Manufacturing ERP Pro</title>
     <style>
         body { font-family: sans-serif; padding: 30px; color: #222; line-height: 1.4; }
-        .header { display: flex; justify-content: space-between; border-bottom: 3px solid #2271b1; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-start; }
-        h1 { margin: 0; color: #2271b1; }
+        .header { display: flex; justify-content: space-between; border-bottom: 3px solid <?php echo get_theme_mod( 'mep_accent_color', '#2271b1' ); ?>; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-start; }
+        h1 { margin: 0; color: <?php echo get_theme_mod( 'mep_accent_color', '#2271b1' ); ?>; }
         .badge { background: #eee; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
         .section { margin-bottom: 30px; }
         h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; font-size: 1.2em; color: #444; }
@@ -30,7 +30,14 @@
 <body>
     <div class="header">
         <div>
+            <?php
+            $logo_id = get_theme_mod( 'mep_factory_logo' );
+            if ( $logo_id ) :
+                echo wp_get_attachment_image( $logo_id, 'medium', false, array( 'style' => 'max-height: 60px; width: auto; margin-bottom: 10px;' ) );
+            endif;
+            ?>
             <h1>WORK ORDER</h1>
+            <p><strong><?php echo esc_html( get_theme_mod( 'mep_company_legal_name', 'LeatherCraft Manufacturing Co.' ) ); ?></strong></p>
             <p><strong>#<?php echo esc_html( $data['id'] ); ?></strong></p>
             <div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; display: inline-block; text-align: center;">
                 <div style="font-family: 'Courier New', Courier, monospace; letter-spacing: 5px; font-weight: bold;">|| ||| | ||| || ||</div>
@@ -125,7 +132,7 @@
     </div>
 
     <div class="footer">
-        Manufacturing ERP Pro - Enterprise Production Control System
+        <?php echo esc_html( get_theme_mod( 'mep_print_footer_note', 'Manufacturing ERP Pro - Enterprise Production Control System' ) ); ?>
     </div>
 
     <div class="no-print" style="margin-top: 20px; text-align: center;">

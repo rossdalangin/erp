@@ -132,7 +132,11 @@ class MEP_Admin_UI {
 			$help_mode = get_option( 'mep_help_mode', 'off' );
 			$help_suffix = $help_mode === 'on' ? ' ℹ️' : '';
 			$bom_url = admin_url( 'admin.php?page=mep-bom-builder&product_id=' . $post->ID );
-			$actions['mep_bom'] = '<a href="' . esc_url( $bom_url ) . '" style="color: #2271b1; font-weight: bold;" title="' . esc_attr__( 'Open visual BOM editor', 'manufacturing-erp-pro' ) . '">' . __( 'Visual BOM Builder', 'manufacturing-erp-pro' ) . $help_suffix . '</a>';
+
+			$actions['mep_bom'] = '<a href="' . esc_url( $bom_url ) . '" style="color: #2271b1; font-weight: bold;" title="' . esc_attr__( 'Open visual BOM editor', 'manufacturing-erp-pro' ) . '">' . __( '🛠️ BOM Builder', 'manufacturing-erp-pro' ) . $help_suffix . '</a>';
+
+			$release_url = admin_url( 'admin.php?page=mep-production&product_id=' . $post->ID );
+			$actions['mep_release'] = '<a href="' . esc_url( $release_url ) . '" style="color: #46b450;" title="' . esc_attr__( 'Release production order', 'manufacturing-erp-pro' ) . '">' . __( '🚀 Release WO', 'manufacturing-erp-pro' ) . '</a>';
 		}
 		return $actions;
 	}
