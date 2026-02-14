@@ -343,6 +343,21 @@ class MEP_Admin {
 										<input type="number" step="0.01" name="mep_default_labor_rate" value="<?php echo esc_attr( get_option( 'mep_default_labor_rate', '0.50' ) ); ?>" class="regular-text">
 									</td>
 								</tr>
+								<tr>
+									<th scope="row"><?php _e( 'Default Production Warehouse', 'manufacturing-erp-pro' ); ?></th>
+									<td>
+										<?php
+										$warehouses = get_posts( array( 'post_type' => 'mep_warehouse', 'numberposts' => -1 ) );
+										$current_wh = get_option( 'mep_default_warehouse', '' );
+										?>
+										<select name="mep_default_warehouse">
+											<option value=""><?php _e( '-- Select --', 'manufacturing-erp-pro' ); ?></option>
+											<?php foreach ( $warehouses as $wh ) : ?>
+												<option value="<?php echo $wh->ID; ?>" <?php selected( $current_wh, $wh->ID ); ?>><?php echo $wh->post_title; ?></option>
+											<?php endforeach; ?>
+										</select>
+									</td>
+								</tr>
 							</table>
 
 							<input type="submit" name="mep_action_save_settings" class="button button-primary" value="<?php _e( 'Update System Settings', 'manufacturing-erp-pro' ); ?>">
@@ -461,6 +476,7 @@ class MEP_Admin {
 			update_option( 'mep_currency', sanitize_text_field( $_POST['mep_currency'] ) );
 			update_option( 'mep_weight_unit', sanitize_text_field( $_POST['mep_weight_unit'] ) );
 			update_option( 'mep_default_labor_rate', sanitize_text_field( $_POST['mep_default_labor_rate'] ) );
+			update_option( 'mep_default_warehouse', sanitize_text_field( $_POST['mep_default_warehouse'] ) );
 
 			add_action( 'admin_notices', function() {
 				echo '<div class="updated"><p>' . __( 'Settings saved.', 'manufacturing-erp-pro' ) . '</p></div>';
