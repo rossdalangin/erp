@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Executive Dashboard - v2.0
  */
@@ -152,3 +153,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(Dashboard, null), container);
     }
 });
+
+})();

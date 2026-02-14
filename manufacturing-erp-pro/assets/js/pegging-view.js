@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Pegging View - Demand to Material Chain Visualization
  */
@@ -46,3 +47,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(PeggingView, null), container);
     }
 });
+
+})();

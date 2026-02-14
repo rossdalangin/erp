@@ -20,6 +20,15 @@ class MEP_API {
 
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+		add_filter( 'rest_prepare_mep_po', array( $this, 'expose_po_meta' ), 10, 3 );
+	}
+
+	/**
+	 * Expose PO meta at the top level for the REST API.
+	 */
+	public function expose_po_meta( $response, $post, $request ) {
+		$response->data['mep_po_lines'] = get_post_meta( $post->ID, '_mep_po_lines', true );
+		return $response;
 	}
 
 	public function register_routes() {

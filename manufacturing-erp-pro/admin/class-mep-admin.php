@@ -94,6 +94,8 @@ class MEP_Admin {
 		add_submenu_page( 'mep-dashboard', __( 'Purchase Orders', 'manufacturing-erp-pro' ), __( 'Purchase Orders', 'manufacturing-erp-pro' ), 'mep_manage_production', 'edit.php?post_type=mep_po' );
 		add_submenu_page( 'mep-dashboard', __( 'Receipt Workspace', 'manufacturing-erp-pro' ), __( 'Receipt Workspace', 'manufacturing-erp-pro' ), 'mep_manage_inventory', 'mep-po-receiving', array( $this, 'po_receiving_page' ) );
 		add_submenu_page( 'mep-dashboard', __( 'MRP Planning Engine', 'manufacturing-erp-pro' ), __( 'MRP Planning Engine', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-mrp-planning', array( $this, 'mrp_planning_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Demand Pegging', 'manufacturing-erp-pro' ), __( 'Demand Pegging', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-pegging', array( $this, 'pegging_page' ) );
+		add_submenu_page( 'mep-dashboard', __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), __( 'Supplier Scorecard', 'manufacturing-erp-pro' ), 'mep_manage_production', 'mep-supplier-scorecard', array( $this, 'supplier_scorecard_page' ) );
 
 		// --- SETTINGS ---
 		add_submenu_page( 'mep-dashboard', '', '<span style="display:block; margin: 10px 0 0 0; border-top:1px solid #ccc;"></span>', 'manage_options', 'mep-sep-6', '' );
@@ -571,19 +573,34 @@ class MEP_Admin {
 		// Scaffolding for React components
 		$deps = array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'wp-api' );
 
-		wp_enqueue_script( 'mep-bom-builder', MEP_PLUGIN_URL . 'assets/js/bom-builder.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-kanban-board', MEP_PLUGIN_URL . 'assets/js/kanban-board.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-warehouse-layout', MEP_PLUGIN_URL . 'assets/js/warehouse-layout.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-dashboard', MEP_PLUGIN_URL . 'assets/js/dashboard.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-wizard', MEP_PLUGIN_URL . 'assets/js/wizard.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-traceability', MEP_PLUGIN_URL . 'assets/js/traceability.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-mrp-suggestions', MEP_PLUGIN_URL . 'assets/js/mrp-suggestions.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-pegging-view', MEP_PLUGIN_URL . 'assets/js/pegging-view.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-supplier-scorecard', MEP_PLUGIN_URL . 'assets/js/supplier-scorecard.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-po-receiving', MEP_PLUGIN_URL . 'assets/js/po-receiving.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-quality-dashboard', MEP_PLUGIN_URL . 'assets/js/quality-dashboard.js', $deps, MEP_VERSION, true );
-		wp_enqueue_script( 'mep-capacity-planner', MEP_PLUGIN_URL . 'assets/js/capacity-planner.js', $deps, MEP_VERSION, true );
+		// Map hooks to scripts
+		$script_map = array(
+			'mep-dashboard'         => 'mep-dashboard',
+			'mep-inventory'         => 'mep-warehouse-layout',
+			'mep-bom-builder'       => 'mep-bom-builder',
+			'mep-production'        => 'mep-kanban-board',
+			'mep-quality-dashboard' => 'mep-quality-dashboard',
+			'mep-traceability'      => 'mep-traceability',
+			'mep-po-receiving'      => 'mep-po-receiving',
+			'mep-mrp-planning'      => 'mep-mrp-suggestions',
+			'mep-pegging'           => 'mep-pegging-view',
+			'mep-supplier-scorecard'=> 'mep-supplier-scorecard',
+			'mep-capacity'          => 'mep-capacity-planner',
+			'mep-wizard'            => 'mep-wizard',
+		);
+
+		$active_scripts = array();
+
+		foreach ( $script_map as $page_id => $handle ) {
+			if ( strpos( $hook, $page_id ) !== false ) {
+				wp_enqueue_script( $handle, MEP_PLUGIN_URL . "assets/js/" . str_replace('mep-', '', $handle) . ".js", $deps, MEP_VERSION, true );
+				$active_scripts[] = $handle;
+			}
+		}
+
+		// Always enqueue global search
 		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n', 'wp-api' ), MEP_VERSION, true );
+		$active_scripts[] = 'mep-erp-search';
 
 		// Localize help mode and branding
 		$settings = array(
@@ -594,9 +611,7 @@ class MEP_Admin {
 			'companyName' => get_theme_mod( 'mep_company_legal_name', 'LeatherCraft Manufacturing Co.' ),
 		);
 
-		$scripts = array( 'mep-bom-builder', 'mep-kanban-board', 'mep-warehouse-layout', 'mep-dashboard', 'mep-wizard', 'mep-traceability', 'mep-mrp-suggestions', 'mep-pegging-view', 'mep-supplier-scorecard', 'mep-po-receiving', 'mep-quality-dashboard', 'mep-capacity-planner', 'mep-erp-search' );
-
-		foreach ( $scripts as $handle ) {
+		foreach ( $active_scripts as $handle ) {
 			wp_localize_script( $handle, 'mepSettings', $settings );
 			wp_localize_script( $handle, 'wpApiSettings', array(
 				'root' => esc_url_raw( rest_url() ),

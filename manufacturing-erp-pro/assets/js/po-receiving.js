@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP PO Receiving - Visual Goods Receipt Workflow
  */
@@ -134,3 +135,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(POReceiving, null), container);
     }
 });
+
+})();

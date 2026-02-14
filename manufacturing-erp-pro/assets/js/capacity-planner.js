@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Detailed Capacity & Maintenance Planner
  */
@@ -78,3 +79,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(CapacityPlanner, null), container);
     }
 });
+
+})();

@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Quality & Compliance Dashboard
  */
@@ -71,3 +72,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(QualityDashboard, null), container);
     }
 });
+
+})();

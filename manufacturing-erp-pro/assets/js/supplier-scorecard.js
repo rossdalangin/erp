@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Supplier Scorecard - Vendor Performance Visualization
  */
@@ -75,3 +76,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(SupplierScorecard, null), container);
     }
 });
+
+})();

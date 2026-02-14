@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Production Kanban Board - with HTML5 Drag and Drop
  */
@@ -143,3 +144,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(KanbanBoard, null), container);
     }
 });
+
+})();

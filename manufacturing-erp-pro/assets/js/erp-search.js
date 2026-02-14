@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP ERP Search - Global Command Palette
  */
@@ -98,3 +99,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(root);
     wp.element.render(wp.element.createElement(ERPSearch, null), root);
 });
+
+})();

@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Setup Wizard - v2.0
  */
@@ -144,3 +145,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(SetupWizard, null), container);
     }
 });
+
+})();

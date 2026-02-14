@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP MRP Suggestions - Interactive Procurement Planning
  */
@@ -147,3 +148,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(MRPSuggestions, null), container);
     }
 });
+
+})();

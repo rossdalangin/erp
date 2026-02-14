@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Warehouse Layout - Visual Inventory Management
  */
@@ -186,3 +187,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(WarehouseLayout, null), container);
     }
 });
+
+})();

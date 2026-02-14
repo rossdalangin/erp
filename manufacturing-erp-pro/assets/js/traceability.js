@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP Lot Traceability - Graphical Genealogy Visualization
  */
@@ -115,3 +116,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(Traceability, null), container);
     }
 });
+
+})();

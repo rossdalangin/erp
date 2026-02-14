@@ -1,3 +1,4 @@
+(function() {
 /**
  * MEP BOM Builder - Interactive React Component with Real DnD
  */
@@ -280,3 +281,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wp.element.render(wp.element.createElement(BOMBuilder, { productId: productId }), container);
     }
 });
+
+})();
