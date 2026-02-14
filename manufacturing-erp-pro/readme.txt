@@ -4,7 +4,7 @@ Tags: manufacturing, erp, mrp, inventory, factory
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 
 Full-featured Manufacturing ERP for WordPress. Supports discrete and light process manufacturing.
@@ -21,10 +21,13 @@ Key Features:
 * **Traceability & Quality**: Lot genealogy visualization and QC checkpoint management.
 * **Capacity Planning**: Monitor machine load and schedule maintenance.
 * **Procurement**: Automated PO generation and supplier performance scorecards.
+* **WordPress Customizer Integration**: Brand your ERP with factory logos and accent colors.
+* **One-Click Release**: Move from engineering to production with a single click.
 
 == Installation ==
 
-1. Upload the `manufacturing-erp-pro` folder to the `/wp-content/plugins/` directory.
+1. Download the plugin folder.
+2. Upload the `manufacturing-erp-pro` folder to the `/wp-content/plugins/` directory of your WordPress installation.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Follow the Setup Wizard in the ERP Pro menu to configure your factory.
 
