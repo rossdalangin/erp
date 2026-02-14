@@ -1,159 +1,171 @@
-# Manufacturing ERP Pro: The Complete Operational Manual (v1.7.0)
+# Manufacturing ERP Pro: Comprehensive Operational Guide (v1.0.0)
 
-Welcome to **Manufacturing ERP Pro**. This manual is designed to help you transform your manufacturing facility into a data-driven, highly efficient operation.
-
----
-
-## 1. Installation & Initial Setup
-
-### System Requirements
-- **WordPress:** 5.8 or higher.
-- **PHP:** 7.4 or higher (8.1 recommended for performance).
-- **Database:** MySQL 5.7+ or MariaDB 10.3+.
-- **Recommended Plugin:** A database optimization plugin (to handle high-frequency transaction tables).
-
-### Installation Steps
-1. **Upload:** Download the `manufacturing-erp-pro.zip` and upload it via the WordPress Admin (`Plugins > Add New > Upload Plugin`).
-2. **Activate:** Once uploaded, click "Activate."
-3. **Setup Wizard:** Upon activation, you will be redirected to the **Setup Wizard**.
-    - **Step 1:** Select your default Unit of Measure (Metric or Imperial).
-    - **Step 2:** Define your primary warehouse name (e.g., "Main Plant").
-    - **Step 3:** (Optional but Recommended) Click "Seed Sample Data" to load the **LeatherCraft Co.** demo. This provides a complete working environment for testing.
+Welcome to the **Manufacturing ERP Pro** master manual. This document provides a chronological, step-by-step roadmap to implementing and effectively using the ERP system in a real-world manufacturing SME.
 
 ---
 
-## 2. Core Operational Modules
+## Phase 1: Installation & Initial Configuration
 
-### 2.0 Frontend Portals & Shop Floor UI
+### Step 1: Plugin Activation
+1. Navigate to your WordPress Dashboard > **Plugins > Add New**.
+2. Upload the `manufacturing-erp-pro.zip` file.
+3. Click **Activate**. You will be immediately redirected to the **Setup Wizard**.
 
-Manufacturing ERP Pro provides dedicated frontend pages for shop floor operators and B2B customers, allowing them to interact with the system without needing access to the WordPress dashboard.
-
-#### 1. Shop Floor Command Center
-Accessible by default at `/erp-shop-floor/`.
-- **Production Board**: A touch-optimized Kanban board for moving Work Orders.
-- **Inventory & Bins**: A visual interface for warehouse staff to perform bin transfers via tablets.
-- **Security**: Access is restricted to logged-in users with appropriate ERP roles.
-
-#### 2. B2B Customer Portal
-Accessible by default at `/erp-customer-portal/`.
-- Customers can view their demand forecasts, historical order status, and track shipments.
-- This portal can be embedded on any WordPress page using the `[mep_customer_portal]` shortcode.
-
-
-### 2.1 Inventory & Warehouse Management
-Manage your raw materials and finished goods with surgical precision.
-
-- **Creating Materials:** Go to `ERP Pro > Materials`. Define your SKU, Unit of Measure, and **Safety Stock**.
-- **Visual Warehouse:** Navigate to `ERP Pro > Visual Warehouse`.
-    - **Heatmap:** Bins will turn Yellow (>70% capacity) or Red (>90% capacity) based on your settings.
-    - **Transfers:** To move stock, drag a material card from its source bin and drop it into the destination bin.
-- **Lot Tracking:** Every "Receive" transaction generates a unique Lot ID, enabling full downstream traceability.
-
-### 2.2 The Visual BOM Builder
-Build multi-level assemblies using our proprietary drag-and-drop canvas.
-
-1. **Select Product:** Choose a finished product from the `Products` list.
-2. **Library:** Drag Materials or **Operations** (Work Centers) from the left sidebar into the canvas.
-3. **Recursive Assemblies:** To nest a sub-assembly (e.g., a "Strap Assembly" inside a "Bag"), drag the sub-assembly product node into the main tree.
-4. **Real-Time Costing:** Watch the "Estimated Roll-up Cost" update live as you change quantities or scrap percentages.
-5. **Versioning:** Click "Save as New Version" to archive the previous BOM and activate the new one.
-
-### 2.3 Production & Kanban Planning
-Manage your shop floor travelers visually.
-
-- **Backlog:** Newly created Work Orders appear here.
-- **In-Progress:** When a worker starts an order, drag it to this column. You will be prompted to assign an **Operator ID**.
-- **Completion:** Drag to "Completed" to capture:
-    - **Actual Scrap:** Used for yield variance reporting.
-    - **Actual Labor:** Used for labor cost variance analysis.
-
-### 2.4 MRP (Material Requirements Planning)
-The "Brain" of your factory.
-
-1. **Demand Source:** Enter your targets in `ERP Pro > Forecasts`.
-2. **Run MRP:** Click "Recalculate MRP Results." This runs in the background to prevent server timeouts.
-3. **Pegging:** Use the `Pegging View` to see *why* the system is asking you to buy 500 meters of leather (traced back to a specific customer forecast).
-4. **Procurement:** Select items from the suggestions and click "Generate Purchase Orders" to automatically create POs for your suppliers.
+### Step 2: The Setup Wizard
+1. **Company Profile**: Select your manufacturing type (**Discrete** or **Process**).
+2. **Experience Mode**: Choose between:
+    - **Clean Slate**: Recommended for live production if you have your data ready.
+    - **Demo Mode (LeatherCraft Co.)**: Recommended for first-time users to see how data interlinks.
+3. Click **Finish**. You are now ready to begin.
 
 ---
 
-## 3. Quality & Traceability
+## Phase 2: Master Data Setup (The Foundation)
 
-### 3.1 Quality Dashboard
-Monitor your factory's health in real-time.
-- **QC Pass Rate:** See the percentage of inspections that passed vs. failed.
-- **Defect Pareto:** Identify the most common production issues (e.g., "Loose Stitching").
-- **Active NCRs:** Monitor Non-Conformance Reports currently being investigated.
-- **CAPA Workflow:** Promote critical NCRs to the **CAPA (Corrective and Preventive Action)** stage. This adds a dedicated tracking layer for long-term resolution and preventive measures.
+Before you can produce anything, you must define *what* you use and *who* you buy it from.
 
-### 3.2 Lot Genealogy Trace
-In the event of a customer complaint:
-1. Enter the Batch/Lot ID in the `Traceability` module.
-2. View the **Genealogy Graph** showing every upstream movement (which supplier provided the leather, which operator cut the pattern).
-3. Export the report as a PDF for compliance audits.
+### Step 3: Register Suppliers
+1. Go to **ERP Pro > Suppliers**.
+2. Click **Add New Supplier**.
+3. Enter the Company Name, Contact Email, and **Average Lead Time**.
+    - *Tip*: Lead time is critical for MRP planning. If a supplier takes 14 days to deliver leather, the system will use this to suggest when you should place your order.
 
----
+### Step 4: Define Materials (Raw Items)
+1. Go to **ERP Pro > Materials**.
+2. Click **Add New Material**.
+3. **Crucial Fields**:
+    - **SKU**: A unique identifier (e.g., `MAT-LTH-TAN-01`).
+    - **Avg Unit Cost**: Enter your current purchase price. This drives your **BOM Cost Roll-up**.
+    - **Safety Stock**: The minimum amount you must have on hand. If stock falls below this, MRP will flag it.
+    - **Preferred Supplier**: Link this material to a supplier created in Step 3.
 
-## 4. Advanced Capacity Planning
-
-Avoid bottlenecks before they happen.
-- **Machine Schedule:** View the `Capacity Planner` to see the load vs. capacity for every Work Center.
-- **Maintenance Logs:** Track the health of your equipment. Log every service and repair to understand the "Total Cost of Ownership" for your machines.
-
----
-
-## 5. Security & Governance
-This is an ERP-grade system, not a toy.
-
-- **Roles:** Assign users to `ERP Administrator`, `Production Manager`, `Warehouse Clerk`, or `Quality Inspector`.
-- **Audit Logs:** Every status change, inventory move, and BOM update is logged. Access these in `System Utilities > Audit Logs`.
-- **Reset Safely:** To wipe transactional data while keeping your products, use the "Soft Reset." A "Hard Reset" requires the confirmation phrase: `RESET PRODUCTION ENVIRONMENT`.
-- **Help Mode:** Click the "Interactive Help Mode" button on the Dashboard. When enabled, the system displays information icons (ℹ️) and contextual tooltips across the BOM Builder, Kanban, and Warehouse views to guide new users.
-- **ERP Search (Command Palette):** Press `Ctrl+K` at any time to open the global search. Quickly jump between modules, search for SKUs, or trace Lots without multiple clicks.
+### Step 5: Define Equipment & Resources
+1. Go to **ERP Pro > Equipment**.
+2. Click **Add New Equipment**.
+3. Enter the **Daily Capacity (Minutes)**.
+    - *Example*: A 1-shift operation (8 hours) is 480 minutes.
+4. Set the **Labor Rate ($/min)**. This is used to calculate the manufacturing cost of your products.
 
 ---
 
-## 6. Pro UX Workflows
+## Phase 3: Engineering & Design
 
-### 6.1 Engineering to Production (The One-Click Release)
-Inside the **Visual BOM Builder**, after you have finalized your product structure and cost roll-up, you don't need to navigate away. Use the **🚀 Release Work Order** button in the footer to immediately launch a production job.
+### Step 6: Create Products (Finished Goods)
+1. Go to **ERP Pro > Products**.
+2. Click **Add New Product**.
+3. Enter the Product Name (e.g., "Luxury Handbag") and SKU.
+4. Set the **Standard Selling Price**.
 
-### 6.2 Visual Replenishment
-In the **Visual Warehouse** view, you can drag any material from a bin into the **🛒 Reorder Basket** sidebar. Once you have flagged all needed items, one click will take you to the MRP Planning page to finalize the procurement.
+### Step 7: Build the Visual BOM (Bill of Materials)
+1. In the **Products** list, click **BOM Builder** for your new product.
+2. **Drag & Drop**:
+    - From the left sidebar, drag **Materials** into the central canvas.
+    - Adjust the **Quantity** (e.g., `1.2 m2` of leather).
+    - Set a **Scrap Factor** (e.g., `0.05` for 5% waste during cutting).
+3. **Nesting**: If your bag has a "Strap" that is also a manufactured product, drag the "Strap" product into the canvas to create a multi-level BOM.
+4. **Cost Roll-up**: Watch the "Total Estimated Cost" at the bottom. It updates instantly.
+5. Click **Save as New Version**.
 
-### 6.3 Automated QC Loop
-When you drag a Work Order to "Completed" on the Production Board, the system automatically:
-1. Generates a Lot ID.
-2. Creates a PENDING Quality Check.
-3. Provides a direct link to the QC record for immediate inspection.
-
----
-
-## 7. Quick Start Examples
-
-### Scenario A: Producing a New Leather Bag
-1.  **Define Materials:** Go to `ERP Pro > Materials`. Add "Tan Cowhide" and "Heavy Duty Zip".
-2.  **Define Product:** Go to `ERP Pro > Products`. Add "Classic Tan Handbag".
-3.  **Build BOM:** Click "Visual BOM Builder" on the handbag row. Drag the Zip and Cowhide into the tree. Set Cowhide quantity to `1.2` and Zip to `1`.
-4.  **Receive Stock:** Go to `ERP Pro > Receive Shipments`. Drag leather from a draft PO into "Main Warehouse".
-5.  **Release Production:** Go to `ERP Pro > Work Orders`. Create a new order for 10 units.
-6.  **Execute:** Go to `ERP Pro > Production Board`. Drag the order to "In Progress".
-
-### Scenario B: Handling a Quality Failure
-1.  **Inspect:** On the Shop Floor Portal, mark a Work Order as "Completed".
-2.  **Log QC:** The system prompts for inspection. Select "FAIL" and enter "Scratch on leather".
-3.  **Investigate:** Go to `ERP Pro > Quality Dashboard`. Click on the new NCR.
-4.  **Action Plan:** If it's a systemic issue, click "Promote to CAPA" and enter a preventive plan (e.g., "Add protective sheets between stacked bags").
+### Step 8: Define the Production Route
+1. Go to **ERP Pro > Routes**.
+2. Link a route to your Product.
+3. Add steps in sequence:
+    - *Step 1*: Cutting (Work Center: Laser Cutter, Time: 15 mins).
+    - *Step 2*: Stitching (Work Center: Sewing Machine, Time: 45 mins).
+4. These steps define the labor cost and the schedule for your capacity planning.
 
 ---
 
-## 8. Troubleshooting FAQ
+## Phase 4: Inventory Establishment
 
-**Q: Why is my BOM cost roll-up incorrect?**
-A: Ensure every material in the BOM has an "Avg Cost" defined in its master record.
+### Step 9: Establish Warehouse Layout
+1. Go to **ERP Pro > Warehouses**. Create a "Main Warehouse".
+2. Go to **ERP Pro > Bins**. Create bins like "Raw Material Rack A" and "Finished Goods Zone". Link them to the warehouse.
 
-**Q: How do I handle rework?**
-A: When a QC check fails, select "Trigger Rework." The system will automatically create a linked Work Order with the "REWORK" prefix.
+### Step 10: Receive Initial Stock
+1. Go to **ERP Pro > Receive Shipments**.
+2. **Visual Receiving**: Drag a material from the "Open PO Items" list (or use the Manual Receipt button) and drop it into a specific bin.
+3. The system will prompt for a **Lot Number**. Enter it to ensure traceability.
+4. **Result**: Your inventory levels are now updated, and the transaction is logged in the Audit Trail.
 
-**Q: Can I export my inventory to my accounting software?**
-A: Yes. Use the "Export Inventory CSV" button in the `Visual Warehouse` or `System Utilities` pages.
+---
+
+## Phase 5: Planning & Procurement
+
+### Step 11: Create a Forecast
+1. Go to **ERP Pro > Forecasts**.
+2. Enter your expected demand for the next month (e.g., "Winter Sale - 500 units of Handbags").
+
+### Step 12: Run the MRP Engine
+1. Go to **ERP Pro > MRP Planning**.
+2. Click **Recalculate MRP**.
+3. **Analyze Results**: The system will explode your 500-unit forecast into raw material requirements, compare them with current stock, and show "Purchase Suggestions".
+4. **Pegging**: Click on a suggestion to see the **Pegging View**. It will show exactly which forecast is driving the need for more leather.
+
+### Step 13: Generate Purchase Orders
+1. In the MRP Planning screen, select the materials you need to buy.
+2. Click **Generate Purchase Orders**.
+3. The system creates draft POs in **ERP Pro > Purchase Orders**, ready to be sent to your suppliers.
+
+---
+
+## Phase 6: Production Execution
+
+### Step 14: Release Work Orders
+1. You can release a Work Order directly from the **BOM Builder** (One-Click Release) or via **ERP Pro > Work Orders > Add New**.
+2. Specify the **Target Quantity** and **Due Date**.
+3. The order now appears in the "Released" state.
+
+### Step 15: The Shop Floor Kanban Board
+1. Open the **Production Board** (via Admin or the `/erp-shop-floor/` frontend page).
+2. **Start Production**: Drag the Work Order card from "Backlog" to **"In Progress"**.
+    - Assign an **Operator** and a **Machine**.
+3. **Finish Production**: Drag the card to **"Completed"**.
+    - **Log Actuals**: The system will ask for **Actual Scrap** and **Actual Labor Time**.
+    - **Auto-Inventory**: The raw materials are automatically deducted (backflushed) from inventory, and the finished products are added to stock.
+    - **Auto-QC**: A PENDING Quality Check is automatically generated for the new batch.
+
+---
+
+## Phase 7: Quality & Traceability
+
+### Step 16: Perform Quality Inspections
+1. Go to **ERP Pro > Quality Dashboard**.
+2. Find the PENDING check for your recent batch.
+3. Mark it as **PASS** or **FAIL**.
+4. **Handling Failures**: If it fails, the system creates an **NCR (Non-Conformance Report)**.
+5. **CAPA**: If the defect is serious, click **Promote to CAPA** on the NCR page to define a long-term corrective action plan.
+
+### Step 17: Lot Traceability (The Recall Test)
+1. If a customer reports a defect in "Batch #101", go to **ERP Pro > Traceability**.
+2. Enter the Batch/Lot ID.
+3. The system displays a **Visual Genealogy Graph**.
+    - You can see exactly which supplier lot of leather was used.
+    - You can see which operator performed the stitching.
+    - You can see which other Work Orders used the same material lot (to find other potentially defective products).
+
+---
+
+## Phase 8: Monitoring & Optimization
+
+### Step 18: Executive Dashboards
+1. Monitor the **Main Dashboard** for high-level KPIs:
+    - **Inventory Value**: Total capital tied up in stock.
+    - **OTD (On-Time Delivery)**: Percentage of orders completed by their due date.
+    - **Scrap Rate**: Are you wasting too much material?
+2. Check the **Capacity Planner** to ensure no machines are over-scheduled.
+
+### Step 19: System Maintenance
+1. **Audit Logs**: Periodically review **System Utilities > Audit Logs** to track all user actions.
+2. **Backups**: Use the **Export ERP Backup** tool before performing any major data changes.
+3. **Soft Reset**: Use this to clear your transaction history at the end of a fiscal year while keeping your Material/Product master data.
+
+---
+
+## Troubleshooting & Tips
+
+- **BOM Costs are $0?** Check that your raw materials have an "Avg Unit Cost" set.
+- **MRP showing no suggestions?** Check that your Forecasts are "Published" and that the Safety Stock on your materials is set correctly.
+- **Cannot move Kanban cards?** Ensure your user account has the `mep_manage_production` role capability.
+
+**Congratulations!** You have successfully implemented a complete manufacturing lifecycle in Manufacturing ERP Pro.
