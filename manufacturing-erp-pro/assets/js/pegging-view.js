@@ -36,16 +36,22 @@ const PeggingView = () => {
     return wp.element.createElement('div', { className: 'mep-pegging-container' },
         wp.element.createElement('h2', null, 'Demand Pegging View (Demand → BOM → Materials)'),
         wp.element.createElement('div', { style: { background: '#fff', padding: '20px', border: '1px solid #ccc' } },
-            peggingData.map((node, i) => wp.element.createElement(PeggingNode, { key: i, label: node.label, children: node.children }))
+            (peggingData || []).map((node, i) => wp.element.createElement(PeggingNode, { key: i, label: node.label, children: node.children }))
         )
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-pegging-root');
     if (container) {
         wp.element.render(wp.element.createElement(PeggingView, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

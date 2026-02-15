@@ -42,7 +42,7 @@ const KanbanBoard = () => {
             wp.apiFetch({ path: '/mep/v1/work-orders' }),
             wp.apiFetch({ path: '/mep/v1/operators' }),
             wp.apiFetch({ path: '/mep/v1/equipment' })
-        ]).then(([woData, opData, eqData]) => {
+        ]).then(([woData, opData, eqData]).catch(err => console.error('Fetch Error:', err)) => {
                 setWorkOrders(woData);
                 setOperators(opData);
                 setEquipment(eqData);
@@ -88,7 +88,7 @@ const KanbanBoard = () => {
             path: `/mep/v1/work-orders/${id}/status`,
             method: 'POST',
             data: { status: nextStatus, ...extraData }
-        }).then((res) => {
+        }).then((res).catch(err => console.error('Fetch Error:', err)) => {
             if (nextStatus === 'completed' && res.qc_id) {
                 alert(`${__('Production Complete!', 'manufacturing-erp-pro')}\n${__('Lot Assigned:', 'manufacturing-erp-pro')} ${res.lot_number}\n${__('QC Check Created:', 'manufacturing-erp-pro')} #${res.qc_id}`);
             }
@@ -132,18 +132,24 @@ const KanbanBoard = () => {
             onDrop: (e) => onDrop(e, col.id),
         },
             wp.element.createElement('h3', null, col.label),
-            workOrders.filter(wo => wo.status === col.id).map(wo =>
+            (workOrders || []).filter(wo => wo.status === col.id).map(wo =>
                 wp.element.createElement(WorkOrderCard, { key: wo.id, wo: wo, onDragStart: onDragStart, helpMode: helpMode })
             )
         ))
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-kanban-root');
     if (container) {
         wp.element.render(wp.element.createElement(KanbanBoard, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

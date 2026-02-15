@@ -95,7 +95,7 @@ const Dashboard = () => {
             // Capacity Planner Snapshot
             wp.element.createElement('div', { style: { background: '#fff', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } },
                 wp.element.createElement('h3', { style: { marginTop: 0 } }, __('Resource Utilization', 'manufacturing-erp-pro')),
-                capacity.length > 0 ? capacity.map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
+                capacity.length > 0 ? (capacity || []).map(item => wp.element.createElement('div', { key: item.id, style: { marginBottom: '15px' } },
                     wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px' } },
                         wp.element.createElement('span', null, item.name),
                         wp.element.createElement('span', { style: { fontWeight: 'bold' } }, `${item.percent}%`)
@@ -146,11 +146,17 @@ const Dashboard = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-dashboard-root');
     if (container) {
         wp.element.render(wp.element.createElement(Dashboard, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

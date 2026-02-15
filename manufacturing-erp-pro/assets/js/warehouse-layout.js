@@ -1,4 +1,5 @@
 (function() {
+const { __ } = wp.i18n;
 /**
  * MEP Warehouse Layout - Visual Inventory Management
  */
@@ -93,9 +94,9 @@ const WarehouseLayout = () => {
                     target_bin_id: targetBinId,
                     quantity: parseFloat(transferQty)
                 }
-            }).then(() => {
+            }).then(().catch(err => console.error('Fetch Error:', err)) => {
                 // Reload bins
-                wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins);
+                wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins).catch(err => console.error('Fetch Error:', err));
             }).catch(err => {
                 alert(__('Inventory transfer failed. Check stock levels and permissions.', 'manufacturing-erp-pro'));
                 console.error(err);
@@ -148,7 +149,7 @@ const WarehouseLayout = () => {
                 title: helpMode ? 'Warehouse Grid: Shows bin occupancy. Drag materials between cards to perform a visual bin transfer.' : '',
                 style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }
             },
-                bins.map(bin => wp.element.createElement(Bin, {
+                (bins || []).map(bin => wp.element.createElement(Bin, {
                     key: bin.id,
                     bin: bin,
                     onDragStart,
@@ -182,11 +183,17 @@ const WarehouseLayout = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-warehouse-root');
     if (container) {
         wp.element.render(wp.element.createElement(WarehouseLayout, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

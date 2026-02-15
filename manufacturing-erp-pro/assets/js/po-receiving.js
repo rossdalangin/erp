@@ -1,4 +1,5 @@
 (function() {
+const { __ } = wp.i18n;
 /**
  * MEP PO Receiving - Visual Goods Receipt Workflow
  */
@@ -31,10 +32,10 @@ const POReceiving = () => {
         Promise.all([
             wp.apiFetch({ path: '/mep/v1/work-orders' }), // Using this for now or need a real PO list
             wp.apiFetch({ path: '/mep/v1/warehouses' })
-        ]).then(([woData, whData]) => {
+        ]).then(([woData, whData]).catch(err => console.error('Fetch Error:', err)) => {
             // Need real POs, but let's assume we fetch them
             wp.apiFetch({ path: '/wp/v2/mep_po?status=publish' }).then(poData => {
-                 setPos(poData.map(p => ({ id: p.id, title: p.title.rendered, items: p.mep_po_lines || [] })));
+                 setPos(poData.map(p => ({ id: p.id, title: p.title.rendered, items: p.mep_po_lines || [] }).catch(err => console.error('Fetch Error:', err))));
                  setLoading(false);
             });
             setWarehouses(whData);
@@ -44,7 +45,7 @@ const POReceiving = () => {
 
     useEffect(() => {
         if (selectedWh) {
-            wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins);
+            wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins).catch(err => console.error('Fetch Error:', err));
         }
     }, [selectedWh]);
 
@@ -71,10 +72,10 @@ const POReceiving = () => {
                     reference_id: item.poId,
                     type: 'RECEIVE'
                 }
-            }).then(() => {
+            }).then(().catch(err => console.error('Fetch Error:', err)) => {
                 alert(__('Goods Received Successfully!', 'manufacturing-erp-pro'));
                 // Refresh bins
-                wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins);
+                wp.apiFetch({ path: `/mep/v1/warehouses/${selectedWh}/bins` }).then(setBins).catch(err => console.error('Fetch Error:', err));
             }).catch(err => {
                 alert(__('Failed to receive goods. Please check permissions.', 'manufacturing-erp-pro'));
                 console.error(err);
@@ -94,7 +95,7 @@ const POReceiving = () => {
             title: helpMode ? 'PO List: Select an open Purchase Order to view its lines.' : ''
         },
             wp.element.createElement('h3', null, '📑 ' + __('Open Purchase Orders', 'manufacturing-erp-pro')),
-            pos.map(po => wp.element.createElement('div', {
+            (pos || []).map(po => wp.element.createElement('div', {
                 key: po.id,
                 onClick: () => setSelectedPo(po),
                 className: 'mep-library-item',
@@ -119,7 +120,7 @@ const POReceiving = () => {
                 className: 'mep-bins-grid',
                 title: helpMode ? 'Receiving Zones: Drag items from the left into these bins.' : ''
             },
-                bins.map(bin => wp.element.createElement('div', {
+                (bins || []).map(bin => wp.element.createElement('div', {
                     key: bin.id,
                     onDragOver: (e) => { e.preventDefault(); setDragOverBin(bin.id); },
                     onDragLeave: () => setDragOverBin(null),
@@ -135,11 +136,17 @@ const POReceiving = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-po-receiving-root');
     if (container) {
         wp.element.render(wp.element.createElement(POReceiving, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

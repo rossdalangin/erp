@@ -27,7 +27,7 @@ const CapacityPlanner = () => {
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
     return wp.element.createElement('div', { className: 'mep-capacity-planner' },
-        equipment.map(item => wp.element.createElement('div', {
+        (equipment || []).map(item => wp.element.createElement('div', {
             key: item.id,
             title: helpMode ? 'Machine View: Compares available time with production demand. Maintenance logs help track machine health.' : '',
             style: { background: '#fff', padding: '20px', border: '1px solid #ccd0d4', marginBottom: '20px' }
@@ -73,11 +73,17 @@ const CapacityPlanner = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-capacity-root');
     if (container) {
         wp.element.render(wp.element.createElement(CapacityPlanner, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

@@ -65,16 +65,22 @@ const SupplierScorecard = () => {
             title: helpMode ? 'Scorecard: Aggregates Quality (QC results) and OTD (Lead time compliance) to give each vendor a 0-100 score. Example: A score of 95 indicates a highly reliable partner.' : ''
         }, 'Supplier Performance Scorecards'),
         suppliers.length > 0 ?
-            suppliers.map(s => wp.element.createElement(ScoreCard, { key: s.id, supplier: s })) :
+            (suppliers || []).map(s => wp.element.createElement(ScoreCard, { key: s.id, supplier: s })) :
             wp.element.createElement('p', null, 'No suppliers found.')
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-supplier-scorecard-root');
     if (container) {
         wp.element.render(wp.element.createElement(SupplierScorecard, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

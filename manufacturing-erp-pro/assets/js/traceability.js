@@ -1,4 +1,5 @@
 (function() {
+const { __ } = wp.i18n;
 /**
  * MEP Lot Traceability - Graphical Genealogy Visualization
  */
@@ -110,11 +111,17 @@ const Traceability = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-traceability-root');
     if (container) {
         wp.element.render(wp.element.createElement(Traceability, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

@@ -83,7 +83,7 @@ const BOMBuilder = ({ productId }) => {
             wp.apiFetch({ path: `/mep/v1/bom/${productId}` }),
             wp.apiFetch({ path: '/mep/v1/materials' }),
             wp.apiFetch({ path: '/mep/v1/equipment' })
-        ]).then(([bomData, matData, eqData]) => {
+        ]).then(([bomData, matData, eqData]).catch(err => console.error('Fetch Error:', err)) => {
             setBom(bomData);
             setMaterials(matData);
             setEquipment(eqData);
@@ -172,10 +172,10 @@ const BOMBuilder = ({ productId }) => {
                 components: bom.bom,
                 create_new_version: newVersion
             }
-        }).then(() => {
+        }).then(().catch(err => console.error('Fetch Error:', err)) => {
             alert(__('BOM Saved Successfully!', 'manufacturing-erp-pro'));
             setNewVersion(false);
-            wp.apiFetch({ path: `/mep/v1/bom/${productId}` }).then(setBom);
+            wp.apiFetch({ path: `/mep/v1/bom/${productId}` }).then(setBom).catch(err => console.error('Fetch Error:', err));
         });
     };
 
@@ -189,7 +189,7 @@ const BOMBuilder = ({ productId }) => {
             method: 'POST',
             data: { product_id: productId, qty: parseFloat(qty), due_date: dueDate }
         }).then(res => {
-            alert(`${__('Work Order Released:', 'manufacturing-erp-pro')} #${res.wo_id}`);
+            alert(`${__('Work Order Released:', 'manufacturing-erp-pro').catch(err => console.error('Fetch Error:', err))} #${res.wo_id}`);
         }).catch(err => {
             alert(__('Failed to release Work Order.', 'manufacturing-erp-pro'));
             console.error(err);
@@ -208,7 +208,7 @@ const BOMBuilder = ({ productId }) => {
             title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure.' : '',
         },
             wp.element.createElement('h3', null, __('Materials', 'manufacturing-erp-pro')),
-            materials.map(mat => wp.element.createElement('div', {
+            (materials || []).map(mat => wp.element.createElement('div', {
                 key: mat.id,
                 className: 'mep-library-item',
                 draggable: true,
@@ -216,7 +216,7 @@ const BOMBuilder = ({ productId }) => {
             }, wp.element.createElement('span', null, '📦 '), mat.name)),
 
             wp.element.createElement('h3', { style: { marginTop: '30px' } }, __('Operations', 'manufacturing-erp-pro')),
-            equipment.map(eq => wp.element.createElement('div', {
+            (equipment || []).map(eq => wp.element.createElement('div', {
                 key: eq.id,
                 className: 'mep-library-item',
                 draggable: true,
@@ -243,7 +243,7 @@ const BOMBuilder = ({ productId }) => {
                 style: { minHeight: '500px' }
             },
                 bom.bom.length > 0 ?
-                    bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :
+                    ((bom && bom.bom) || []).map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :
                     wp.element.createElement('p', { className: 'empty-msg' }, __('Drag materials or operations here to start building...', 'manufacturing-erp-pro'))
             ),
             wp.element.createElement('footer', { className: 'mep-bom-actions', style: { marginTop: '20px', display: 'flex', alignItems: 'center', gap: '20px', background: '#f9f9f9', padding: '15px', border: '1px solid #eee' } },
@@ -271,12 +271,18 @@ const BOMBuilder = ({ productId }) => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-bom-builder-root');
     if (container) {
         const productId = container.dataset.productId;
         wp.element.render(wp.element.createElement(BOMBuilder, { productId: productId }), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

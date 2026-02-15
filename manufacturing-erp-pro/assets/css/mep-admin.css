@@ -123,21 +123,27 @@
 
 /* --- Drag & Drop Column Pattern (Generic) --- */
 .mep-column-container {
-    display: flex;
-    gap: 24px;
-    padding: 10px 0;
-    overflow-x: auto;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 24px !important;
+    padding: 20px 0 !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    align-items: flex-start !important;
 }
 
 .mep-column {
-    background: #f1f5f9;
-    border-radius: var(--mep-radius-lg);
-    padding: 20px;
-    min-width: 320px;
-    flex: 1;
-    min-height: 60vh;
-    border: 2px dashed transparent;
-    transition: var(--mep-transition);
+    background: #f1f5f9 !important;
+    border-radius: var(--mep-radius-lg) !important;
+    padding: 24px !important;
+    min-width: 350px !important;
+    flex: 1 0 350px !important;
+    min-height: 70vh !important;
+    border: 2px dashed transparent !important;
+    transition: var(--mep-transition) !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .mep-column.is-dragging-over {
@@ -156,19 +162,26 @@
 
 /* --- Kanban Board (Production) --- */
 .mep-kanban-board {
-    display: flex;
-    gap: 24px;
-    padding: 10px 0;
-    overflow-x: auto;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
+    padding: 20px 0 !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    min-width: 100% !important;
 }
 
 .mep-kanban-column {
-    background: #f1f5f9;
-    border-radius: var(--mep-radius-lg);
-    padding: 16px;
-    min-width: 320px;
-    flex: 1;
-    min-height: 70vh;
+    background: #f1f5f9 !important;
+    border-radius: var(--mep-radius-lg) !important;
+    padding: 20px !important;
+    min-width: 320px !important;
+    flex: 1 0 320px !important;
+    min-height: 75vh !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .mep-kanban-column h3 {
@@ -201,14 +214,16 @@
 
 /* --- BOM Builder --- */
 .mep-bom-layout {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 30px;
-    background: #fff;
-    border-radius: var(--mep-radius-lg);
-    border: 1px solid var(--mep-border);
-    overflow: hidden;
-    box-shadow: var(--mep-shadow-lg);
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
+    gap: 30px !important;
+    background: #fff !important;
+    border-radius: var(--mep-radius-lg) !important;
+    border: 1px solid var(--mep-border) !important;
+    overflow: hidden !important;
+    box-shadow: var(--mep-shadow-lg) !important;
+    width: 100% !important;
+    margin-top: 20px !important;
 }
 
 .mep-bom-sidebar {
@@ -334,12 +349,28 @@
 }
 
 /* Mobile Adjustments */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .mep-bom-layout {
-        grid-template-columns: 1fr;
+        display: block !important;
+    }
+
+    .mep-bom-sidebar {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--mep-border) !important;
+        margin-bottom: 20px !important;
     }
 
     .mep-kanban-board {
-        flex-direction: column;
+        flex-direction: column !important;
+    }
+
+    .mep-column-container {
+        flex-direction: column !important;
+    }
+
+    .mep-column, .mep-kanban-column {
+        width: 100% !important;
+        min-width: 100% !important;
     }
 }

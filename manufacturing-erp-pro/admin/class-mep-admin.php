@@ -573,7 +573,9 @@ class MEP_Admin {
 		// Scaffolding for React components
 		$deps = array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'wp-api' );
 
-		// Map hooks to scripts
+		// Map page slugs to scripts
+		$current_page = isset( $_GET['page'] ) ? $_GET['page'] : '';
+
 		$script_map = array(
 			'mep-dashboard'         => 'mep-dashboard',
 			'mep-inventory'         => 'mep-warehouse-layout',
@@ -591,11 +593,10 @@ class MEP_Admin {
 
 		$active_scripts = array();
 
-		foreach ( $script_map as $page_id => $handle ) {
-			if ( strpos( $hook, $page_id ) !== false ) {
-				wp_enqueue_script( $handle, MEP_PLUGIN_URL . "assets/js/" . str_replace('mep-', '', $handle) . ".js", $deps, MEP_VERSION, true );
-				$active_scripts[] = $handle;
-			}
+		if ( isset( $script_map[ $current_page ] ) ) {
+			$handle = $script_map[ $current_page ];
+			wp_enqueue_script( $handle, MEP_PLUGIN_URL . "assets/js/" . str_replace('mep-', '', $handle) . ".js", $deps, MEP_VERSION, true );
+			$active_scripts[] = $handle;
 		}
 
 		// Always enqueue global search

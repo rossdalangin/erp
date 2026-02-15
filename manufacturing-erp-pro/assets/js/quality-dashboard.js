@@ -66,11 +66,17 @@ const QualityDashboard = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-quality-dashboard-root');
     if (container) {
         wp.element.render(wp.element.createElement(QualityDashboard, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

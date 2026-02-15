@@ -93,11 +93,17 @@ const ERPSearch = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const root = document.createElement('div');
     root.id = 'mep-erp-search-root';
     document.body.appendChild(root);
     wp.element.render(wp.element.createElement(ERPSearch, null), root);
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();

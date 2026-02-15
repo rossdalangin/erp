@@ -86,7 +86,7 @@ const MRPSuggestions = () => {
             method: 'POST',
             data: { items: basket }
         }).then(data => {
-            alert(sprintf(__('Successfully created %d Purchase Orders!', 'manufacturing-erp-pro'), data.po_ids.length));
+            alert(sprintf(__('Successfully created %d Purchase Orders!', 'manufacturing-erp-pro').catch(err => console.error('Fetch Error:', err)), data.po_ids.length));
             setBasket([]);
         }).catch(err => {
             alert(__('Failed to create Purchase Orders.', 'manufacturing-erp-pro'));
@@ -120,7 +120,7 @@ const MRPSuggestions = () => {
         },
             wp.element.createElement('h3', null, '🔍 ' + __('MRP Suggestions', 'manufacturing-erp-pro')),
             suggestions.length > 0 ?
-                suggestions.map((item, i) => wp.element.createElement(SuggestionItem, { key: i, item: item, onDragStart })) :
+                (suggestions || []).map((item, i) => wp.element.createElement(SuggestionItem, { key: i, item: item, onDragStart })) :
                 wp.element.createElement('p', { style: { color: '#94a3b8', fontStyle: 'italic' } }, __('No suggestions found.', 'manufacturing-erp-pro'))
         ),
         wp.element.createElement('div', {
@@ -131,7 +131,7 @@ const MRPSuggestions = () => {
             title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation.' : ''
         },
             wp.element.createElement('h3', null, '🛒 ' + __('Draft PO Basket', 'manufacturing-erp-pro')),
-            basket.map((item, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd' } },
+            (basket || []).map((item, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd' } },
                 `Material #${item.material_id} - ${item.needed} units`
             )),
             basket.length > 0 && wp.element.createElement('button', {
@@ -143,11 +143,17 @@ const MRPSuggestions = () => {
     );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+
+const init = () => {
     const container = document.getElementById('mep-mrp-suggestions-root');
     if (container) {
         wp.element.render(wp.element.createElement(MRPSuggestions, null), container);
     }
-});
+};
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
 
 })();
