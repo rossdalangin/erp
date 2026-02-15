@@ -33,6 +33,8 @@ The plugin includes frontend portals (`/erp-shop-floor/`) specifically designed 
 ## 📄 Documentation
 
 Exhaustive documentation is provided in the `/manufacturing-erp-pro/docs/` directory:
+*   **[TUTORIAL_SCRIPT.txt](manufacturing-erp-pro/docs/TUTORIAL_SCRIPT.txt)**: A concise intro walk-through for new users.
+*   **[SOP_USER_ROLES.md](manufacturing-erp-pro/docs/SOP_USER_ROLES.md)**: Standard Operating Procedures for Admins, Managers, and Staff.
 *   **[USER_MANUAL.md](manufacturing-erp-pro/docs/USER_MANUAL.md)**: A 19-step guide for manufacturing managers.
 *   **[SPECIFICATION.md](manufacturing-erp-pro/docs/SPECIFICATION.md)**: Technical architecture, DB schema, and API documentation.
 *   **[GOVERNANCE.md](manufacturing-erp-pro/docs/GOVERNANCE.md)**: Permission matrix and role-based access control rules.

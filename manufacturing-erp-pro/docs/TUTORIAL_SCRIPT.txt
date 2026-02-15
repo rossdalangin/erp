@@ -1,0 +1,54 @@
+# Manufacturing ERP Pro: Tutorial Script (Zero to Production)
+
+## Introduction (The Elevator Pitch)
+"Welcome to Manufacturing ERP Pro. This tutorial will take you from a fresh installation to your first completed production batch. We'll be using the demo company 'LeatherCraft Co.' to show you how a leather handbag is born."
+
+---
+
+## Act 1: The Setup (1 Minute)
+1. **Scene**: The WordPress Plugins page.
+2. **Action**: Activate the plugin.
+3. **Dialogue**: "Once activated, you'll land in the Setup Wizard. Let's select 'Discrete Goods' and click 'Demo Mode'. This plants the seeds for our leather factory."
+4. **Scene**: The ERP Dashboard.
+5. **Dialogue**: "Welcome to the Command Center. You see KPIs like Output and Inventory Value. Since we're in Demo Mode, these are already populated."
+
+---
+
+## Act 2: Master Data (The Ingredients)
+1. **Scene**: ERP Pro > Materials.
+2. **Action**: Click on 'Cowhide Leather'.
+3. **Dialogue**: "Every product starts here. Notice the SKU, UOM (square meters), and Avg Cost. Most importantly, look at the 'Safety Stock'. If we fall below 100m2, the system will tell us to buy more."
+4. **Scene**: ERP Pro > Products.
+5. **Action**: Click 'BOM Builder' next to 'Leather Handbag - Tan'.
+6. **Dialogue**: "This is the brain of the operation. We've dragged 0.8m2 of leather and a stitching operation into this tree. The 'Cost Roll-up' at the top tells us exactly what this bag costs to make in real-time."
+
+---
+
+## Act 3: Planning (The Strategy)
+1. **Scene**: ERP Pro > MRP Planning.
+2. **Action**: Click 'Recalculate MRP'.
+3. **Dialogue**: "Our Forecast says we need 500 bags. MRP explodes that BOM, checks our current stock, and BOOM—here are your Purchase Suggestions. It's telling us we're short on zippers. One click, and we generate a Purchase Order."
+
+---
+
+## Act 4: Shop Floor (The Action)
+1. **Scene**: ERP Pro > Production Board.
+2. **Action**: Drag 'WO-BAG-TAN' from Backlog to 'In Progress'.
+3. **Dialogue**: "Production starts now. We assign an operator and a machine. The factory floor is now humming."
+4. **Action**: Drag the card to 'Completed'.
+5. **Dialogue**: "The job is done. We log that we used 2 extra square meters of leather as scrap. The system automatically subtracts materials from the warehouse and adds 25 handbags to our finished stock. It also creates a Quality Check automatically."
+
+---
+
+## Act 5: Quality & Traceability (The Guarantee)
+1. **Scene**: ERP Pro > Compliance Dashboard.
+2. **Action**: Mark the new batch as 'PASS'.
+3. **Dialogue**: "Quality is king. We've inspected the lot, it looks great, and it's now available for sale."
+4. **Scene**: ERP Pro > Traceability.
+5. **Action**: Type in 'LOT-BAG-001'.
+6. **Dialogue**: "If a customer ever calls with a problem, we can trace this bag back to the exact cowhide shipment received six months ago. That's ERP-grade governance."
+
+---
+
+## Conclusion
+"That's Manufacturing ERP Pro. Modular, Scalable, and Professional. Happy manufacturing!"
