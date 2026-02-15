@@ -595,12 +595,13 @@ class MEP_Admin {
 
 		if ( isset( $script_map[ $current_page ] ) ) {
 			$handle = $script_map[ $current_page ];
-			wp_enqueue_script( $handle, MEP_PLUGIN_URL . "assets/js/" . str_replace('mep-', '', $handle) . ".js", $deps, MEP_VERSION, true );
+			$filename = str_replace( 'mep-', '', $handle );
+			wp_enqueue_script( $handle, MEP_PLUGIN_URL . "assets/js/{$filename}.js", $deps, MEP_VERSION, true );
 			$active_scripts[] = $handle;
 		}
 
 		// Always enqueue global search
-		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n', 'wp-api' ), MEP_VERSION, true );
+		wp_enqueue_script( 'mep-erp-search', MEP_PLUGIN_URL . 'assets/js/erp-search.js', array( 'wp-element', 'wp-i18n' ), MEP_VERSION, true );
 		$active_scripts[] = 'mep-erp-search';
 
 		// Localize help mode and branding

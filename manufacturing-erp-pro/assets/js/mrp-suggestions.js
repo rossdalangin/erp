@@ -1,8 +1,4 @@
 (function() {
-/**
- * MEP MRP Suggestions - Interactive Procurement Planning
- */
-
 const { useState, useEffect } = wp.element;
 const { __, sprintf } = wp.i18n;
 
@@ -11,11 +7,10 @@ const SuggestionItem = ({ item, onDragStart }) => {
         className: 'mep-suggestion-item',
         draggable: true,
         onDragStart: (e) => onDragStart(e, item),
-        style: { padding: '10px', border: '1px solid #ccc', background: '#fff', marginBottom: '10px', cursor: 'grab' }
     },
-        wp.element.createElement('strong', null, `Material #${item.material_id}`),
-        wp.element.createElement('p', null, `Needed: ${item.needed} units`),
-        wp.element.createElement('small', null, `Type: ${item.type}`)
+        wp.element.createElement('strong', null, `Mat #${item.material_id}`),
+        wp.element.createElement('p', { style: { margin: '5px 0' } }, `Needed: ${item.needed} units`),
+        wp.element.createElement('div', { className: 'mep-badge mep-badge-info' }, item.type)
     );
 };
 
@@ -28,18 +23,16 @@ const MRPSuggestions = () => {
     const [error, setError] = useState(null);
     const [isDraggingOverBasket, setIsDraggingOverBasket] = useState(false);
 
-    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
-
     const fetchStatus = () => {
         wp.apiFetch({ path: '/mep/v1/mrp/status' })
             .then(data => {
-                setStatus(data.status);
-                setLastRun(data.last_run);
-                setSuggestions(data.results);
+                setStatus(data.status || 'idle');
+                setLastRun(data.last_run || 'Never');
+                setSuggestions(data.results || []);
                 setLoading(false);
             })
             .catch(err => {
-                setError('Failed to fetch MRP Status.');
+                setError(__('Failed to fetch MRP Status.', 'manufacturing-erp-pro'));
                 setLoading(false);
             });
     };
@@ -59,20 +52,21 @@ const MRPSuggestions = () => {
     const runMRP = () => {
         setLoading(true);
         wp.apiFetch({ path: '/mep/v1/mrp/run', method: 'POST' })
-            .then(() => fetchStatus());
+            .then(() => fetchStatus())
+            .catch(() => setLoading(false));
     };
 
     const onDragStart = (e, item) => {
         e.dataTransfer.setData('suggestion', JSON.stringify(item));
     };
 
-    const onDragOver = (e) => {
-        e.preventDefault();
-    };
+    const onDragOver = (e) => e.preventDefault();
 
     const onDrop = (e) => {
         setIsDraggingOverBasket(false);
-        const item = JSON.parse(e.dataTransfer.getData('suggestion'));
+        const itemStr = e.dataTransfer.getData('suggestion');
+        if (!itemStr) return;
+        const item = JSON.parse(itemStr);
         if (!basket.find(i => i.material_id === item.material_id)) {
             setBasket([...basket, item]);
             setSuggestions(suggestions.filter(i => i.material_id !== item.material_id));
@@ -86,68 +80,63 @@ const MRPSuggestions = () => {
             method: 'POST',
             data: { items: basket }
         }).then(data => {
-            alert(sprintf(__('Successfully created %d Purchase Orders!', 'manufacturing-erp-pro').catch(err => console.error('Fetch Error:', err)), data.po_ids.length));
+            alert(sprintf(__('Successfully created %d Purchase Orders!', 'manufacturing-erp-pro'), (data.po_ids || []).length));
             setBasket([]);
-        }).catch(err => {
-            alert(__('Failed to create Purchase Orders.', 'manufacturing-erp-pro'));
-            console.error(err);
-        });
+        }).catch(err => alert(__('Failed to create POs.', 'manufacturing-erp-pro')));
     };
 
-    if (loading && status !== 'processing') return wp.element.createElement('p', null, 'Loading MRP Planning...');
     if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
+    if (loading && status !== 'processing') return wp.element.createElement('p', null, __('Loading MRP suggestions...', 'manufacturing-erp-pro'));
+
+    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
     return wp.element.createElement('div', { className: 'mep-mrp-planner' },
-        wp.element.createElement('header', { style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '15px', border: '1px solid #ccc' } },
+        wp.element.createElement('header', { style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #cbd5e1' } },
             wp.element.createElement('div', null,
-                wp.element.createElement('strong', null, 'MRP Engine Status: '),
-                wp.element.createElement('span', { style: { color: status === 'processing' ? '#dba617' : '#46b450', fontWeight: 'bold' } }, status.toUpperCase()),
-                wp.element.createElement('span', { style: { marginLeft: '20px', color: '#666', fontSize: '12px' } }, `Last Run: ${lastRun}`)
+                wp.element.createElement('strong', null, __('Engine Status:', 'manufacturing-erp-pro')),
+                wp.element.createElement('span', { style: { marginLeft: '10px', color: status === 'processing' ? 'var(--mep-warning)' : 'var(--mep-success)', fontWeight: 'bold' } }, status.toUpperCase()),
+                wp.element.createElement('span', { style: { marginLeft: '20px', color: '#64748b', fontSize: '12px' } }, `${__('Last Run:', 'manufacturing-erp-pro')} ${lastRun}`)
             ),
             wp.element.createElement('button', {
                 className: 'button button-primary',
                 onClick: runMRP,
                 disabled: status === 'processing'
-            }, status === 'processing' ? 'Calculating...' : 'Recalculate MRP Results')
+            }, status === 'processing' ? __('Calculating...', 'manufacturing-erp-pro') : __('Run MRP Engine', 'manufacturing-erp-pro'))
         ),
-
-        status === 'processing' && wp.element.createElement('div', { className: 'notice notice-info' }, wp.element.createElement('p', null, 'The MRP engine is exploding BOMs and netting inventory in the background. Results will refresh automatically.')),
 
         wp.element.createElement('div', { className: 'mep-column-container mep-admin-style mep-animate-fade-in' },
-        wp.element.createElement('div', {
-            className: 'mep-column',
-            title: helpMode ? 'Suggestions: These are items the MRP engine thinks you should buy based on demand.' : ''
-        },
-            wp.element.createElement('h3', null, '🔍 ' + __('MRP Suggestions', 'manufacturing-erp-pro')),
-            suggestions.length > 0 ?
-                (suggestions || []).map((item, i) => wp.element.createElement(SuggestionItem, { key: i, item: item, onDragStart })) :
-                wp.element.createElement('p', { style: { color: '#94a3b8', fontStyle: 'italic' } }, __('No suggestions found.', 'manufacturing-erp-pro'))
-        ),
-        wp.element.createElement('div', {
-            className: `mep-column ${isDraggingOverBasket ? 'is-dragging-over' : ''}`,
-            onDragOver: (e) => { e.preventDefault(); setIsDraggingOverBasket(true); },
-            onDragLeave: () => setIsDraggingOverBasket(false),
-            onDrop: onDrop,
-            title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation.' : ''
-        },
-            wp.element.createElement('h3', null, '🛒 ' + __('Draft PO Basket', 'manufacturing-erp-pro')),
-            (basket || []).map((item, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd' } },
-                `Material #${item.material_id} - ${item.needed} units`
-            )),
-            basket.length > 0 && wp.element.createElement('button', {
-                className: 'button button-primary',
-                style: { marginTop: '20px' },
-                onClick: createPOs
-            }, 'Generate Purchase Orders')
+            wp.element.createElement('div', { className: 'mep-column', title: helpMode ? __('Items the engine thinks you should buy.', 'manufacturing-erp-pro') : '' },
+                wp.element.createElement('h3', null, '🔍 ' + __('MRP Suggestions', 'manufacturing-erp-pro')),
+                (suggestions || []).length > 0 ?
+                    suggestions.map((item, i) => wp.element.createElement(SuggestionItem, { key: i, item, onDragStart })) :
+                    wp.element.createElement('p', { style: { color: '#94a3b8', fontStyle: 'italic', padding: '20px', textAlign: 'center' } }, __('No shortages detected.', 'manufacturing-erp-pro'))
+            ),
+            wp.element.createElement('div', {
+                className: `mep-column ${isDraggingOverBasket ? 'is-dragging-over' : ''}`,
+                onDragOver: (e) => { e.preventDefault(); setIsDraggingOverBasket(true); },
+                onDragLeave: () => setIsDraggingOverBasket(false),
+                onDrop: onDrop,
+                title: helpMode ? __('Drag suggestions here to prepare POs.', 'manufacturing-erp-pro') : ''
+            },
+                wp.element.createElement('h3', null, '🛒 ' + __('Draft PO Basket', 'manufacturing-erp-pro')),
+                (basket || []).map((item, i) => wp.element.createElement('div', { key: i, className: 'mep-library-item' },
+                    `Mat #${item.material_id} - ${item.needed} units`
+                )),
+                basket.length === 0 && wp.element.createElement('p', { style: { color: '#94a3b8', fontStyle: 'italic', padding: '20px', textAlign: 'center' } }, __('Drag items here...', 'manufacturing-erp-pro')),
+                basket.length > 0 && wp.element.createElement('button', {
+                    className: 'button button-primary',
+                    style: { width: '100%', marginTop: '20px' },
+                    onClick: createPOs
+                }, __('Generate Purchase Orders', 'manufacturing-erp-pro'))
+            )
         )
     );
 };
 
-
 const init = () => {
     const container = document.getElementById('mep-mrp-suggestions-root');
     if (container) {
-        wp.element.render(wp.element.createElement(MRPSuggestions, null), container);
+        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(MRPSuggestions); } else { wp.element.render(wp.element.createElement(MRPSuggestions, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -155,5 +144,4 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     document.addEventListener('DOMContentLoaded', init);
 }
-
 })();

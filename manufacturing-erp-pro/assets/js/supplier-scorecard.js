@@ -74,7 +74,7 @@ const SupplierScorecard = () => {
 const init = () => {
     const container = document.getElementById('mep-supplier-scorecard-root');
     if (container) {
-        wp.element.render(wp.element.createElement(SupplierScorecard, null), container);
+        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(SupplierScorecard); } else { wp.element.render(wp.element.createElement(SupplierScorecard, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

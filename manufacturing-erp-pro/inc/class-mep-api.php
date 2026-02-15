@@ -182,6 +182,12 @@ class MEP_API {
 			'permission_callback' => array( $this, 'check_production_permission' ),
 		) );
 
+		register_rest_route( 'mep/v1', '/purchase-orders', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_purchase_orders' ),
+			'permission_callback' => array( $this, 'check_production_permission' ),
+		) );
+
 		register_rest_route( 'mep/v1', '/procurement/supplier-score/(?P<id>\d+)', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_supplier_score' ),
@@ -452,6 +458,19 @@ class MEP_API {
 				'id'   => $post->ID,
 				'name' => $post->post_title,
 				'code' => get_post_meta( $post->ID, '_mep_location_code', true ),
+			);
+		}
+		return new WP_REST_Response( $data, 200 );
+	}
+
+	public function get_purchase_orders( $request ) {
+		$posts = get_posts( array( 'post_type' => 'mep_po', 'numberposts' => -1, 'post_status' => 'publish' ) );
+		$data = array();
+		foreach ( $posts as $post ) {
+			$data[] = array(
+				'id'    => $post->ID,
+				'title' => $post->post_title,
+				'items' => get_post_meta( $post->ID, '_mep_po_lines', true ) ?: array()
 			);
 		}
 		return new WP_REST_Response( $data, 200 );

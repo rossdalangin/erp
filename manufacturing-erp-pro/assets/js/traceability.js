@@ -115,7 +115,7 @@ const Traceability = () => {
 const init = () => {
     const container = document.getElementById('mep-traceability-root');
     if (container) {
-        wp.element.render(wp.element.createElement(Traceability, null), container);
+        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(Traceability); } else { wp.element.render(wp.element.createElement(Traceability, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

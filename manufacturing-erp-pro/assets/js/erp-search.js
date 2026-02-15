@@ -98,7 +98,7 @@ const init = () => {
     const root = document.createElement('div');
     root.id = 'mep-erp-search-root';
     document.body.appendChild(root);
-    wp.element.render(wp.element.createElement(ERPSearch, null), root);
+    if (wp.element.createRoot) { wp.element.createRoot(null), root).render(wp.element.createElement(ERPSearch); } else { wp.element.render(wp.element.createElement(ERPSearch, null), root); }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
     init();

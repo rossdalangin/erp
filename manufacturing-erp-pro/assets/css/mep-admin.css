@@ -1,127 +1,29 @@
 /**
- * Manufacturing ERP Pro - Modern UI Overhaul
- * Inspired by Protean ERP and modern SaaS design.
+ * Manufacturing ERP Pro - Enterprise UI
+ * Optimized for horizontal column-based drag and drop.
  */
 
 :root {
-    /* Colors */
     --mep-primary: #2563eb;
     --mep-primary-hover: #1d4ed8;
-    --mep-secondary: #64748b;
-    --mep-success: #10b981;
-    --mep-danger: #ef4444;
-    --mep-warning: #f59e0b;
-    --mep-info: #0ea5e9;
-
-    /* Grays */
-    --mep-bg-canvas: #f8fafc;
+    --mep-bg-canvas: #f1f5f9;
     --mep-bg-card: #ffffff;
-    --mep-border: #e2e8f0;
-    --mep-text-main: #1e293b;
+    --mep-border: #cbd5e1;
+    --mep-text-main: #0f172a;
     --mep-text-muted: #64748b;
-
-    /* Elevation */
-    --mep-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --mep-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --mep-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-
-    /* Layout */
     --mep-radius: 8px;
     --mep-radius-lg: 12px;
-    --mep-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --mep-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-/* --- Global Overrides --- */
-#wpbody-content .wrap {
-    background-color: var(--mep-bg-canvas);
-    padding: 20px;
-    min-height: calc(100vh - 32px);
-}
-
-.mep-admin-style h1, .mep-admin-style h2, .mep-admin-style h3 {
+/* --- Global Layout --- */
+.mep-admin-style {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     color: var(--mep-text-main);
-    font-weight: 600;
+    margin-top: 20px;
 }
 
-/* --- Modern Buttons --- */
-.mep-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    border-radius: var(--mep-radius);
-    font-weight: 500;
-    transition: var(--mep-transition);
-    cursor: pointer;
-    border: 1px solid transparent;
-}
-
-.mep-btn-primary {
-    background: var(--mep-primary);
-    color: white;
-}
-
-.mep-btn-primary:hover {
-    background: var(--mep-primary-hover);
-}
-
-/* --- Dashboard & KPI Cards --- */
-.mep-dashboard-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.mep-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.mep-kpi-card {
-    background: var(--mep-bg-card);
-    border: 1px solid var(--mep-border);
-    border-radius: var(--mep-radius-lg);
-    padding: 24px;
-    box-shadow: var(--mep-shadow-sm);
-    transition: var(--mep-transition);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-}
-
-.mep-kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-color, var(--mep-primary));
-}
-
-.mep-kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--mep-shadow-lg);
-    border-color: var(--mep-primary);
-}
-
-.mep-kpi-label {
-    font-size: 0.875rem;
-    color: var(--mep-text-muted);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-
-.mep-kpi-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--mep-text-main);
-}
-
-/* --- Drag & Drop Column Pattern (Generic) --- */
+/* --- Drag & Drop Horizontal Pattern --- */
 .mep-column-container {
     display: flex !important;
     flex-direction: row !important;
@@ -129,248 +31,129 @@
     gap: 24px !important;
     padding: 20px 0 !important;
     overflow-x: auto !important;
-    width: 100% !important;
     align-items: flex-start !important;
+    width: 100% !important;
+    min-height: 70vh;
 }
 
 .mep-column {
-    background: #f1f5f9 !important;
+    background: #e2e8f0 !important;
     border-radius: var(--mep-radius-lg) !important;
-    padding: 24px !important;
+    padding: 20px !important;
     min-width: 350px !important;
-    flex: 1 0 350px !important;
-    min-height: 70vh !important;
-    border: 2px dashed transparent !important;
-    transition: var(--mep-transition) !important;
+    flex: 0 0 350px !important;
     display: flex !important;
     flex-direction: column !important;
+    border: 1px solid var(--mep-border) !important;
 }
 
 .mep-column.is-dragging-over {
-    border-color: var(--mep-primary);
-    background: #e0f2fe;
+    background: #dbeafe !important;
+    border: 2px dashed var(--mep-primary) !important;
 }
 
 .mep-column h3 {
-    margin: 0 0 20px 0;
-    font-size: 1.1rem;
-    color: var(--mep-text-main);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    margin: 0 0 15px 0 !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--mep-text-main) !important;
+    border-bottom: 2px solid var(--mep-primary) !important;
+    padding-bottom: 10px !important;
 }
 
-/* --- Kanban Board (Production) --- */
-.mep-kanban-board {
+/* --- BOM Builder Layout --- */
+.mep-bom-layout {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    align-items: flex-start !important;
-    gap: 24px !important;
-    padding: 20px 0 !important;
-    overflow-x: auto !important;
-    width: 100% !important;
-    min-width: 100% !important;
-}
-
-.mep-kanban-column {
-    background: #f1f5f9 !important;
-    border-radius: var(--mep-radius-lg) !important;
-    padding: 20px !important;
-    min-width: 320px !important;
-    flex: 1 0 320px !important;
-    min-height: 75vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.mep-kanban-column h3 {
-    margin: 0 0 16px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.mep-wo-card {
-    background: var(--mep-bg-card);
-    border-radius: var(--mep-radius);
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: var(--mep-shadow-sm);
-    border: 1px solid var(--mep-border);
-    transition: var(--mep-transition);
-    cursor: grab;
-}
-
-.mep-wo-card:hover {
-    box-shadow: var(--mep-shadow-md);
-    border-color: var(--mep-primary);
-}
-
-.mep-wo-card:active {
-    cursor: grabbing;
-    transform: rotate(2deg) scale(1.02);
-}
-
-/* --- BOM Builder --- */
-.mep-bom-layout {
-    display: grid !important;
-    grid-template-columns: 300px 1fr !important;
-    gap: 30px !important;
+    gap: 0 !important;
     background: #fff !important;
     border-radius: var(--mep-radius-lg) !important;
     border: 1px solid var(--mep-border) !important;
     overflow: hidden !important;
-    box-shadow: var(--mep-shadow-lg) !important;
-    width: 100% !important;
-    margin-top: 20px !important;
+    min-height: 600px !important;
 }
 
 .mep-bom-sidebar {
-    background: #f8fafc;
-    border-right: 1px solid var(--mep-border);
-    padding: 24px;
+    width: 300px !important;
+    flex: 0 0 300px !important;
+    background: #f8fafc !important;
+    border-right: 1px solid var(--mep-border) !important;
+    padding: 20px !important;
 }
 
-.mep-library-item {
-    background: #fff;
-    border: 1px solid var(--mep-border);
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: var(--mep-radius);
-    cursor: grab;
-    transition: var(--mep-transition);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.mep-library-item:hover {
-    border-color: var(--mep-primary);
-    color: var(--mep-primary);
-    transform: translateX(4px);
+.mep-bom-main {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .mep-bom-canvas {
-    padding: 40px;
-    background: radial-gradient(#e2e8f0 1px, transparent 1px);
-    background-size: 20px 20px;
+    flex: 1 !important;
+    padding: 30px !important;
+    background: #ffffff !important;
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px) !important;
+    background-size: 20px 20px !important;
+    overflow-y: auto !important;
 }
 
-.mep-bom-node {
-    background: white;
-    border-radius: var(--mep-radius);
-    padding: 16px;
-    margin-bottom: 10px;
-    border: 1px solid var(--mep-border);
-    box-shadow: var(--mep-shadow-sm);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    position: relative;
+/* --- Kanban Board --- */
+.mep-kanban-board {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 20px !important;
+    overflow-x: auto !important;
+    padding: 10px 0 !important;
 }
 
-/* --- Visual Warehouse --- */
+.mep-kanban-column {
+    background: #f1f5f9 !important;
+    border-radius: var(--mep-radius) !important;
+    padding: 15px !important;
+    min-width: 300px !important;
+    flex: 0 0 300px !important;
+    min-height: 500px !important;
+}
+
+/* --- Cards --- */
+.mep-wo-card, .mep-library-item, .mep-suggestion-item, .mep-bin-card {
+    background: #fff !important;
+    border-radius: var(--mep-radius) !important;
+    padding: 15px !important;
+    margin-bottom: 15px !important;
+    border: 1px solid var(--mep-border) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    transition: all 0.2s ease !important;
+}
+
+.mep-wo-card:hover, .mep-library-item:hover {
+    border-color: var(--mep-primary) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
+}
+
+/* --- Visual Warehouse Grid --- */
 .mep-bins-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 15px !important;
+    width: 100% !important;
 }
 
-.mep-bin-card {
-    background: #fff;
-    border-radius: var(--mep-radius);
-    border: 1px solid var(--mep-border);
-    padding: 20px;
-    transition: var(--mep-transition);
-    text-align: center;
+/* --- Utilities --- */
+.mep-animate-fade-in {
+    animation: mepFadeIn 0.3s ease-out forwards;
 }
 
-.mep-bin-card.occupancy-high {
-    border-color: var(--mep-danger);
-    background: #fef2f2;
-}
-
-.mep-bin-card.occupancy-medium {
-    border-color: var(--mep-warning);
-    background: #fffbeb;
-}
-
-/* --- Setup Wizard --- */
-.mep-wizard-overlay {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-.mep-wizard-card {
-    border-radius: var(--mep-radius-lg) !important;
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
-}
-
-/* --- Utils --- */
-.mep-badge {
-    padding: 4px 10px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.mep-badge-info { background: #e0f2fe; color: #0369a1; }
-.mep-badge-success { background: #dcfce7; color: #15803d; }
-.mep-badge-error { background: #fee2e2; color: #b91c1c; }
-
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* --- Animations --- */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+@keyframes mepFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.mep-animate-fade-in {
-    animation: fadeIn 0.4s ease forwards;
-}
-
-/* Mobile Adjustments */
-@media (max-width: 900px) {
-    .mep-bom-layout {
-        display: block !important;
-    }
-
-    .mep-bom-sidebar {
-        width: 100% !important;
-        border-right: none !important;
-        border-bottom: 1px solid var(--mep-border) !important;
-        margin-bottom: 20px !important;
-    }
-
-    .mep-kanban-board {
-        flex-direction: column !important;
-    }
-
-    .mep-column-container {
-        flex-direction: column !important;
-    }
-
-    .mep-column, .mep-kanban-column {
-        width: 100% !important;
-        min-width: 100% !important;
+/* Responsive Overrides - Maintain Horizontal as much as possible */
+@media (max-width: 782px) {
+    .mep-column-container, .mep-kanban-board {
+        padding-bottom: 30px !important;
     }
 }

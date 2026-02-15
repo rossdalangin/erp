@@ -150,7 +150,7 @@ const Dashboard = () => {
 const init = () => {
     const container = document.getElementById('mep-dashboard-root');
     if (container) {
-        wp.element.render(wp.element.createElement(Dashboard, null), container);
+        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(Dashboard); } else { wp.element.render(wp.element.createElement(Dashboard, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

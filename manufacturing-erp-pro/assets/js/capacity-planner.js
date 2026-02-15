@@ -77,7 +77,7 @@ const CapacityPlanner = () => {
 const init = () => {
     const container = document.getElementById('mep-capacity-root');
     if (container) {
-        wp.element.render(wp.element.createElement(CapacityPlanner, null), container);
+        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(CapacityPlanner); } else { wp.element.render(wp.element.createElement(CapacityPlanner, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
