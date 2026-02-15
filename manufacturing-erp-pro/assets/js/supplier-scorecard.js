@@ -1,80 +1,38 @@
 (function() {
-/**
- * MEP Supplier Scorecard - Vendor Performance Visualization
- */
-
 const { useState, useEffect } = wp.element;
-
-const ScoreCard = ({ supplier }) => {
-    const scoreColor = supplier.score > 80 ? '#46b450' : (supplier.score > 60 ? '#dba617' : '#d63638');
-
-    return wp.element.createElement('div', {
-        className: 'mep-supplier-card',
-        style: { border: '1px solid #ccc', padding: '20px', background: '#fff', borderRadius: '8px', marginBottom: '20px' }
-    },
-        wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-            wp.element.createElement('h3', { style: { margin: 0 } }, supplier.name),
-            wp.element.createElement('div', {
-                style: { background: scoreColor, color: '#fff', padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold' }
-            }, `Score: ${supplier.score}/100`)
-        ),
-        wp.element.createElement('div', { style: { marginTop: '15px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' } },
-            wp.element.createElement('div', null,
-                wp.element.createElement('strong', null, 'Quality Rate: '),
-                wp.element.createElement('span', null, `${(supplier.quality_rate * 100).toFixed(1)}%`),
-                wp.element.createElement('div', { style: { height: '8px', background: '#eee', marginTop: '5px', borderRadius: '4px' } },
-                    wp.element.createElement('div', { style: { height: '100%', width: `${supplier.quality_rate * 100}%`, background: '#2271b1', borderRadius: '4px' } })
-                )
-            ),
-            wp.element.createElement('div', null,
-                wp.element.createElement('strong', null, 'On-Time Delivery: '),
-                wp.element.createElement('span', null, `${(supplier.on_time_rate * 100).toFixed(1)}%`),
-                wp.element.createElement('div', { style: { height: '8px', background: '#eee', marginTop: '5px', borderRadius: '4px' } },
-                    wp.element.createElement('div', { style: { height: '100%', width: `${supplier.on_time_rate * 100}%`, background: '#673ab7', borderRadius: '4px' } })
-                )
-            )
-        )
-    );
-};
+const { __ } = wp.i18n;
 
 const SupplierScorecard = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        wp.apiFetch({ path: '/mep/v1/suppliers' })
-            .then(async (data) => {
-                const enriched = await Promise.all(data.map(async (s) => {
-                    const scoreData = await wp.apiFetch({ path: `/mep/v1/procurement/supplier-score/${s.id}` });
-                    return { ...s, ...scoreData };
-                }));
-                setSuppliers(enriched);
-                setLoading(false);
-            }).catch(err => {
-                setLoading(false);
-                console.error(err);
-            });
+        wp.apiFetch({ path: '/mep/v1/suppliers' }).then(async data => {
+            const enriched = await Promise.all((data || []).map(async s => {
+                const score = await wp.apiFetch({ path: `/mep/v1/procurement/supplier-score/${s.id}` });
+                return { ...s, ...score };
+            }));
+            setSuppliers(enriched);
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return wp.element.createElement('p', null, 'Calculating vendor performance metrics...');
+    if (loading) return wp.element.createElement('p', null, __('Loading Scores...', 'manufacturing-erp-pro'));
 
-    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
-
-    return wp.element.createElement('div', { className: 'mep-scorecard-container' },
-        wp.element.createElement('h2', {
-            title: helpMode ? 'Scorecard: Aggregates Quality (QC results) and OTD (Lead time compliance) to give each vendor a 0-100 score. Example: A score of 95 indicates a highly reliable partner.' : ''
-        }, 'Supplier Performance Scorecards'),
-        suppliers.length > 0 ?
-            (suppliers || []).map(s => wp.element.createElement(ScoreCard, { key: s.id, supplier: s })) :
-            wp.element.createElement('p', null, 'No suppliers found.')
+    return wp.element.createElement('div', { style: { background: '#fff', padding: '20px', border: '1px solid #ccc' } },
+        wp.element.createElement('h2', null, __('Supplier Performance', 'manufacturing-erp-pro')),
+        (suppliers || []).map(s => wp.element.createElement('div', { key: s.id, style: { borderBottom: '1px solid #eee', padding: '10px 0' } },
+            wp.element.createElement('strong', null, s.name),
+            wp.element.createElement('span', { style: { marginLeft: '20px' } }, `Score: ${s.score}/100`)
+        ))
     );
 };
-
 
 const init = () => {
     const container = document.getElementById('mep-supplier-scorecard-root');
     if (container) {
-        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(SupplierScorecard); } else { wp.element.render(wp.element.createElement(SupplierScorecard, null), container); }
+        if (wp.element.createRoot) { wp.element.createRoot(container).render(wp.element.createElement(SupplierScorecard, null)); }
+        else { wp.element.render(wp.element.createElement(SupplierScorecard, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -82,5 +40,4 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     document.addEventListener('DOMContentLoaded', init);
 }
-
 })();

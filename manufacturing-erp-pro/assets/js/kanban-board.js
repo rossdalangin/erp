@@ -1,4 +1,8 @@
 (function() {
+/**
+ * MEP Production Kanban Board - with HTML5 Drag and Drop
+ */
+
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
@@ -7,28 +11,19 @@ const WorkOrderCard = ({ wo, onDragStart }) => {
         className: 'mep-wo-card',
         draggable: true,
         onDragStart: (e) => onDragStart(e, wo.id),
+        style: { border: '1px solid #ccc', padding: '10px', background: '#fff', marginBottom: '10px', cursor: 'grab', borderRadius: '4px' }
     },
-        wp.element.createElement('h4', null, wo.title),
-        wp.element.createElement('div', { style: { fontSize: '12px', color: '#64748b' } },
-            `#${wo.id} | ${__('Qty', 'manufacturing-erp-pro')}: ${wo.qty}`
-        ),
-        wo.due_date && wp.element.createElement('div', { style: { fontSize: '11px', color: 'var(--mep-danger)', fontWeight: 'bold', marginTop: '5px' } },
-            `${__('Due', 'manufacturing-erp-pro')}: ${wo.due_date}`
-        ),
-        wp.element.createElement('div', { style: { marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-            wp.element.createElement('span', { className: 'mep-badge' }, wo.status),
-            wp.element.createElement('span', { style: { fontSize: '10px', color: '#94a3b8' } }, wo.operator_name || __('Unassigned', 'manufacturing-erp-pro'))
-        )
+        wp.element.createElement('h4', { style: { margin: '0 0 5px 0' } }, wo.title),
+        wp.element.createElement('p', { style: { fontSize: '12px', margin: '2px 0' } }, `ID: #${wo.id} | ${__('Qty', 'manufacturing-erp-pro')}: ${wo.qty}`),
+        wo.due_date && wp.element.createElement('p', { style: { fontSize: '11px', color: '#d63638', fontWeight: 'bold' } }, `${__('Due', 'manufacturing-erp-pro')}: ${wo.due_date}`),
+        wp.element.createElement('span', { className: 'mep-badge', style: { fontSize: '10px', background: '#eee', padding: '2px 5px' } }, wo.status)
     );
 };
 
 const KanbanBoard = () => {
     const [workOrders, setWorkOrders] = useState([]);
-    const [operators, setOperators] = useState([]);
-    const [equipment, setEquipment] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [dragOverCol, setDragOverCol] = useState(null);
 
     const columns = [
         { id: 'publish', label: __('Backlog', 'manufacturing-erp-pro') },
@@ -36,67 +31,43 @@ const KanbanBoard = () => {
         { id: 'completed', label: __('Completed', 'manufacturing-erp-pro') }
     ];
 
-    const fetchData = () => {
-        setLoading(true);
-        Promise.all([
-            wp.apiFetch({ path: '/mep/v1/work-orders' }),
-            wp.apiFetch({ path: '/mep/v1/operators' }),
-            wp.apiFetch({ path: '/mep/v1/equipment' })
-        ]).then(([woData, opData, eqData]) => {
-                setWorkOrders(woData || []);
-                setOperators(opData || []);
-                setEquipment(eqData || []);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError(__('Failed to load shop floor data.', 'manufacturing-erp-pro'));
-                setLoading(false);
-            });
+    const loadData = () => {
+        wp.apiFetch({ path: '/mep/v1/work-orders' })
+            .then(data => { setWorkOrders(data || []); setLoading(false); })
+            .catch(err => { setError(__('Failed to load Work Orders.', 'manufacturing-erp-pro')); setLoading(false); });
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useEffect(() => { loadData(); }, []);
 
-    const onDragStart = (e, id) => {
-        e.dataTransfer.setData('woId', id);
-    };
+    const onDragStart = (e, id) => { e.dataTransfer.setData('woId', id); };
+    const onDragOver = (e) => { e.preventDefault(); };
 
-    const updateOrderStatus = (id, nextStatus) => {
-        let extraData = {};
-        if (nextStatus === 'in-progress') {
-            const opId = prompt(__('Operator ID:', 'manufacturing-erp-pro'));
-            if (opId) extraData.operator_id = opId;
-        }
-        if (nextStatus === 'completed') {
-            const lotId = prompt(__('Lot #:', 'manufacturing-erp-pro'), `LOT-${id}`);
-            if (!lotId) return;
-            extraData = { lot_number: lotId, scrap_qty: 0, labor_mins: 60 };
-        }
+    const onDrop = (e, nextStatus) => {
+        const id = e.dataTransfer.getData('woId');
+        let extra = {};
+        if (nextStatus === 'completed') extra = { lot_number: `LOT-${id}`, scrap_qty: 0, labor_mins: 60 };
 
         wp.apiFetch({
             path: `/mep/v1/work-orders/${id}/status`,
             method: 'POST',
-            data: { status: nextStatus, ...extraData }
-        }).then(() => fetchData()).catch(err => alert(__('Update failed.', 'manufacturing-erp-pro')));
+            data: { status: nextStatus, ...extra }
+        }).then(() => loadData());
     };
 
-    if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
-    if (loading && workOrders.length === 0) return wp.element.createElement('p', null, __('Loading Kanban...', 'manufacturing-erp-pro'));
+    if (loading && workOrders.length === 0) return wp.element.createElement('p', null, __('Loading Production Board...', 'manufacturing-erp-pro'));
 
-    return wp.element.createElement('div', { className: 'mep-kanban-board mep-admin-style mep-animate-fade-in' },
+    return wp.element.createElement('div', {
+        className: 'mep-kanban-board',
+        style: { display: 'flex', gap: '20px', alignItems: 'flex-start', overflowX: 'auto', padding: '10px 0' }
+    },
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
-            className: `mep-kanban-column ${dragOverCol === col.id ? 'is-dragging-over' : ''}`,
-            onDragOver: (e) => { e.preventDefault(); setDragOverCol(col.id); },
-            onDragLeave: () => setDragOverCol(null),
-            onDrop: (e) => {
-                setDragOverCol(null);
-                const id = e.dataTransfer.getData('woId');
-                updateOrderStatus(id, col.id);
-            },
+            className: 'mep-kanban-column',
+            onDragOver: onDragOver,
+            onDrop: (e) => onDrop(e, col.id),
+            style: { flex: '1 0 300px', background: '#f0f0f1', padding: '15px', minHeight: '500px', borderRadius: '6px' }
         },
-            wp.element.createElement('h3', null, col.label),
+            wp.element.createElement('h3', { style: { marginTop: 0, borderBottom: '2px solid #2271b1', paddingBottom: '10px' } }, col.label),
             (workOrders || []).filter(wo => wo.status === col.id).map(wo =>
                 wp.element.createElement(WorkOrderCard, { key: wo.id, wo, onDragStart })
             )
@@ -107,7 +78,8 @@ const KanbanBoard = () => {
 const init = () => {
     const container = document.getElementById('mep-kanban-root');
     if (container) {
-        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(KanbanBoard); } else { wp.element.render(wp.element.createElement(KanbanBoard, null), container); }
+        if (wp.element.createRoot) { wp.element.createRoot(container).render(wp.element.createElement(KanbanBoard, null)); }
+        else { wp.element.render(wp.element.createElement(KanbanBoard, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

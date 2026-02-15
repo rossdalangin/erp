@@ -1,22 +1,15 @@
 (function() {
-const { __ } = wp.i18n;
-/**
- * MEP Lot Traceability - Graphical Genealogy Visualization
- */
-
 const { useState } = wp.element;
+const { __ } = wp.i18n;
 
-const TraceNode = ({ label, type, date, qty, onDragStart, onDragEnd }) => {
+const TraceNode = ({ label, type, date, qty }) => {
     return wp.element.createElement('div', {
         className: 'mep-trace-node',
-        draggable: true,
-        onDragStart: onDragStart,
-        onDragEnd: onDragEnd,
-        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'relative', zIndex: 2, minWidth: '200px', cursor: 'grab' }
+        style: { border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', minWidth: '200px' }
     },
-        wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1', marginBottom: '5px' } }, label),
-        wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, `${type}`),
-        wp.element.createElement('div', { style: { fontSize: '10px', color: '#999', marginTop: '3px' } }, `${date} | Qty: ${qty}`)
+        wp.element.createElement('div', { style: { fontWeight: 'bold', color: '#2271b1' } }, label),
+        wp.element.createElement('div', { style: { fontSize: '11px', color: '#666' } }, type),
+        wp.element.createElement('div', { style: { fontSize: '10px', color: '#999' } }, `${date} | Qty: ${qty}`)
     );
 };
 
@@ -29,93 +22,32 @@ const Traceability = () => {
         if (!lot) return;
         setLoading(true);
         wp.apiFetch({ path: `/mep/v1/qc/trace/${lot}` })
-            .then(data => {
-                setTrace(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                alert(__('Lot trace failed. Verify the Lot ID exists and you have permissions.', 'manufacturing-erp-pro'));
-                console.error(err);
-                setLoading(false);
-            });
+            .then(data => { setTrace(data); setLoading(false); })
+            .catch(() => setLoading(false));
     };
 
-    const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
-
-    return wp.element.createElement('div', { className: 'mep-traceability-view' },
-        wp.element.createElement('div', {
-            className: 'mep-trace-search',
-            title: helpMode ? 'Lot Search: Enter a lot number to see its entire production history. Example: Enter "LOT-COW-001" to trace raw cowhide.' : '',
-            style: { marginBottom: '30px', display: 'flex', gap: '10px' }
-        },
-            wp.element.createElement('input', {
-                type: 'text',
-                placeholder: 'Enter Lot Number...',
-                value: lot,
-                onChange: (e) => setLot(e.target.value),
-                style: { flex: 1 }
-            }),
-            wp.element.createElement('button', { className: 'button button-primary', onClick: performTrace }, 'Trace Lot')
+    return wp.element.createElement('div', { className: 'mep-traceability-view', style: { background: '#fff', padding: '20px', border: '1px solid #ccc' } },
+        wp.element.createElement('div', { style: { marginBottom: '30px', display: 'flex', gap: '10px' } },
+            wp.element.createElement('input', { type: 'text', placeholder: __('Lot Number...', 'manufacturing-erp-pro'), value: lot, onChange: (e) => setLot(e.target.value), style: { flex: 1 } }),
+            wp.element.createElement('button', { className: 'button button-primary', onClick: performTrace }, __('Trace Lot', 'manufacturing-erp-pro'))
         ),
-
-        loading && wp.element.createElement('p', null, 'Tracing lot genealogy...'),
-
-        trace && wp.element.createElement('div', {
-            className: 'mep-trace-results',
-            title: helpMode ? 'Trace Results: Shows upstream and downstream movements of this lot. The graph displays receipt, transfer, and consumption nodes.' : ''
-        },
-            wp.element.createElement('h3', null, `Genealogy Graph for Lot: ${trace.lot}`),
-            wp.element.createElement('div', {
-                className: 'mep-trace-graph-layout',
-                onDragOver: (e) => e.preventDefault(),
-                style: { padding: '40px', background: '#f0f0f1', borderRadius: '8px', overflowX: 'auto', minHeight: '400px' }
-            },
-                trace.history.length > 0 ?
-                    wp.element.createElement('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
-                        trace.history.map((h, i) => wp.element.createElement(wp.element.Fragment, { key: i },
-                            wp.element.createElement(TraceNode, {
-                                label: h.transaction_type,
-                                type: `Material #${h.material_id}`,
-                                date: h.created_at,
-                                qty: h.quantity,
-                                onDragStart: (e) => {
-                                    e.target.style.opacity = '0.5';
-                                    e.dataTransfer.setData('text/plain', i);
-                                },
-                                onDragEnd: (e) => {
-                                    e.target.style.opacity = '1';
-                                }
-                            }),
-                            i < trace.history.length - 1 && wp.element.createElement('div', {
-                                className: 'mep-trace-connector',
-                                style: { height: '30px', width: '2px', background: '#2271b1', position: 'relative' }
-                            },
-                                wp.element.createElement('div', {
-                                    style: { position: 'absolute', bottom: '-5px', left: '-4px', borderTop: '6px solid #2271b1', borderLeft: '5px solid transparent', borderRight: '5px solid transparent' }
-                                })
-                            )
-                        ))
-                    ) :
-                    wp.element.createElement('p', null, 'No history found.')
-            ),
-            wp.element.createElement('div', { style: { marginTop: '20px' } },
-                wp.element.createElement('button', {
-                    className: 'button button-secondary',
-                    onClick: () => {
-                        const reportUrl = wpApiSettings.root + `mep/v1/qc/trace/${trace.lot}/report?_wpnonce=` + wpApiSettings.nonce + '&print=1';
-                        window.open(reportUrl, '_blank');
-                    }
-                }, 'Generate Trace Report (PDF)')
+        trace && wp.element.createElement('div', null,
+            wp.element.createElement('h3', null, `${__('Genealogy Graph:', 'manufacturing-erp-pro')} ${trace.lot}`),
+            wp.element.createElement('div', { style: { padding: '20px', background: '#f0f0f1', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' } },
+                (trace.history || []).map((h, i) => wp.element.createElement(wp.element.Fragment, { key: i },
+                    wp.element.createElement(TraceNode, { label: h.transaction_type, type: `Material #${h.material_id}`, date: h.created_at, qty: h.quantity }),
+                    i < trace.history.length - 1 && wp.element.createElement('div', { style: { height: '20px', width: '2px', background: '#2271b1' } })
+                ))
             )
         )
     );
 };
 
-
 const init = () => {
     const container = document.getElementById('mep-traceability-root');
     if (container) {
-        if (wp.element.createRoot) { wp.element.createRoot(null), container).render(wp.element.createElement(Traceability); } else { wp.element.render(wp.element.createElement(Traceability, null), container); }
+        if (wp.element.createRoot) { wp.element.createRoot(container).render(wp.element.createElement(Traceability, null)); }
+        else { wp.element.render(wp.element.createElement(Traceability, null), container); }
     }
 };
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -123,5 +55,4 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     document.addEventListener('DOMContentLoaded', init);
 }
-
 })();

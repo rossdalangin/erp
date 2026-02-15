@@ -1,159 +1,205 @@
 /**
- * Manufacturing ERP Pro - Enterprise UI
- * Optimized for horizontal column-based drag and drop.
+ * Manufacturing ERP Pro - Admin Styles
  */
 
 :root {
-    --mep-primary: #2563eb;
-    --mep-primary-hover: #1d4ed8;
-    --mep-bg-canvas: #f1f5f9;
-    --mep-bg-card: #ffffff;
-    --mep-border: #cbd5e1;
-    --mep-text-main: #0f172a;
-    --mep-text-muted: #64748b;
-    --mep-radius: 8px;
-    --mep-radius-lg: 12px;
-    --mep-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --mep-primary: #2271b1;
+    --mep-success: #46b450;
+    --mep-danger: #d63638;
+    --mep-warning: #dba617;
+    --mep-bg-light: #f6f7f7;
+    --mep-border: #c3c4c7;
+    --mep-text: #3c434a;
 }
 
-/* --- Global Layout --- */
-.mep-admin-style {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    color: var(--mep-text-main);
+/* Dashboard & KPI Cards */
+.mep-dashboard-grid {
     margin-top: 20px;
 }
 
-/* --- Drag & Drop Horizontal Pattern --- */
-.mep-column-container {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 24px !important;
-    padding: 20px 0 !important;
-    overflow-x: auto !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    min-height: 70vh;
+.mep-kpi-card {
+    background: #fff;
+    border: 1px solid var(--mep-border);
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    transition: transform 0.2s ease;
 }
 
-.mep-column {
-    background: #e2e8f0 !important;
-    border-radius: var(--mep-radius-lg) !important;
-    padding: 20px !important;
-    min-width: 350px !important;
-    flex: 0 0 350px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    border: 1px solid var(--mep-border) !important;
+.mep-kpi-card:hover {
+    transform: translateY(-2px);
 }
 
-.mep-column.is-dragging-over {
-    background: #dbeafe !important;
-    border: 2px dashed var(--mep-primary) !important;
-}
-
-.mep-column h3 {
-    margin: 0 0 15px 0 !important;
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
-    color: var(--mep-text-main) !important;
-    border-bottom: 2px solid var(--mep-primary) !important;
-    padding-bottom: 10px !important;
-}
-
-/* --- BOM Builder Layout --- */
-.mep-bom-layout {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 0 !important;
-    background: #fff !important;
-    border-radius: var(--mep-radius-lg) !important;
-    border: 1px solid var(--mep-border) !important;
-    overflow: hidden !important;
-    min-height: 600px !important;
-}
-
-.mep-bom-sidebar {
-    width: 300px !important;
-    flex: 0 0 300px !important;
-    background: #f8fafc !important;
-    border-right: 1px solid var(--mep-border) !important;
-    padding: 20px !important;
-}
-
-.mep-bom-main {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.mep-bom-canvas {
-    flex: 1 !important;
-    padding: 30px !important;
-    background: #ffffff !important;
-    background-image: radial-gradient(#e2e8f0 1px, transparent 1px) !important;
-    background-size: 20px 20px !important;
-    overflow-y: auto !important;
-}
-
-/* --- Kanban Board --- */
+/* Kanban Board */
 .mep-kanban-board {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 20px !important;
-    overflow-x: auto !important;
-    padding: 10px 0 !important;
+    margin-top: 20px;
 }
 
 .mep-kanban-column {
-    background: #f1f5f9 !important;
-    border-radius: var(--mep-radius) !important;
-    padding: 15px !important;
-    min-width: 300px !important;
-    flex: 0 0 300px !important;
-    min-height: 500px !important;
+    border-radius: 6px;
+    border: 1px solid var(--mep-border);
 }
 
-/* --- Cards --- */
-.mep-wo-card, .mep-library-item, .mep-suggestion-item, .mep-bin-card {
-    background: #fff !important;
-    border-radius: var(--mep-radius) !important;
-    padding: 15px !important;
-    margin-bottom: 15px !important;
-    border: 1px solid var(--mep-border) !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-    transition: all 0.2s ease !important;
+.mep-kanban-column h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: var(--mep-text);
+    border-bottom: 2px solid var(--mep-primary);
+    padding-bottom: 10px;
 }
 
-.mep-wo-card:hover, .mep-library-item:hover {
+.mep-wo-card {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--mep-primary) !important;
+    user-select: none; /* Better for touch drag */
+    touch-action: none;
+}
+
+.mep-wo-card h4 {
+    margin: 0 0 5px 0;
+    color: var(--mep-primary);
+}
+
+/* BOM Builder */
+.mep-bom-editor-layout {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid var(--mep-border);
+    border-radius: 4px;
+}
+
+.mep-material-library {
+    background: var(--mep-bg-light);
+}
+
+.mep-library-item {
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.mep-library-item:hover {
+    background: #fff;
     border-color: var(--mep-primary) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
+    color: var(--mep-primary);
 }
 
-/* --- Visual Warehouse Grid --- */
+.mep-bom-node {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
+}
+
+.mep-node-type {
+    font-size: 1.2em;
+    margin-right: 8px;
+}
+
+/* Warehouse View */
 .mep-bins-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    gap: 15px !important;
-    width: 100% !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
 }
 
-/* --- Utilities --- */
-.mep-animate-fade-in {
-    animation: mepFadeIn 0.3s ease-out forwards;
+.mep-bin-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s;
 }
 
-@keyframes mepFadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+.mep-bin-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Responsive Overrides - Maintain Horizontal as much as possible */
-@media (max-width: 782px) {
-    .mep-column-container, .mep-kanban-board {
-        padding-bottom: 30px !important;
+.mep-bin-card h4 {
+    border-bottom: 1px solid #eee;
+    margin: 0;
+    padding-bottom: 5px;
+    color: var(--mep-primary);
+}
+
+.mep-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #eee;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Utilities Page */
+.card {
+    max-width: 100% !important;
+    margin-top: 20px !important;
+}
+
+/* Traceability & Pegging */
+.mep-trace-graph-layout, .mep-pegging-container {
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+/* Mobile & Tablet Optimizations */
+@media (max-width: 960px) {
+    .mep-kanban-column {
+        touch-action: pan-y;
+    }
+
+    .mep-wo-card {
+        padding: 15px !important; /* Larger hit area */
+        margin-bottom: 15px !important;
+    }
+
+    .mep-bom-editor-layout {
+        flex-direction: column;
+    }
+
+    .mep-material-library {
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+
+    .mep-kanban-board {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .mep-kanban-column {
+        min-height: auto !important;
+        width: 100% !important;
+    }
+
+    .mep-kpi-card {
+        padding: 15px;
+    }
+
+    .mep-kpi-card p {
+        font-size: 20px !important;
+    }
+
+    .mep-bins-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .wrap h1 {
+        font-size: 1.5em;
+    }
+
+    .mep-wizard-card {
+        padding: 20px !important;
+        margin: 10px auto !important;
+    }
+
+    .mep-bins-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mep-wh-toolbar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
     }
 }
