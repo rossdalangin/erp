@@ -6,6 +6,13 @@
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
+const LoadingUI = ({ message = __('Loading...', 'manufacturing-erp-pro') }) => (
+    wp.element.createElement('div', { className: 'mep-loading-container' },
+        wp.element.createElement('div', { className: 'mep-spinner' }),
+        wp.element.createElement('p', null, message)
+    )
+);
+
 const BOMNode = ({ item, index, depth, onRemove, onMarkSubstitute, onUpdate, onReorder }) => {
     const isOp = item.type === 'operation';
     const icon = item.type === 'material' ? '📦 ' : (isOp ? '⚡ ' : '⚙️ ');
@@ -113,7 +120,7 @@ const BOMBuilder = ({ productId }) => {
         });
     };
 
-    if (loading) return wp.element.createElement('p', null, __('Loading Interactive BOM Builder...', 'manufacturing-erp-pro'));
+    if (loading) return wp.element.createElement(LoadingUI, { message: __('Loading Interactive BOM Builder...', 'manufacturing-erp-pro') });
     if (error) return wp.element.createElement('div', { className: 'notice notice-error' }, wp.element.createElement('p', null, error));
 
     return wp.element.createElement('div', { className: 'mep-bom-editor-layout', style: { display: 'flex', gap: '20px', background: '#fff', padding: '20px', border: '1px solid #ccc' } },

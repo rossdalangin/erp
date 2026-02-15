@@ -4,202 +4,273 @@
 
 :root {
     --mep-primary: #2271b1;
+    --mep-primary-dark: #135e96;
     --mep-success: #46b450;
     --mep-danger: #d63638;
     --mep-warning: #dba617;
+    --mep-info: #72aee6;
     --mep-bg-light: #f6f7f7;
+    --mep-bg-white: #ffffff;
     --mep-border: #c3c4c7;
     --mep-text: #3c434a;
+    --mep-text-muted: #64748b;
+    --mep-radius: 6px;
+    --mep-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Dashboard & KPI Cards */
-.mep-dashboard-grid {
-    margin-top: 20px;
+/* Base Layout */
+.mep-dashboard-container, .mep-module-container {
+    padding: 20px;
+    max-width: 1400px;
+}
+
+/* Card Components */
+.mep-card {
+    background: var(--mep-bg-white);
+    border: 1px solid var(--mep-border);
+    border-radius: var(--mep-radius);
+    padding: 24px;
+    box-shadow: var(--mep-shadow);
+    margin-bottom: 24px;
+}
+
+.mep-card-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--mep-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mep-dark-card {
+    background: #2c3338;
+    color: #fff;
+    border-radius: var(--mep-radius);
+    padding: 24px;
+}
+
+.mep-dark-card h3 {
+    color: #fff !important;
+    margin-top: 0;
+}
+
+/* KPI Cards */
+.mep-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .mep-kpi-card {
-    background: #fff;
+    background: var(--mep-bg-white);
     border: 1px solid var(--mep-border);
-    border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
-    transition: transform 0.2s ease;
+    border-radius: var(--mep-radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-top: 4px solid var(--mep-primary);
+    position: relative;
+    overflow: hidden;
 }
 
 .mep-kpi-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Kanban Board */
-.mep-kanban-board {
+.mep-kpi-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mep-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mep-kpi-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--mep-text);
+    line-height: 1;
+}
+
+/* Welcome Banner */
+.mep-welcome-banner {
+    background: linear-gradient(135deg, #fff8e1 0%, #fffde7 100%);
+    border: 1px solid #ffe082;
+    padding: 30px;
+    margin-bottom: 40px;
+    border-radius: var(--mep-radius);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.mep-step-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
     margin-top: 20px;
 }
 
-.mep-kanban-column {
-    border-radius: 6px;
-    border: 1px solid var(--mep-border);
+.mep-step-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--mep-radius);
+    transition: all 0.2s;
+    border-left: 4px solid var(--mep-primary);
 }
 
-.mep-kanban-column h3 {
-    margin-top: 0;
-    font-size: 16px;
-    color: var(--mep-text);
-    border-bottom: 2px solid var(--mep-primary);
-    padding-bottom: 10px;
+.mep-step-link:hover {
+    border-color: var(--mep-primary);
+    background: var(--mep-bg-light);
+    transform: translateX(4px);
+}
+
+.mep-step-link strong {
+    display: block;
+    color: var(--mep-primary);
+    margin-bottom: 4px;
+}
+
+/* Kanban Board - Enforce Horizontal */
+.mep-kanban-board {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 20px !important;
+    overflow-x: auto !important;
+    padding: 10px 0 !important;
+    align-items: flex-start !important;
+    min-height: 600px !important;
+}
+
+.mep-kanban-column {
+    flex: 0 0 320px !important;
+    background: #f1f5f9 !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    border: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 100% !important;
 }
 
 .mep-wo-card {
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #fff;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     border-left: 4px solid var(--mep-primary) !important;
-    user-select: none; /* Better for touch drag */
-    touch-action: none;
+    cursor: grab;
 }
 
-.mep-wo-card h4 {
-    margin: 0 0 5px 0;
-    color: var(--mep-primary);
+.mep-wo-card:active {
+    cursor: grabbing;
 }
 
 /* BOM Builder */
 .mep-bom-editor-layout {
-    background: #fff;
-    padding: 20px;
-    border: 1px solid var(--mep-border);
-    border-radius: 4px;
+    display: flex;
+    gap: 24px;
+    height: calc(100vh - 150px);
 }
 
 .mep-material-library {
-    background: var(--mep-bg-light);
-}
-
-.mep-library-item {
-    border-radius: 3px;
-    transition: all 0.2s;
-}
-
-.mep-library-item:hover {
+    width: 320px;
     background: #fff;
-    border-color: var(--mep-primary) !important;
-    color: var(--mep-primary);
+    border: 1px solid var(--mep-border);
+    border-radius: var(--mep-radius);
+    display: flex;
+    flex-direction: column;
 }
 
-.mep-bom-node {
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
+.mep-bom-canvas {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid var(--mep-border);
+    border-radius: var(--mep-radius);
+    overflow-y: auto;
+    padding: 30px;
 }
 
-.mep-node-type {
-    font-size: 1.2em;
-    margin-right: 8px;
-}
-
-/* Warehouse View */
-.mep-bins-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+/* --- Professional Spinner --- */
+.mep-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
     gap: 20px;
 }
 
-.mep-bin-card {
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: box-shadow 0.2s;
+.mep-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(34, 113, 177, 0.1);
+    border-top: 4px solid var(--mep-primary);
+    border-radius: 50%;
+    animation: mep-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.mep-bin-card:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+@keyframes mep-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.mep-bin-card h4 {
-    border-bottom: 1px solid #eee;
-    margin: 0;
-    padding-bottom: 5px;
-    color: var(--mep-primary);
+/* Resource Utilization bars */
+.mep-resource-item {
+    margin-bottom: 20px;
 }
 
-.mep-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    background: #eee;
-    font-size: 11px;
-    font-weight: bold;
+.mep-resource-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
 }
 
-/* Utilities Page */
-.card {
-    max-width: 100% !important;
-    margin-top: 20px !important;
+.mep-progress-bg {
+    width: 100%;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    height: 10px;
+    overflow: hidden;
 }
 
-/* Traceability & Pegging */
-.mep-trace-graph-layout, .mep-pegging-container {
-    overflow-x: auto;
-    padding-bottom: 20px;
+.mep-progress-fill {
+    height: 100%;
+    background: var(--mep-primary);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Mobile & Tablet Optimizations */
-@media (max-width: 960px) {
-    .mep-kanban-column {
-        touch-action: pan-y;
-    }
-
-    .mep-wo-card {
-        padding: 15px !important; /* Larger hit area */
-        margin-bottom: 15px !important;
+/* Tablet & Mobile */
+@media (max-width: 1024px) {
+    .mep-kanban-board {
+        flex-wrap: nowrap;
     }
 
     .mep-bom-editor-layout {
         flex-direction: column;
+        height: auto;
     }
 
     .mep-material-library {
-        width: 100% !important;
-        margin-bottom: 20px;
-    }
-
-    .mep-kanban-board {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .mep-kanban-column {
-        min-height: auto !important;
-        width: 100% !important;
-    }
-
-    .mep-kpi-card {
-        padding: 15px;
-    }
-
-    .mep-kpi-card p {
-        font-size: 20px !important;
-    }
-
-    .mep-bins-grid {
-        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        height: 300px;
     }
 }
 
-@media (max-width: 600px) {
-    .wrap h1 {
-        font-size: 1.5em;
-    }
-
-    .mep-wizard-card {
-        padding: 20px !important;
-        margin: 10px auto !important;
-    }
-
-    .mep-bins-grid {
+@media (max-width: 640px) {
+    .mep-kpi-grid {
         grid-template-columns: 1fr;
-    }
-
-    .mep-wh-toolbar {
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 10px;
     }
 }

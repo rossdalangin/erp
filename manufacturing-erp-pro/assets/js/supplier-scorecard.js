@@ -2,6 +2,13 @@
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
+const LoadingUI = ({ message = __('Loading...', 'manufacturing-erp-pro') }) => (
+    wp.element.createElement('div', { className: 'mep-loading-container' },
+        wp.element.createElement('div', { className: 'mep-spinner' }),
+        wp.element.createElement('p', null, message)
+    )
+);
+
 const SupplierScorecard = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,14 +24,19 @@ const SupplierScorecard = () => {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return wp.element.createElement('p', null, __('Loading Scores...', 'manufacturing-erp-pro'));
+    if (loading) return wp.element.createElement(LoadingUI, { message: __('Loading Scores...', 'manufacturing-erp-pro') });
 
-    return wp.element.createElement('div', { style: { background: '#fff', padding: '20px', border: '1px solid #ccc' } },
-        wp.element.createElement('h2', null, __('Supplier Performance', 'manufacturing-erp-pro')),
-        (suppliers || []).map(s => wp.element.createElement('div', { key: s.id, style: { borderBottom: '1px solid #eee', padding: '10px 0' } },
-            wp.element.createElement('strong', null, s.name),
-            wp.element.createElement('span', { style: { marginLeft: '20px' } }, `Score: ${s.score}/100`)
-        ))
+    return wp.element.createElement('div', { className: 'mep-module-container' },
+        wp.element.createElement('h2', { className: 'mep-card-title' }, __('Supplier Performance Scorecard', 'manufacturing-erp-pro')),
+        wp.element.createElement('div', { className: 'mep-kpi-grid' },
+            (suppliers || []).map(s => wp.element.createElement('div', { key: s.id, className: 'mep-kpi-card' },
+                wp.element.createElement('span', { className: 'mep-kpi-label' }, s.name),
+                wp.element.createElement('span', { className: 'mep-kpi-value' }, `${s.score}%`),
+                wp.element.createElement('div', { className: 'mep-progress-bg', style: { marginTop: '10px' } },
+                    wp.element.createElement('div', { className: 'mep-progress-fill', style: { width: `${s.score}%`, background: s.score > 80 ? 'var(--mep-success)' : (s.score > 50 ? 'var(--mep-warning)' : 'var(--mep-danger)') } })
+                )
+            ))
+        )
     );
 };
 

@@ -2,6 +2,13 @@
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
+const LoadingUI = ({ message = __('Loading...', 'manufacturing-erp-pro') }) => (
+    wp.element.createElement('div', { className: 'mep-loading-container' },
+        wp.element.createElement('div', { className: 'mep-spinner' }),
+        wp.element.createElement('p', null, message)
+    )
+);
+
 const POReceiving = () => {
     const [pos, setPos] = useState([]);
     const [selectedPo, setSelectedPo] = useState(null);
@@ -37,7 +44,7 @@ const POReceiving = () => {
         }
     };
 
-    if (loading) return wp.element.createElement('p', null, __('Loading PO Receiving Workspace...', 'manufacturing-erp-pro'));
+    if (loading) return wp.element.createElement(LoadingUI, { message: __('Loading PO Receiving Workspace...', 'manufacturing-erp-pro') });
 
     return wp.element.createElement('div', { className: 'mep-receiving-layout', style: { display: 'flex', gap: '30px', background: '#fff', padding: '20px', border: '1px solid #ccc' } },
         wp.element.createElement('div', { style: { width: '300px' } },

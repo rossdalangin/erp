@@ -6,6 +6,13 @@
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
+const LoadingUI = ({ message = __('Loading...', 'manufacturing-erp-pro') }) => (
+    wp.element.createElement('div', { className: 'mep-loading-container' },
+        wp.element.createElement('div', { className: 'mep-spinner' }),
+        wp.element.createElement('p', null, message)
+    )
+);
+
 const WorkOrderCard = ({ wo, onDragStart }) => {
     return wp.element.createElement('div', {
         className: 'mep-wo-card',
@@ -54,7 +61,7 @@ const KanbanBoard = () => {
         }).then(() => loadData());
     };
 
-    if (loading && workOrders.length === 0) return wp.element.createElement('p', null, __('Loading Production Board...', 'manufacturing-erp-pro'));
+    if (loading && workOrders.length === 0) return wp.element.createElement(LoadingUI, { message: __('Loading Production Board...', 'manufacturing-erp-pro') });
 
     return wp.element.createElement('div', {
         className: 'mep-kanban-board',

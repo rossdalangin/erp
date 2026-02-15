@@ -2,6 +2,13 @@
 const { useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 
+const LoadingUI = ({ message = __('Loading...', 'manufacturing-erp-pro') }) => (
+    wp.element.createElement('div', { className: 'mep-loading-container' },
+        wp.element.createElement('div', { className: 'mep-spinner' }),
+        wp.element.createElement('p', null, message)
+    )
+);
+
 const Bin = ({ bin, onDragStart, onDragOver, onDrop }) => {
     const bgColor = bin.occupancy > 90 ? '#fff0f0' : (bin.occupancy > 70 ? '#fffcf0' : '#fcfcfc');
 
@@ -53,7 +60,7 @@ const WarehouseLayout = () => {
         }
     };
 
-    if (loading && warehouses.length === 0) return wp.element.createElement('p', null, __('Loading Warehouse...', 'manufacturing-erp-pro'));
+    if (loading && warehouses.length === 0) return wp.element.createElement(LoadingUI, { message: __('Loading Warehouse...', 'manufacturing-erp-pro') });
 
     return wp.element.createElement('div', { className: 'mep-warehouse-layout', style: { display: 'flex', gap: '20px', background: '#fff', padding: '20px', border: '1px solid #ccc' } },
         wp.element.createElement('div', { style: { flex: 1 } },
