@@ -201,12 +201,11 @@ const BOMBuilder = ({ productId }) => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-bom-editor-layout', style: { display: 'flex', gap: '20px' } },
+    return wp.element.createElement('div', { className: 'mep-bom-layout mep-admin-style mep-animate-fade-in' },
         // Left Sidebar: Material & Operation Library
         wp.element.createElement('div', {
-            className: 'mep-material-library',
-            title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure. Example: Drag "Cowhide Leather" then "Stitching" to define the first assembly step.' : '',
-            style: { width: '250px', border: '1px solid #ccc', padding: '10px' }
+            className: 'mep-bom-sidebar',
+            title: helpMode ? 'Library: Drag materials or operations into the BOM canvas to build your product structure.' : '',
         },
             wp.element.createElement('h3', null, __('Materials', 'manufacturing-erp-pro')),
             materials.map(mat => wp.element.createElement('div', {
@@ -214,20 +213,18 @@ const BOMBuilder = ({ productId }) => {
                 className: 'mep-library-item',
                 draggable: true,
                 onDragStart: (e) => onDragStart(e, mat, 'material'),
-                style: { padding: '8px', border: '1px solid #eee', marginBottom: '5px', cursor: 'grab', background: '#fff' }
-            }, mat.name)),
+            }, wp.element.createElement('span', null, '📦 '), mat.name)),
 
-            wp.element.createElement('h3', { style: { marginTop: '20px' } }, __('Work Centers (Operations)', 'manufacturing-erp-pro')),
+            wp.element.createElement('h3', { style: { marginTop: '30px' } }, __('Operations', 'manufacturing-erp-pro')),
             equipment.map(eq => wp.element.createElement('div', {
                 key: eq.id,
                 className: 'mep-library-item',
                 draggable: true,
                 onDragStart: (e) => onDragStart(e, eq, 'operation'),
-                style: { padding: '8px', border: '1px solid #e0f0ff', marginBottom: '5px', cursor: 'grab', background: '#fff' }
-            }, eq.name))
+            }, wp.element.createElement('span', null, '⚡ '), eq.name))
         ),
         // Central Canvas
-        wp.element.createElement('div', { className: 'mep-bom-main', style: { flex: 1 } },
+        wp.element.createElement('div', { className: 'mep-bom-main' },
             wp.element.createElement('header', { className: 'mep-bom-header', style: { marginBottom: '20px' } },
                 wp.element.createElement('h2', null, `${__('Visual BOM Editor: Product', 'manufacturing-erp-pro')} #${productId}`),
                 wp.element.createElement('div', {
@@ -240,10 +237,10 @@ const BOMBuilder = ({ productId }) => {
             ),
             wp.element.createElement('div', {
                 className: 'mep-bom-canvas',
-                title: helpMode ? __('Canvas: Drop materials and operations here. Click on Qty/Time or Scrap/Loss to edit them. Drag nodes to reorder the assembly sequence. Example: Set 1.2m2 for leather and 15 mins for cutting.', 'manufacturing-erp-pro') : '',
+                title: helpMode ? __('Canvas: Drop materials and operations here.', 'manufacturing-erp-pro') : '',
                 onDragOver: onDragOver,
                 onDrop: onDrop,
-                style: { minHeight: '300px', border: '2px dashed #ccc', padding: '20px', background: '#fff' }
+                style: { minHeight: '500px' }
             },
                 bom.bom.length > 0 ?
                     bom.bom.map((item, index) => wp.element.createElement(BOMNode, { key: index, item: item, index: index, depth: 0, onRemove: removeComponent, onMarkSubstitute: markSubstitute, onUpdate: updateComponent, onReorder: reorderComponents })) :

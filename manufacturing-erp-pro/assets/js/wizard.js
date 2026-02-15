@@ -47,24 +47,25 @@ const SetupWizard = () => {
     };
 
     return wp.element.createElement('div', {
-        className: 'mep-wizard-overlay',
+        className: 'mep-wizard-overlay mep-admin-style mep-animate-fade-in',
         style: {
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            background: '#f0f0f1', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '20px', boxSizing: 'border-box'
         }
     },
         wp.element.createElement('div', {
             className: 'mep-wizard-card',
             style: {
-                background: '#fff', padding: '40px', maxWidth: '600px', width: '100%',
-                borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                background: '#fff', padding: '50px', maxWidth: '650px', width: '100%',
+                borderRadius: 'var(--mep-radius-lg)', boxShadow: 'var(--mep-shadow-lg)',
                 textAlign: 'center'
             }
         },
-            wp.element.createElement('header', { style: { marginBottom: '30px' } },
-                wp.element.createElement('h1', { style: { margin: '0 0 10px 0', fontSize: '28px', color: '#2271b1' } }, __('Manufacturing ERP Pro', 'manufacturing-erp-pro')),
-                wp.element.createElement('p', { style: { color: '#666', fontSize: '16px' } }, __('Factory Setup & Onboarding', 'manufacturing-erp-pro'))
+            wp.element.createElement('header', { style: { marginBottom: '40px' } },
+                wp.element.createElement('div', { style: { fontSize: '48px', marginBottom: '20px' } }, '🏭'),
+                wp.element.createElement('h1', { style: { margin: '0 0 10px 0', fontSize: '32px', color: 'var(--mep-primary)' } }, __('Manufacturing ERP Pro', 'manufacturing-erp-pro')),
+                wp.element.createElement('p', { style: { color: 'var(--mep-text-muted)', fontSize: '18px' } }, __('Factory Setup & Onboarding', 'manufacturing-erp-pro'))
             ),
 
             error && wp.element.createElement('div', {

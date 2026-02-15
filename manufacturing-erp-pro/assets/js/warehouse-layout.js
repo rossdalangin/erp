@@ -6,15 +6,13 @@
 const { useState, useEffect } = wp.element;
 
 const Bin = ({ bin, onTransfer, onDragStart, onDragOver, onDrop, helpMode }) => {
-    const bgColor = bin.occupancy > 90 ? '#fff0f0' : (bin.occupancy > 70 ? '#fffcf0' : '#fcfcfc');
-    const borderColor = bin.occupancy > 90 ? '#d63638' : (bin.occupancy > 70 ? '#dba617' : '#ccc');
+    const occupancyClass = bin.occupancy > 90 ? 'occupancy-high' : (bin.occupancy > 70 ? 'occupancy-medium' : '');
 
     return wp.element.createElement('div', {
-        className: 'mep-bin-card',
+        className: `mep-bin-card ${occupancyClass}`,
         onDragOver: onDragOver,
         onDrop: (e) => onDrop(e, bin.id),
-        title: helpMode ? `Bin (${bin.name}): Shows current material levels. Drag materials out of this bin to transfer them elsewhere. Example: Drag 'Cowhide' to the 'Production Floor' to issue material.` : '',
-        style: { border: `2px solid ${borderColor}`, padding: '15px', minWidth: '180px', background: bgColor, borderRadius: '4px' }
+        title: helpMode ? `Bin (${bin.name}): Shows current material levels.` : '',
     },
         wp.element.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' } },
             wp.element.createElement('h4', { style: { margin: 0 } }, bin.name),
@@ -122,7 +120,7 @@ const WarehouseLayout = () => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-warehouse-layout', style: { display: 'flex', gap: '20px' } },
+    return wp.element.createElement('div', { className: 'mep-warehouse-layout mep-admin-style mep-animate-fade-in', style: { display: 'flex', gap: '30px' } },
         wp.element.createElement('div', { style: { flex: 1 } },
         wp.element.createElement('div', { className: 'mep-wh-toolbar', style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
             wp.element.createElement('div', {

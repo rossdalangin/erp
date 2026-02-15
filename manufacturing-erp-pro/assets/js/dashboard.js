@@ -8,12 +8,12 @@ const { __ } = wp.i18n;
 
 const KPICard = ({ label, value, color, loading }) => {
     return wp.element.createElement('div', {
-        className: 'mep-kpi-card',
-        style: { borderTop: `4px solid ${color}`, padding: '20px', background: '#fff', textAlign: 'center', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
+        className: 'mep-kpi-card mep-animate-fade-in',
+        style: { '--accent-color': color }
     },
-        wp.element.createElement('h3', { style: { margin: 0, fontSize: '14px', color: '#666', fontWeight: 'normal' } }, label),
+        wp.element.createElement('span', { className: 'mep-kpi-label' }, label),
         loading ? wp.element.createElement('span', { className: 'spinner is-active', style: { float: 'none' } }) :
-                  wp.element.createElement('p', { style: { fontSize: '28px', fontWeight: 'bold', margin: '10px 0', color: '#2c3338' } }, value)
+                  wp.element.createElement('span', { className: 'mep-kpi-value' }, value)
     );
 };
 
@@ -41,15 +41,15 @@ const Dashboard = () => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-dashboard-container' },
+    return wp.element.createElement('div', { className: 'mep-dashboard-container mep-admin-style' },
         // Step-by-Step Onboarding Guidance (Only show if data is empty)
         (!loading && kpis && kpis.production_output === 0) && wp.element.createElement('div', {
-            className: 'mep-onboarding-guide',
-            style: { background: '#fff8e1', border: '1px solid #ffe082', padding: '20px', marginBottom: '30px', borderRadius: '4px' }
+            className: 'mep-onboarding-guide mep-animate-fade-in',
+            style: { background: 'white', border: '2px solid var(--mep-warning)', padding: '30px', marginBottom: '30px', borderRadius: 'var(--mep-radius-lg)', boxShadow: 'var(--mep-shadow-md)' }
         },
-            wp.element.createElement('h2', { style: { marginTop: 0 } }, '✨ ' + __('Welcome! Let\'s build your factory.', 'manufacturing-erp-pro')),
-            wp.element.createElement('p', null, __('Follow these steps to get your first production order released:', 'manufacturing-erp-pro')),
-            wp.element.createElement('div', { style: { display: 'flex', gap: '20px', marginTop: '15px' } },
+            wp.element.createElement('h2', { style: { marginTop: 0, color: 'var(--mep-warning)' } }, '✨ ' + __('Welcome! Let\'s build your factory.', 'manufacturing-erp-pro')),
+            wp.element.createElement('p', { style: { fontSize: '1.1rem', color: 'var(--mep-text-muted)' } }, __('Follow these steps to get your first production order released:', 'manufacturing-erp-pro')),
+            wp.element.createElement('div', { style: { display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' } },
                 [
                     { title: __('1. Materials', 'manufacturing-erp-pro'), desc: __('Add your raw ingredients.', 'manufacturing-erp-pro'), link: 'edit.php?post_type=mep_material' },
                     { title: __('2. Products', 'manufacturing-erp-pro'), desc: __('Define finished goods.', 'manufacturing-erp-pro'), link: 'edit.php?post_type=mep_product' },
@@ -57,18 +57,17 @@ const Dashboard = () => {
                     { title: __('4. Release WO', 'manufacturing-erp-pro'), desc: __('Start production!', 'manufacturing-erp-pro'), link: 'admin.php?page=mep-production' }
                 ].map((s, i) => wp.element.createElement('a', {
                     key: i, href: s.link,
-                    style: { flex: 1, textDecoration: 'none', color: 'inherit', background: '#fff', padding: '15px', border: '1px solid #e0c46a', borderRadius: '4px' }
+                    className: 'mep-onboarding-step',
+                    style: { flex: '1 1 200px', textDecoration: 'none', color: 'inherit', background: '#f8fafc', padding: '20px', border: '1px solid var(--mep-border)', borderRadius: 'var(--mep-radius)', transition: 'var(--mep-transition)' }
                 },
-                    wp.element.createElement('strong', { style: { display: 'block', marginBottom: '5px', color: '#2271b1' } }, s.title),
-                    wp.element.createElement('span', { style: { fontSize: '12px' } }, s.desc)
+                    wp.element.createElement('strong', { style: { display: 'block', marginBottom: '8px', color: 'var(--mep-primary)', fontSize: '1.1rem' } }, s.title),
+                    wp.element.createElement('span', { style: { fontSize: '13px', color: 'var(--mep-text-muted)' } }, s.desc)
                 ))
             )
         ),
 
         // KPI Row
-        wp.element.createElement('div', {
-            style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }
-        },
+        wp.element.createElement('div', { className: 'mep-kpi-grid' },
             wp.element.createElement(KPICard, {
                 label: __('Monthly Output', 'manufacturing-erp-pro'),
                 value: kpis ? kpis.production_output : '0',

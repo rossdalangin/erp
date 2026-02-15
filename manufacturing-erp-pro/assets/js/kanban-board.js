@@ -118,17 +118,15 @@ const KanbanBoard = () => {
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
     return wp.element.createElement('div', {
-        className: 'mep-kanban-board',
+        className: 'mep-kanban-board mep-admin-style mep-animate-fade-in',
         title: helpMode ? 'Production Board: Drag Work Order cards between columns to update their manufacturing status.' : '',
-        style: { display: 'flex', gap: '20px', alignItems: 'flex-start' }
     },
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
             className: 'mep-kanban-column',
-            title: helpMode ? `Column (${col.label}): Drop Work Orders here to set them to ${col.label} status. Example: Drop here to mark as ${col.label}.` : '',
+            title: helpMode ? `Column (${col.label}): Drop Work Orders here.` : '',
             onDragOver: onDragOver,
             onDrop: (e) => onDrop(e, col.id),
-            style: { flex: 1, background: '#f0f0f1', padding: '15px', minHeight: '500px', border: '2px dashed transparent' }
         },
             wp.element.createElement('h3', null, col.label),
             workOrders.filter(wo => wo.status === col.id).map(wo =>
