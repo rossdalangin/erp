@@ -26,6 +26,7 @@ const MRPSuggestions = () => {
     const [basket, setBasket] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isDraggingOverBasket, setIsDraggingOverBasket] = useState(false);
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
@@ -70,6 +71,7 @@ const MRPSuggestions = () => {
     };
 
     const onDrop = (e) => {
+        setIsDraggingOverBasket(false);
         const item = JSON.parse(e.dataTransfer.getData('suggestion'));
         if (!basket.find(i => i.material_id === item.material_id)) {
             setBasket([...basket, item]);
@@ -111,25 +113,24 @@ const MRPSuggestions = () => {
 
         status === 'processing' && wp.element.createElement('div', { className: 'notice notice-info' }, wp.element.createElement('p', null, 'The MRP engine is exploding BOMs and netting inventory in the background. Results will refresh automatically.')),
 
-        wp.element.createElement('div', { style: { display: 'flex', gap: '30px' } },
+        wp.element.createElement('div', { className: 'mep-column-container mep-admin-style mep-animate-fade-in' },
         wp.element.createElement('div', {
-            className: 'mep-suggestions-list',
-            style: { flex: 1 },
-            title: helpMode ? 'Suggestions: These are items the MRP engine thinks you should buy based on demand. Example: If leather is below safety stock, it will appear here.' : ''
+            className: 'mep-column',
+            title: helpMode ? 'Suggestions: These are items the MRP engine thinks you should buy based on demand.' : ''
         },
-            wp.element.createElement('h2', null, 'MRP Suggestions'),
+            wp.element.createElement('h3', null, '🔍 ' + __('MRP Suggestions', 'manufacturing-erp-pro')),
             suggestions.length > 0 ?
                 suggestions.map((item, i) => wp.element.createElement(SuggestionItem, { key: i, item: item, onDragStart })) :
-                wp.element.createElement('p', null, 'No suggestions found. Your inventory levels meet current demand.')
+                wp.element.createElement('p', { style: { color: '#94a3b8', fontStyle: 'italic' } }, __('No suggestions found.', 'manufacturing-erp-pro'))
         ),
         wp.element.createElement('div', {
-            className: 'mep-po-basket',
-            onDragOver: onDragOver,
+            className: `mep-column ${isDraggingOverBasket ? 'is-dragging-over' : ''}`,
+            onDragOver: (e) => { e.preventDefault(); setIsDraggingOverBasket(true); },
+            onDragLeave: () => setIsDraggingOverBasket(false),
             onDrop: onDrop,
-            style: { flex: 1, background: '#f6f7f7', border: '2px dashed #ccc', padding: '20px', minHeight: '400px' },
-            title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation. Example: Drag all "Thread" suggestions to create one bulk order.' : ''
+            title: helpMode ? 'Basket: Drag suggestions here to prepare them for Purchase Order generation.' : ''
         },
-            wp.element.createElement('h2', null, 'Draft PO Basket'),
+            wp.element.createElement('h3', null, '🛒 ' + __('Draft PO Basket', 'manufacturing-erp-pro')),
             basket.map((item, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd' } },
                 `Material #${item.material_id} - ${item.needed} units`
             )),

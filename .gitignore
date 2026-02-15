@@ -1,0 +1,17 @@
+# WordPress Specific
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/backup-db/
+*.log
+.htaccess
+
+# Plugin Specific
+manufacturing-erp-pro/tests/temp/
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Backups
+manufacturing-erp-pro/docs/backups/
+wp-content/uploads/mep_backups/

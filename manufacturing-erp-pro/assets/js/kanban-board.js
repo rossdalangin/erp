@@ -29,6 +29,7 @@ const KanbanBoard = () => {
     const [equipment, setEquipment] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [dragOverCol, setDragOverCol] = useState(null);
 
     const columns = [
         { id: 'publish', label: __('Backlog', 'manufacturing-erp-pro') },
@@ -63,6 +64,7 @@ const KanbanBoard = () => {
     };
 
     const onDrop = (e, nextStatus) => {
+        setDragOverCol(null);
         const id = e.dataTransfer.getData('woId');
         updateOrderStatus(id, nextStatus);
     };
@@ -119,13 +121,14 @@ const KanbanBoard = () => {
 
     return wp.element.createElement('div', {
         className: 'mep-kanban-board mep-admin-style mep-animate-fade-in',
-        title: helpMode ? 'Production Board: Drag Work Order cards between columns to update their manufacturing status.' : '',
+        title: helpMode ? 'Production Board: Drag Work Order cards between columns.' : '',
     },
         columns.map(col => wp.element.createElement('div', {
             key: col.id,
-            className: 'mep-kanban-column',
+            className: `mep-kanban-column ${dragOverCol === col.id ? 'is-dragging-over' : ''}`,
             title: helpMode ? `Column (${col.label}): Drop Work Orders here.` : '',
-            onDragOver: onDragOver,
+            onDragOver: (e) => { e.preventDefault(); setDragOverCol(col.id); },
+            onDragLeave: () => setDragOverCol(null),
             onDrop: (e) => onDrop(e, col.id),
         },
             wp.element.createElement('h3', null, col.label),

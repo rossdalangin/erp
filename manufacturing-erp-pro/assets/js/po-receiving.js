@@ -25,6 +25,7 @@ const POReceiving = () => {
     const [selectedWh, setSelectedWh] = useState(null);
     const [bins, setBins] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dragOverBin, setDragOverBin] = useState(null);
 
     useEffect(() => {
         Promise.all([
@@ -54,6 +55,7 @@ const POReceiving = () => {
     const onDragOver = (e) => e.preventDefault();
 
     const onDrop = (e, binId) => {
+        setDragOverBin(null);
         const item = JSON.parse(e.dataTransfer.getData('receiptItem'));
         const qty = prompt(`Enter quantity to receive into this bin (Max: ${item.needed}):`, item.needed);
 
@@ -84,27 +86,29 @@ const POReceiving = () => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-receiving-layout', style: { display: 'flex', gap: '30px' } },
+    return wp.element.createElement('div', { className: 'mep-column-container mep-admin-style mep-animate-fade-in' },
         // Left: PO List & Items
         wp.element.createElement('div', {
-            style: { width: '300px' },
-            title: helpMode ? 'PO List: Select an open Purchase Order to view its lines. Example: Select PO #401 to receive leather from Supplier A.' : ''
+            className: 'mep-column',
+            style: { flex: '0 0 350px' },
+            title: helpMode ? 'PO List: Select an open Purchase Order to view its lines.' : ''
         },
-            wp.element.createElement('h3', null, 'Open Purchase Orders'),
+            wp.element.createElement('h3', null, '📑 ' + __('Open Purchase Orders', 'manufacturing-erp-pro')),
             pos.map(po => wp.element.createElement('div', {
                 key: po.id,
                 onClick: () => setSelectedPo(po),
-                style: { padding: '10px', border: '1px solid #ccc', marginBottom: '5px', background: selectedPo?.id === po.id ? '#e7f1f9' : '#fff', cursor: 'pointer' }
+                className: 'mep-library-item',
+                style: { background: selectedPo?.id === po.id ? 'var(--mep-bg-canvas)' : '', borderColor: selectedPo?.id === po.id ? 'var(--mep-primary)' : '', cursor: 'pointer' }
             }, po.title)),
 
-            selectedPo && wp.element.createElement('div', { style: { marginTop: '20px' } },
-                wp.element.createElement('h4', null, `Items in PO #${selectedPo.id}`),
+            selectedPo && wp.element.createElement('div', { style: { marginTop: '30px' } },
+                wp.element.createElement('h4', null, `${__('Items in PO', 'manufacturing-erp-pro')} #${selectedPo.id}`),
                 selectedPo.items.map((item, i) => wp.element.createElement(POItem, { key: i, item: item, poId: selectedPo.id, onDragStart }))
             )
         ),
 
         // Right: Warehouse Bins (Drop Zones)
-        wp.element.createElement('div', { style: { flex: 1 } },
+        wp.element.createElement('div', { className: 'mep-column', style: { flex: 2 } },
             wp.element.createElement('div', { style: { marginBottom: '20px' } },
                 wp.element.createElement('label', null, 'Select Target Warehouse: '),
                 wp.element.createElement('select', { value: selectedWh, onChange: (e) => setSelectedWh(e.target.value) },
@@ -112,14 +116,16 @@ const POReceiving = () => {
                 )
             ),
             wp.element.createElement('div', {
-                style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
-                title: helpMode ? 'Receiving Zones: Drag items from the left into these bins to record goods receipt. Example: Drag leather into "Leather Storage".' : ''
+                className: 'mep-bins-grid',
+                title: helpMode ? 'Receiving Zones: Drag items from the left into these bins.' : ''
             },
                 bins.map(bin => wp.element.createElement('div', {
                     key: bin.id,
-                    onDragOver: onDragOver,
+                    onDragOver: (e) => { e.preventDefault(); setDragOverBin(bin.id); },
+                    onDragLeave: () => setDragOverBin(null),
                     onDrop: (e) => onDrop(e, bin.id),
-                    style: { padding: '20px', border: '2px dashed #ccc', background: '#fcfcfc', borderRadius: '8px', textAlign: 'center' }
+                    className: `mep-bin-card ${dragOverBin === bin.id ? 'occupancy-medium' : ''}`,
+                    style: { borderStyle: 'dashed', cursor: 'default' }
                 },
                     wp.element.createElement('strong', null, bin.name),
                     wp.element.createElement('p', { style: { fontSize: '11px', color: '#999' } }, 'Drop items here to receive stock')

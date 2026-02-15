@@ -42,6 +42,7 @@ const WarehouseLayout = () => {
     const [reorderBasket, setReorderBasket] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isDraggingOverBasket, setIsDraggingOverBasket] = useState(false);
 
     useEffect(() => {
         wp.apiFetch({ path: '/mep/v1/warehouses' })
@@ -103,6 +104,7 @@ const WarehouseLayout = () => {
     };
 
     const onBasketDrop = (e) => {
+        setIsDraggingOverBasket(false);
         const dataStr = e.dataTransfer.getData('transferData');
         if (!dataStr) return;
         const data = JSON.parse(dataStr);
@@ -120,8 +122,8 @@ const WarehouseLayout = () => {
 
     const helpMode = typeof mepSettings !== 'undefined' && mepSettings.helpMode === 'on';
 
-    return wp.element.createElement('div', { className: 'mep-warehouse-layout mep-admin-style mep-animate-fade-in', style: { display: 'flex', gap: '30px' } },
-        wp.element.createElement('div', { style: { flex: 1 } },
+    return wp.element.createElement('div', { className: 'mep-column-container mep-admin-style mep-animate-fade-in' },
+        wp.element.createElement('div', { className: 'mep-column', style: { flex: 3 } },
         wp.element.createElement('div', { className: 'mep-wh-toolbar', style: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
             wp.element.createElement('div', {
                 className: 'mep-wh-selector',
@@ -158,13 +160,14 @@ const WarehouseLayout = () => {
         ),
         // Sidebar: Reorder Basket
         wp.element.createElement('div', {
-            className: 'mep-reorder-basket-sidebar',
-            onDragOver: (e) => e.preventDefault(),
+            className: `mep-column ${isDraggingOverBasket ? 'is-dragging-over' : ''}`,
+            onDragOver: (e) => { e.preventDefault(); setIsDraggingOverBasket(true); },
+            onDragLeave: () => setIsDraggingOverBasket(false),
             onDrop: onBasketDrop,
-            title: helpMode ? 'Reorder Basket: Drag materials here from any bin to flag them for reordering. Example: Drag "Thread" if you notice physical stock is low.' : '',
-            style: { width: '250px', background: '#f6f7f7', border: '2px dashed #ccd0d4', padding: '20px', borderRadius: '4px' }
+            title: helpMode ? 'Reorder Basket: Drag materials here from any bin to flag them for reordering.' : '',
+            style: { flex: '0 0 300px' }
         },
-            wp.element.createElement('h3', null, '🛒 Reorder Basket'),
+            wp.element.createElement('h3', null, '🛒 ' + __('Reorder Basket', 'manufacturing-erp-pro')),
             wp.element.createElement('div', { style: { minHeight: '100px', marginBottom: '20px' } },
                 reorderBasket.length > 0 ?
                     reorderBasket.map((id, i) => wp.element.createElement('div', { key: i, style: { padding: '5px', borderBottom: '1px solid #ddd', fontSize: '12px' } }, `Mat #${id}`)) :

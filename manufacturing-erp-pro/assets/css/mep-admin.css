@@ -121,6 +121,39 @@
     color: var(--mep-text-main);
 }
 
+/* --- Drag & Drop Column Pattern (Generic) --- */
+.mep-column-container {
+    display: flex;
+    gap: 24px;
+    padding: 10px 0;
+    overflow-x: auto;
+}
+
+.mep-column {
+    background: #f1f5f9;
+    border-radius: var(--mep-radius-lg);
+    padding: 20px;
+    min-width: 320px;
+    flex: 1;
+    min-height: 60vh;
+    border: 2px dashed transparent;
+    transition: var(--mep-transition);
+}
+
+.mep-column.is-dragging-over {
+    border-color: var(--mep-primary);
+    background: #e0f2fe;
+}
+
+.mep-column h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    color: var(--mep-text-main);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 /* --- Kanban Board (Production) --- */
 .mep-kanban-board {
     display: flex;
