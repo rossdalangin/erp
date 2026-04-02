@@ -3,69 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manufacturing ERP Pro | Scale Your Factory with WordPress</title>
+    <title>Manufacturing ERP Pro | Enterprise-Grade Factory Management on WordPress</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-        .hero { background: #2271b1; color: #fff; padding: 100px 20px; text-align: center; }
-        .hero h1 { fontSize: 48px; margin-bottom: 20px; }
-        .hero p { fontSize: 24px; max-width: 800px; margin: 0 auto 40px; }
-        .btn { background: #dba617; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; fontSize: 20px; }
-        .features { padding: 80px 20px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .feature-card { border: 1px solid #eee; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .feature-card h3 { color: #2271b1; fontSize: 24px; }
-        .pricing { background: #f9f9f9; padding: 80px 20px; text-align: center; }
-        .footer { background: #333; color: #fff; padding: 40px 20px; text-align: center; }
+        :root {
+            --mep-blue: #2271b1;
+            --mep-gold: #dba617;
+            --mep-dark: #1e1e1e;
+            --mep-gray: #f0f0f1;
+            --mep-text: #3c434a;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; line-height: 1.6; color: var(--mep-text); margin: 0; padding: 0; background: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Hero Section */
+        .hero { background: linear-gradient(135deg, var(--mep-blue) 0%, #135e96 100%); color: #fff; padding: 120px 0 100px; text-align: center; }
+        .hero h1 { font-size: 56px; margin-bottom: 24px; letter-spacing: -1px; }
+        .hero p { font-size: 24px; max-width: 800px; margin: 0 auto 48px; opacity: 0.9; }
+        .hero-btns { display: flex; justify-content: center; gap: 20px; }
+        .btn { display: inline-block; padding: 18px 36px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 18px; transition: transform 0.2s; }
+        .btn-primary { background: var(--mep-gold); color: #fff; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #fff; }
+        .btn:hover { transform: translateY(-2px); }
+
+        /* Social Proof */
+        .social-proof { background: var(--mep-gray); padding: 40px 0; text-align: center; border-bottom: 1px solid #ddd; }
+        .social-proof p { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 20px; }
+        .logos { display: flex; justify-content: center; gap: 60px; opacity: 0.5; filter: grayscale(100%); }
+
+        /* Features Section */
+        .section-title { text-align: center; margin: 80px 0 60px; }
+        .section-title h2 { font-size: 40px; color: var(--mep-blue); }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; margin-bottom: 80px; }
+        .feature-card { border: 1px solid #e5e5e5; padding: 40px; border-radius: 12px; transition: box-shadow 0.3s; }
+        .feature-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .feature-card h3 { color: var(--mep-blue); font-size: 24px; margin-bottom: 16px; }
+        .feature-card p { color: #50575e; }
+
+        /* Comparison Table */
+        .comparison { background: #fff; padding: 80px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 40px; }
+        th, td { padding: 20px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: var(--mep-blue); color: #fff; }
+        .check { color: #2ecc71; font-weight: bold; }
+        .cross { color: #e74c3c; font-weight: bold; }
+
+        /* Pricing */
+        .pricing { background: var(--mep-gray); padding: 100px 0; text-align: center; }
+        .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 60px; }
+        .price-card { background: #fff; padding: 60px 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+        .price-card.featured { border: 3px solid var(--mep-gold); transform: scale(1.05); z-index: 10; }
+        .badge { background: var(--mep-gold); color: #fff; padding: 8px 24px; position: absolute; top: 20px; right: -30px; transform: rotate(45deg); font-weight: bold; }
+        .price-card h3 { font-size: 28px; margin-bottom: 10px; }
+        .price-card .price { font-size: 48px; font-weight: 800; margin-bottom: 30px; color: var(--mep-blue); }
+        .price-card ul { list-style: none; padding: 0; margin-bottom: 40px; text-align: left; }
+        .price-card li { margin-bottom: 12px; color: #50575e; }
+        .price-card li::before { content: "✓"; color: var(--mep-gold); margin-right: 10px; font-weight: bold; }
+
+        /* CTA Section */
+        .cta-final { background: var(--mep-dark); color: #fff; padding: 100px 0; text-align: center; }
+        .cta-final h2 { font-size: 48px; margin-bottom: 24px; }
+        .cta-final p { font-size: 22px; opacity: 0.8; margin-bottom: 40px; }
+
+        .footer { background: #111; color: #888; padding: 60px 0; text-align: center; font-size: 14px; }
     </style>
 </head>
 <body>
-    <section class="hero">
-        <h1>Stop Fighting Your Factory. Start Scaling It.</h1>
-        <p>The only enterprise-grade Manufacturing ERP built natively for WordPress. Manage BOMs, Inventory, MRP, and Quality in one unified workspace.</p>
-        <a href="#demo" class="btn">Get Started with LeatherCraft Co. Demo</a>
+    <header class="hero">
+        <div class="container">
+            <h1>Stop Fighting Your Factory.<br>Start Scaling It.</h1>
+            <p>The only enterprise-grade Manufacturing ERP built natively for WordPress. Manage BOMs, Inventory, MRP, and Quality in one unified workspace.</p>
+            <div class="hero-btns">
+                <a href="#demo" class="btn btn-primary">Schedule a Live Demo</a>
+                <a href="#pricing" class="btn btn-secondary">View Pricing Plans</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="social-proof">
+        <div class="container">
+            <p>Trusted by modern manufacturers worldwide</p>
+            <div class="logos">
+                <!-- Placeholders for actual client logos -->
+                <span style="font-size: 24px; font-weight: bold;">LeatherCraft Co.</span>
+                <span style="font-size: 24px; font-weight: bold;">Precision Parts Ltd.</span>
+                <span style="font-size: 24px; font-weight: bold;">EcoFurniture Inc.</span>
+                <span style="font-size: 24px; font-weight: bold;">Stellar Apparel</span>
+            </div>
+        </div>
     </section>
 
-    <section class="features">
-        <div class="feature-card">
-            <h3>Visual BOM & Routing</h3>
-            <p>Drag and drop materials and labor operations into multi-level Bill of Materials. Calculate real-time roll-up costs and manage versions with ease.</p>
+    <section class="container">
+        <div class="section-title">
+            <h2>Everything You Need to Run Your Shop Floor</h2>
         </div>
-        <div class="feature-card">
-            <h3>Visual Warehouse Management</h3>
-            <p>Heatmapped bin tracking and drag-and-drop transfers. Know exactly where your leather, soles, and thread are at all times.</p>
-        </div>
-        <div class="feature-card">
-            <h3>MRP Planning Engine</h3>
-            <p>Automate your procurement. Explode demand from forecasts into purchase suggestions. Never run out of critical raw materials again.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Shop Floor Kanban</h3>
-            <p>Empower your operators with a tablet-friendly production board. Track actual labor, scrap, and yield variance in real-time.</p>
+        <div class="features">
+            <div class="feature-card">
+                <h3>Visual BOM & Routing</h3>
+                <p>Drag and drop materials and labor operations into multi-level Bill of Materials. Calculate real-time roll-up costs and manage versions with ease.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Visual Warehouse Management</h3>
+                <p>Heatmapped bin tracking and drag-and-drop transfers. Know exactly where your leather, soles, and thread are at all times.</p>
+            </div>
+            <div class="feature-card">
+                <h3>MRP Planning Engine</h3>
+                <p>Automate your procurement. Explode demand from forecasts into purchase suggestions. Never run out of critical raw materials again.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Shop Floor Kanban</h3>
+                <p>Empower your operators with a tablet-friendly production board. Track actual labor, scrap, and yield variance in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Quality & Compliance</h3>
+                <p>Integrated QC checks, NCR reporting, and full lot genealogy. Trace any finished product back to its raw material source in seconds.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Native WordPress Power</h3>
+                <p>Leverage the SEO, security, and user management of WordPress while gaining the power of an industrial ERP.</p>
+            </div>
         </div>
     </section>
 
-    <section class="pricing">
-        <h2>Pricing Built for SMEs</h2>
-        <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px;">
-            <div class="feature-card" style="background: #fff; min-width: 250px;">
-                <h3>Starter</h3>
-                <p><strong>Free</strong></p>
-                <p>Up to 50 Materials<br>Basic BOMs<br>Community Support</p>
+    <section class="comparison">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why ERP Pro Beats Spreadsheets</h2>
             </div>
-            <div class="feature-card" style="background: #fff; border: 2px solid #dba617; min-width: 250px;">
-                <h3>Pro</h3>
-                <p><strong>$99/mo</strong></p>
-                <p>Unlimited Everything<br>MRP & Forecasting<br>Priority Support</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Spreadsheets</th>
+                        <th>Manufacturing ERP Pro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Real-Time Inventory Levels</td>
+                        <td><span class="cross">✗</span> Manual Entry</td>
+                        <td><span class="check">✓</span> Automatic Backflushing</td>
+                    </tr>
+                    <tr>
+                        <td>Cost Roll-up Accuracy</td>
+                        <td><span class="cross">✗</span> Prone to Formula Errors</td>
+                        <td><span class="check">✓</span> Database-Driven Precision</td>
+                    </tr>
+                    <tr>
+                        <td>Production Traceability</td>
+                        <td><span class="cross">✗</span> Impossible to Track</td>
+                        <td><span class="check">✓</span> Full Lot Genealogy</td>
+                    </tr>
+                    <tr>
+                        <td>Supply Chain Planning</td>
+                        <td><span class="cross">✗</span> Guesswork</td>
+                        <td><span class="check">✓</span> Automated MRP Engine</td>
+                    </tr>
+                    <tr>
+                        <td>Multi-User Collaboration</td>
+                        <td><span class="cross">✗</span> File Locking / Confusion</td>
+                        <td><span class="check">✓</span> Role-Based Permissions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Simple, Transparent Pricing</h2>
             </div>
-            <div class="feature-card" style="background: #fff; min-width: 250px;">
-                <h3>Enterprise</h3>
-                <p><strong>Custom</strong></p>
-                <p>Multi-Site ERP<br>Custom Integrations<br>Dedicated Manager</p>
+            <div class="price-grid">
+                <div class="price-card">
+                    <h3>Starter</h3>
+                    <div class="price">$0</div>
+                    <p>Perfect for solo makers</p>
+                    <ul>
+                        <li>Up to 50 Materials</li>
+                        <li>Basic Visual BOM</li>
+                        <li>Single Warehouse</li>
+                        <li>Community Support</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="color: #333;">Get Started</a>
+                </div>
+                <div class="price-card featured">
+                    <div class="badge">BEST VALUE</div>
+                    <h3>Pro</h3>
+                    <div class="price">$99<span>/mo</span></div>
+                    <p>For growing SMEs</p>
+                    <ul>
+                        <li>Unlimited Everything</li>
+                        <li>Full MRP Engine</li>
+                        <li>Advanced Quality Control</li>
+                        <li>Priority Email Support</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">Try Pro 14-Days Free</a>
+                </div>
+                <div class="price-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <p>For high-volume factories</p>
+                    <ul>
+                        <li>Multi-Site Support</li>
+                        <li>Custom API Integrations</li>
+                        <li>Dedicated Account Manager</li>
+                        <li>On-Site Training</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="color: #333;">Contact Sales</a>
+                </div>
             </div>
+        </div>
+    </section>
+
+    <section class="cta-final">
+        <div class="container">
+            <h2>Ready to Transform Your Shop Floor?</h2>
+            <p>Join 2,500+ manufacturers scaling their business with Manufacturing ERP Pro.</p>
+            <a href="#" class="btn btn-primary" style="padding: 20px 50px; font-size: 24px;">Get Started Today</a>
         </div>
     </section>
 
     <footer class="footer">
-        <p>&copy; 2024 Manufacturing ERP Pro. All rights reserved.</p>
+        <div class="container">
+            <p>&copy; 2024 Manufacturing ERP Pro. All rights reserved.</p>
+            <p>Built with ❤️ for Manufacturers on WordPress.</p>
+        </div>
     </footer>
 </body>
 </html>

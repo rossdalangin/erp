@@ -118,18 +118,21 @@ React-based interactive canvas for product engineering.
 
 ## 1. MRP (Material Requirements Planning) Engine
 **Netting Logic**: `Net Needed = Gross Demand - (On Hand - Reserved)`.
-- **BOM Explosion**: Recursive traversal of multi-level BOMs.
-- **Pegging View**: Hierarchical visualization tracing demand sources (Forecasts) to material requirements.
+- **Recursive BOM Explosion**: Traverses multiple levels (e.g., Handbag -> Strap -> Buckle) to aggregate material needs at all tiers.
+- **Time-Phased Planning**: Considers `Lead Time` and `Safety Stock` to calculate "Order By" dates.
+- **Demand Pegging**: A JSON-structured tree that links every material requirement back to its parent Work Order or Forecast ID.
 
 ---
 
 # 6. Quality, Traceability & Procurement
 
 ## 1. Traceability & Lot Genealogy
-Interactive node graph showing the journey of a specific Lot from Raw Material receipt to Finished Good production.
+**Interactive Node Graph**: A visualization mapping the journey of a specific Lot.
+- **Nodes**: Materials, Work Orders, Operators, Equipment, and QC Checks.
+- **Data Structure**: Hierarchical object containing `lot_id`, `parents` (upstream), and `children` (downstream batches).
 
 ## 2. Procurement & Supplier Management
-- **Supplier Scoring**: Automated tracking of Quality Rate and OTD (On-Time Delivery).
+- **Supplier Scoring**: Automated tracking of Quality Rate (Pass/Fail) and OTD (On-Time Delivery).
 - **Scorecards**: Visual performance analysis dashboard for vendors.
 
 ---
