@@ -1,6 +1,6 @@
 # Standard Operating Procedures (SOP) by User Role
 
-This document defines the daily responsibilities and system interactions for each user level in Manufacturing ERP Pro.
+This document defines the daily, weekly, and monthly responsibilities and system interactions for each user level in Manufacturing ERP Pro.
 
 ---
 
@@ -15,6 +15,11 @@ This document defines the daily responsibilities and system interactions for eac
 ### Weekly Tasks:
 1. **User Provisioning**: Ensure new staff are assigned the correct ERP role (Clerk, Manager, or Inspector).
 2. **Settings Tuning**: Review **Global Settings** for Currency and Standard Labor Rates to ensure cost roll-ups remain accurate.
+3. **Audit Log Cleanup**: Review and archive (if needed) logs older than 3 months.
+
+### Monthly Tasks:
+1. **Financial Alignment**: Compare **Inventory Value** from the Executive Dashboard with your accounting software totals.
+2. **System Optimization**: Use the **Recreate DB Tables** utility if performance is lagging (after taking a backup).
 
 ---
 
@@ -25,6 +30,10 @@ This document defines the daily responsibilities and system interactions for eac
 1. **Production Scheduling**: Review the **Production Board (Kanban)**. Ensure 'Backlog' orders are moving to 'In Progress'.
 2. **MRP Run**: Run the **MRP Planning Engine** every morning to identify material shortages.
 3. **Capacity Planning**: Check the **Resource Capacity** view. If a machine (e.g., Laser Cutter) is at >90% load, reassign work orders or schedule overtime.
+
+### Weekly Tasks:
+1. **Lead Time Review**: Check **Supplier Performance** metrics. Update material "Lead Time" if a vendor is consistently late.
+2. **Scrap Analysis**: Review the **Scrap Rate KPI**. Identify the top 3 materials contributing to waste.
 
 ### Project-Based Tasks:
 1. **New Product Engineering**: Use the **Visual BOM Builder** to define materials and operations for new SKUs.
@@ -44,6 +53,9 @@ This document defines the daily responsibilities and system interactions for eac
 1. **Cycle Counting**: Export the **Inventory CSV**. Perform a physical count of 'At Risk' materials (those below safety stock).
 2. **Reorder Triggers**: Drag low-stock items into the **Reorder Basket** in the Visual Warehouse view.
 
+### Monthly Tasks:
+1. **Warehouse Optimization**: Review the **Bin Heatmap**. Reorganize bins that are consistently at 100% capacity to larger locations.
+
 ---
 
 ## 4. Quality Inspector (Role: `mep_quality_inspector`)
@@ -54,6 +66,10 @@ This document defines the daily responsibilities and system interactions for eac
 2. **Result Logging**: Record Pass/Fail status. For Failures, provide detailed 'Defect Nature' notes.
 3. **NCR Management**: Review newly created **Non-Conformance Reports**.
 
-### Critical Procedures:
-1. **CAPA Promotion**: If a defect is recurring (e.g., three consecutive failures on the same machine), promote the NCR to **CAPA Status** and document the preventive action plan.
-2. **Lot Traceability**: In the event of a customer return, use the **Traceability** tool to identify all parent components and sibling batches affected.
+### Weekly Tasks:
+1. **Defect Pareto Analysis**: Identify the most common cause of failure (e.g., "Loose Threads") and brief the Production Manager.
+2. **NCR Closure**: Follow up on "Investigating" NCRs to ensure they are either closed or promoted to CAPA.
+
+### Monthly Tasks:
+1. **CAPA Effectiveness Review**: Review all CAPAs closed in the last 30 days. Verify that the preventive actions have successfully reduced the failure rate for those SKUs.
+2. **Lot Genealogy Drills**: Perform one "Mock Recall" using the **Traceability** tool to ensure the team can trace a lot from material receipt to finished shipment within 1 hour.

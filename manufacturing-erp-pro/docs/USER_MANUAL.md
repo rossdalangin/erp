@@ -4,6 +4,17 @@ Welcome to the **Manufacturing ERP Pro** master manual. This document provides a
 
 ---
 
+## 🚀 Getting Started Checklist
+Before going live, ensure you have completed these essential setup items:
+- [ ] Plugin activated and Setup Wizard completed.
+- [ ] Primary Currency and Weight Units set in **System Utilities**.
+- [ ] At least one Warehouse and one Bin created.
+- [ ] At least one Supplier registered with an accurate Lead Time.
+- [ ] Your primary Materials (Raw Items) uploaded or created with "Avg Unit Cost".
+- [ ] Your Finished Products created with a defined "Standard Selling Price".
+
+---
+
 ## Phase 1: Installation & Initial Configuration
 
 ### Step 1: Plugin Activation
@@ -162,10 +173,25 @@ Before you can produce anything, you must define *what* you use and *who* you bu
 
 ---
 
-## Troubleshooting & Tips
+## 🛠️ Troubleshooting Section
 
-- **BOM Costs are $0?** Check that your raw materials have an "Avg Unit Cost" set.
-- **MRP showing no suggestions?** Check that your Forecasts are "Published" and that the Safety Stock on your materials is set correctly.
-- **Cannot move Kanban cards?** Ensure your user account has the `mep_manage_production` role capability.
+### Common Issues & Solutions
+
+| Issue | Potential Cause | Solution |
+|---|---|---|
+| **BOM Costs are $0.00** | Raw materials have no "Avg Unit Cost" set. | Go to **Materials**, edit the item, and ensure the cost field is populated. |
+| **MRP Suggesting Nothing** | Forecasts are in 'Draft' or Safety Stock is not set. | Ensure Forecasts are 'Published'. Set Safety Stock on critical materials. |
+| **Cannot Drag Kanban Cards** | User lacks `mep_manage_production` capability. | Assign the correct Role (Administrator or Production Manager) to the user. |
+| **Inventory Not Backflushing** | Work Order was closed without logging actuals. | Ensure "Complete Work Order" pop-up is filled out correctly on the Kanban board. |
+| **Receipt Workspace is Empty** | No open Purchase Orders (POs) exist for that supplier. | Generate or manually create a PO first, then set it to 'Sent' status. |
+| **"Restricted Access" Error** | Nonce timeout or session expiry. | Refresh the page. Ensure the user is logged into the WordPress admin. |
+
+### System Health Indicators
+If the "System Health" on the main dashboard is Red:
+1. Check **System Utilities > Audit Logs** for recent database resets.
+2. Verify that the `wp_mep_*` tables exist in your database via **System Utilities > Recreate Tables**.
+3. Ensure no other plugins are conflicting with the REST API endpoints.
+
+---
 
 **Congratulations!** You have successfully implemented a complete manufacturing lifecycle in Manufacturing ERP Pro.
